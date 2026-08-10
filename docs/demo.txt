@@ -1,0 +1,30 @@
+你是一位资深的AI工程师，资深机器人工程师，PPT专家，报告专家
+目标是做一个研究生毕业论文的ppt
+需要让检查软件查不出是AI写的，
+主题是：Learning-Based Scheduling and Motion Coordination of Mobile Robots in Smart Factories
+ppt内容要求语言是英文
+Smart factories and flexible manufacturing systems increasingly employ fleets of mobile robots for internal transportation, material handling, and logistics support. Efficient scheduling and motion coordination are vital to prevent congestion and to maximize productivity. This research proposes the development of learning-based scheduling strategies integrated with classical robotic control for coordinating multiple mobile robots in industrial environments. The essential goal is to design algorithms that allocate tasks, generate coordinated routes, and synchronize robot motions to reduce idle time and improve overall system throughput. A simulated smart factory environment will be implemented using ROS and Gazebo to validate the proposed methods. The study will analyze how intelligent scheduling mechanisms affect motion coordination performance in comparison with traditional rule-based approaches.
+要求做一个15页左右的ppt
+学生姓名： Wenbin Lin
+学号： H00484764
+专业： MSc Robotics
+学校： Heriot-Watt University Dubai
+要多加一点图片，图片与内容相符，图片不能覆盖文字，文字与图片要重叠
+
+要求：
+1-2页介绍项目背景和研究动机，及个人信息
+1-2页介绍环境，包括A/B/C场景，机器人数据，任务的种类，任务频率等，用C:/Users/lwb10/OneDrive/Desktop/mv/smart_factory1_labeled.png图片来展示webots的场景，机器人数据及样貌不用专门一页做展示
+1-2页介绍一下整个项目的逻辑架构
+1-2页介绍一下机器人的算法种类，及目前常用的调用算法
+1页介绍五上强化学习算法在机器人调度的应用
+1-2页ppo,DQN,SARSA的训练过程及优化后的效果,训练的数据和参数在results目录下，须介绍一下其各化算法优化模型的逻辑，不用展示训练rewards的变化
+1-4页比较各个算法做出来的调度效果，包括传统规则算法和强化学习算法的对比，强调强化学习算法在调度效率和机器人协调方面的优势，用python数据整理好，然后用 matplotlib 或 PPT 原生 chart 生成柱状图、折线图、散点图、heatmap，不用比较最小等待时间，因为最小等待时间的意义不大，其实SARSA和DQN的模型效果已经和最好的模型效果相差不大，重点将强化学习算法与其它几类比较好的算法做对比，像NN,匈牙利算法，sa,GA等，做一张图做比对，须在柱状图或饼图上标出算法名称，并标出哪个最好
+1-2页总结和未来工作，包括对研究结果的总结，帮分析一下强化学习算法没有超过其它算法的原因，提出改进和优化方向
+其余自己发挥
+
+
+
+powershell -ExecutionPolicy Bypass -File .\scripts\run_optimized_training_evaluation.ps1  -Profile Full   -Webots "C:\Program Files\Webots\msys64\mingw64\bin\webots.exe"
+
+
+› 你是一位资深的机器人开发工程师及资深AI工程师,在训练中加入自动超参数搜索与最优配置晋级，训练包括DQN,SARSA,PPO,SA,GA等算法训练，参数自动搜索，然后用最优的模型或参数来进行最后的评价，在训练完成后，同时用webots.exe来运行评估A/B/C场景所有算法（包括FCFS等其它所有算法）的优劣,生成这个脚本运行命令

@@ -1,0 +1,76 @@
+{
+  "experiment_info": {
+    "scenario": "A",
+    "scheduler": "SA",
+    "num_robots": 3,
+    "sim_duration": 2.0000000000000013,
+    "timestamp": "2026-08-03 12:40:36"
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.0,
+    "total_tasks_completed": 0,
+    "total_tasks_generated": 1,
+    "avg_task_completion_time": 0.0,
+    "avg_waiting_time": 0.0,
+    "avg_robot_idle_pct": 66.93333333333334,
+    "total_distance_all_robots": 0.436480000000001,
+    "total_conflicts_resolved": 0,
+    "total_deadlocks": 0,
+    "min_pair_distance": 6.0,
+    "pair_distance_violations": 0,
+    "max_completion_time": 0,
+    "min_completion_time": 0,
+    "workload_balance_cv": 0.0,
+    "tasks_per_robot": [
+      0,
+      0,
+      0
+    ],
+    "robot_idle_percentages": [
+      0.7999999999999995,
+      100.0,
+      100.0
+    ],
+    "total_replans": 0,
+    "scheduling_latency_mean_ms": 0.7159000015235506,
+    "scheduling_latency_p50_ms": 0.7159000015235506,
+    "scheduling_latency_p95_ms": 0.7159000015235506,
+    "scheduling_latency_p99_ms": 0.7159000015235506,
+    "scheduling_latency_max_ms": 0.7159000015235506,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0
+  },
+  "task_stats": {
+    "total_generated": 1,
+    "pending": 0,
+    "active": 1,
+    "completed": 0,
+    "failed": 0,
+    "avg_completion_time": 0,
+    "max_completion_time": 0,
+    "avg_waiting_time": 0,
+    "throughput": 0
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 0,
+    "total_replans": 0
+  },
+  "task_completions": [],
+  "deadlock_events": [],
+  "safety_events": [],
+  "time_series": [
+    {
+      "sim_time": 0.0,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 0,
+      "robots_idle": 3,
+      "robots_active": 0,
+      "conflicts_total": 0,
+      "avg_battery": 48.486671801241755,
+      "min_pair_distance": 6.0
+    }
+  ]
+}

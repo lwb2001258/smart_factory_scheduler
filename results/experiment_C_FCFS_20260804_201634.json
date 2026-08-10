@@ -1,0 +1,86 @@
+{
+  "experiment_info": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "num_robots": 8,
+    "sim_duration": 0.112,
+    "timestamp": "2026-08-04 20:16:34"
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.0,
+    "total_tasks_completed": 0,
+    "total_tasks_generated": 1,
+    "avg_task_completion_time": 0.0,
+    "avg_waiting_time": 0.0,
+    "avg_robot_idle_pct": 8.799999999999999,
+    "total_distance_all_robots": 34.4927295586164,
+    "total_conflicts_resolved": 0,
+    "total_deadlocks": 0,
+    "min_pair_distance": Infinity,
+    "pair_distance_violations": 0,
+    "max_completion_time": 0,
+    "min_completion_time": 0,
+    "workload_balance_cv": 0.0,
+    "tasks_per_robot": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "robot_idle_percentages": [
+      3.2,
+      9.6,
+      9.6,
+      9.6,
+      9.6,
+      9.6,
+      9.6,
+      9.6
+    ],
+    "total_replans": 0,
+    "scheduling_latency_mean_ms": 3.2817000001159613,
+    "scheduling_latency_p50_ms": 3.2817000001159613,
+    "scheduling_latency_p95_ms": 3.2817000001159613,
+    "scheduling_latency_p99_ms": 3.2817000001159613,
+    "scheduling_latency_max_ms": 3.2817000001159613,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0,
+    "native_scheduler_commits": 1,
+    "fallback_scheduler_commits": 0,
+    "scheduler_commits_by_algorithm": {
+      "FCFS": 1
+    },
+    "rl_policy_decisions": 0,
+    "rl_fallback_decisions": 0,
+    "rl_fallback_rate": 0.0,
+    "rl_timeout_count": 0,
+    "rl_inference_mean_ms": 0.0,
+    "rl_inference_p95_ms": 0.0,
+    "rl_inference_max_ms": 0.0
+  },
+  "task_stats": {
+    "total_generated": 1,
+    "pending": 0,
+    "active": 1,
+    "completed": 0,
+    "failed": 0,
+    "avg_completion_time": 0,
+    "max_completion_time": 0,
+    "avg_waiting_time": 0,
+    "throughput": 0
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 0,
+    "total_replans": 0
+  },
+  "task_completions": [],
+  "deadlock_events": [],
+  "safety_events": [],
+  "time_series": []
+}
