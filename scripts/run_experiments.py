@@ -390,6 +390,7 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
     
     while sim_time < SIM_DURATION:
         sim_time += dt
+        coordinator.set_sim_time(sim_time)
         step += 1
         
         # Advance lifelong planner clock once per LIFELONG_TICK_PERIOD

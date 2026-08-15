@@ -112,6 +112,7 @@ EMERGENCY_STOP_DIST = 0.45       # m — 中心距小于此值才紧急制动(�
 # 此层仅在重规划延迟期间提供平滑减速保护。
 PEER_SLOW_DIST = 1.0              # m — 开始减速
 PEER_STOP_DIST = 0.55             # m — 停止(保留0.50m硬冲突边界外的余量)
+PEER_RADIAL_STOP_DIST = 0.65      # m — 独立欧氏距离保护，覆盖侧向接近和制动惯性
 # Legacy aliases for compatibility:
 PEER_LOOKAHEAD_DIST = 2.0
 PEER_REPLAN_DIST = 1.5
@@ -159,13 +160,35 @@ class WaypointNavigator:
         self.paused_until = 0.0
         self.path_version = 0
         self.controller_time = 0.0
+        self.speed_scale = 1.0
+        self.waypoint_not_before: List[float] = []
+        self.plan_is_partial = False
+        self.joint_release_index = 10 ** 9
+        self.waypoint_threshold = GOAL_THRESHOLD
+        self.planned_wait_until = 0.0
+        self.planned_wait_reason = None
+        self.joint_epoch_wait_deadline = 0.0
+        self.joint_coordinated = False
+        # Preserve the legacy sample order so DWA tie-breaking is unchanged.
+        self._dwa_v_samples = tuple(self._frange(
+            0.0, MAX_LINEAR_SPEED, DWA_V_RESOLUTION * 5))
+        self._dwa_w_samples = tuple(self._frange(
+            -MAX_ANGULAR_SPEED, MAX_ANGULAR_SPEED, DWA_W_RESOLUTION * 5))
     
-    def set_waypoints(self, waypoints: List[Tuple[float, float]]):
+    def set_waypoints(self, waypoints: List[Tuple[float, float]],
+                      waypoint_not_before=None, partial=False):
         """Set a new list of waypoints to follow."""
         self.waypoints = waypoints
         self.current_waypoint_idx = 0
         self.navigation_active = True
         self.goal_reached = False
+        self.waypoint_not_before = list(waypoint_not_before or ())
+        self.plan_is_partial = bool(partial)
+        self.joint_coordinated = False
+        if not partial:
+            self.joint_release_index = 10 ** 9
+            self.waypoint_threshold = GOAL_THRESHOLD
+            self.joint_epoch_wait_deadline = 0.0
     
     def get_current_target(self) -> Optional[Tuple[float, float]]:
         """Get the current target waypoint."""
@@ -203,8 +226,18 @@ class WaypointNavigator:
             (left_speed, right_speed) motor velocities in rad/s.
         """
         self._nav_step_count += 1
+        self.planned_wait_until = 0.0
+        self.planned_wait_reason = None
         target = self.get_current_target()
         if target is None:
+            return (0.0, 0.0)
+        if self.current_waypoint_idx > self.joint_release_index:
+            bounded_wait_until = min(
+                self.controller_time + 0.5,
+                self.joint_epoch_wait_deadline)
+            if bounded_wait_until > self.controller_time:
+                self.planned_wait_until = bounded_wait_until
+                self.planned_wait_reason = 'joint_epoch_barrier'
             return (0.0, 0.0)
 
         tx, ty = target
@@ -218,15 +251,16 @@ class WaypointNavigator:
         peer_speed_factor = 1.0
         if conflict_result is not None:
             if len(conflict_result) == 2:
-                # (0.0, 0.0) → 紧急停止
+                # (0.0, 0.0) ? ????
                 return conflict_result
             elif len(conflict_result) == 1:
-                # (factor,) → 减速因子
+                # (factor,) ? ????
                 peer_speed_factor = conflict_result[0]
-        peer_speed_factor = min(
-            peer_speed_factor,
-            self._peer_predictive_speed_factor(
-                robot_x, robot_y, robot_heading, self.controller_time))
+        if not getattr(self, 'joint_coordinated', False):
+            peer_speed_factor = min(
+                peer_speed_factor,
+                self._peer_predictive_speed_factor(
+                    robot_x, robot_y, robot_heading, self.controller_time))
 
         # Vector from robot to target
         dx = tx - robot_x
@@ -234,9 +268,35 @@ class WaypointNavigator:
         distance = math.sqrt(dx*dx + dy*dy)
 
         # Check if waypoint reached
-        if distance < GOAL_THRESHOLD:
+        if distance < self.waypoint_threshold:
+            deadline = (self.waypoint_not_before[self.current_waypoint_idx]
+                        if self.current_waypoint_idx < len(
+                            self.waypoint_not_before) else 0.0)
+            if self.controller_time < deadline:
+                self.planned_wait_until = deadline
+                self.planned_wait_reason = 'joint_slot_deadline'
+                return (0.0, 0.0)
+            if (self.plan_is_partial and
+                    self.current_waypoint_idx == len(self.waypoints) - 1):
+                # A rolling-window endpoint is not a business-goal arrival.
+                # Hold the reserved endpoint until the next joint epoch.
+                bounded_wait_until = min(
+                    self.controller_time + 0.5,
+                    self.joint_epoch_wait_deadline)
+                if bounded_wait_until > self.controller_time:
+                    self.planned_wait_until = bounded_wait_until
+                    self.planned_wait_reason = 'joint_window_endpoint'
+                return (0.0, 0.0)
             final = self.advance_waypoint()
             if final:
+                return (0.0, 0.0)
+            if self.current_waypoint_idx > self.joint_release_index:
+                bounded_wait_until = min(
+                    self.controller_time + 0.5,
+                    self.joint_epoch_wait_deadline)
+                if bounded_wait_until > self.controller_time:
+                    self.planned_wait_until = bounded_wait_until
+                    self.planned_wait_reason = 'joint_epoch_barrier'
                 return (0.0, 0.0)
             target = self.get_current_target()
             if target is None:
@@ -255,11 +315,39 @@ class WaypointNavigator:
             heading_error -= 2 * math.pi
         while heading_error < -math.pi:
             heading_error += 2 * math.pi
-        
+
         # ── Dock Zone Check ────────────────────────────────────────
         # When in the shelf-adjacent band (y∈[1.0,2.0] or y∈[-2.0,-1.0]
         # AND x∈[-3.7, 3.7]), bypass DWA entirely. The shelves are too
         # close for reactive avoidance. Use pure pursuit instead.
+        if getattr(self, 'joint_coordinated', False):
+            # A joint plan has already reserved conflict-free space-time
+            # slots. Follow that centreline with pure pursuit instead of
+            # running DWA/peer heuristics that deviate from the reservation
+            # and create the exact dense clustering they are trying to fix.
+            if abs(heading_error) > 0.30:
+                angular_speed = max(
+                    -MAX_ANGULAR_SPEED * 0.70,
+                    min(MAX_ANGULAR_SPEED * 0.70, heading_error * 2.5))
+                left_speed = -angular_speed * WHEEL_BASE / (2 * WHEEL_RADIUS)
+                right_speed = angular_speed * WHEEL_BASE / (2 * WHEEL_RADIUS)
+            else:
+                forward_speed = min(
+                    MAX_LINEAR_SPEED * 0.85, distance * 1.50)
+                angular_speed = max(
+                    -MAX_ANGULAR_SPEED * 0.60,
+                    min(MAX_ANGULAR_SPEED * 0.60, heading_error * 2.0))
+                left_speed = (
+                    forward_speed - angular_speed * WHEEL_BASE / 2
+                ) / WHEEL_RADIUS
+                right_speed = (
+                    forward_speed + angular_speed * WHEEL_BASE / 2
+                ) / WHEEL_RADIUS
+            scale = getattr(self, 'speed_scale', 1.0)
+            left_speed *= scale
+            right_speed *= scale
+            return (left_speed, right_speed)
+
         near_dock = False
         if DOCK_ZONE_X_RANGE[0] <= robot_x <= DOCK_ZONE_X_RANGE[1]:
             for (y_min, y_max) in DOCK_ZONE_Y_BANDS:
@@ -418,8 +506,9 @@ class WaypointNavigator:
                                       now: float) -> float:
         """Apply stale-data fail-safe and continuous relative-motion TTC."""
         factor = 1.0
-        own_v = (MAX_LINEAR_SPEED * math.cos(robot_heading),
-                 MAX_LINEAR_SPEED * math.sin(robot_heading))
+        estimated_speed = MAX_LINEAR_SPEED * self.speed_scale
+        own_v = (estimated_speed * math.cos(robot_heading),
+                 estimated_speed * math.sin(robot_heading))
         for peer_id, sample in self.peer_samples.items():
             position = sample.get('position')
             velocity = sample.get('velocity', (0.0, 0.0))
@@ -429,7 +518,10 @@ class WaypointNavigator:
             age = max(0.0, now - float(sample.get('sample_time', now)))
             if distance < PATH_CONFLICT_DIST:
                 if age > 0.30:
-                    return 0.0
+                    # Stale peer data must reduce speed, not manufacture a
+                    # stationary obstacle. The independent 0.65 m radial
+                    # guard remains authoritative for a physical stop.
+                    factor = min(factor, 0.2)
                 if age > 0.10:
                     factor = min(factor, 0.5)
             rx, ry = position[0] - robot_x, position[1] - robot_y
@@ -442,7 +534,7 @@ class WaypointNavigator:
             minimum = math.hypot(rx + vx * t_cpa, ry + vy * t_cpa)
             if minimum < 0.50:
                 if t_cpa <= 0.5:
-                    return 0.0
+                    factor = min(factor, 0.2)
                 if t_cpa <= 2.0:
                     factor = min(factor, 0.3)
                 elif t_cpa <= 4.0:
@@ -491,23 +583,47 @@ class WaypointNavigator:
             front_min = self._get_front_min(lidar_ranges, robot_heading)
             if front_min < 0.25:
                 if not self._emergency_stopped:
-                    print(f"[Nav {self.robot_id}] ⚠ LiDAR emergency braking! "
+                    print(f"[Nav {self.robot_id}] ? LiDAR emergency braking! "
                           f"Obstacle ahead at {front_min:.2f} m")
-                    self._replan_requested = True  # 只在进入时请求一次
+                    self._replan_requested = True  # ?????????
                 self._emergency_stopped = True
                 return (0.0, 0.0)
-        
-        # ── Peer制动判断: 仅"路径线段正前方"的peer才制动 ──
+
+        if getattr(self, 'joint_coordinated', False):
+            # A joint plan already reserves conflict-free space-time slots.
+            # Peer-projection and predictive braking below otherwise fight the
+            # centralized schedule in wide corridors and create standstills.
+            if self._emergency_stopped:
+                self._emergency_stopped = False
+            return None
+
+        # ?? Peer????: ?"???????"?peer??? ??
         if not self.peer_positions:
             if self._emergency_stopped:
                 self._emergency_stopped = False
             return None
-        
+
         target = self.get_current_target()
         if target is None:
             if self._emergency_stopped:
                 self._emergency_stopped = False
             return None
+
+        # Hard radial safety is independent of path projection. The previous
+        # projection-only rule ignored a peer once lateral offset exceeded
+        # 0.40 m, even when centre distance was already below the 0.50 m hard
+        # boundary. Stop early enough to cover controller/physics latency and
+        # request a replacement route exactly once on entry.
+        move_x, move_y = target[0] - robot_x, target[1] - robot_y
+        dangerous_radial = any(
+            math.hypot(px - robot_x, py - robot_y) < PEER_RADIAL_STOP_DIST
+            and move_x * (px - robot_x) + move_y * (py - robot_y) >= 0.0
+            for px, py in self.peer_positions.values())
+        if dangerous_radial:
+            if not self._emergency_stopped:
+                self._replan_requested = True
+                self._emergency_stopped = True
+            return (0.0, 0.0)
         
         tx, ty = target
         # 路径向量: robot → target
@@ -767,11 +883,13 @@ class WaypointNavigator:
         best_v = 0.0
         best_w = 0.0
 
-        v_range = [0.0, MAX_LINEAR_SPEED]
-        w_range = [-MAX_ANGULAR_SPEED, MAX_ANGULAR_SPEED]
+        obstacle_points = self._lidar_obstacle_points(
+            lidar_ranges, rx, ry, rh)
+        start_obs_dist = self._distance_to_obstacle_points(
+            rx, ry, obstacle_points)
 
-        for v in self._frange(v_range[0], v_range[1], DWA_V_RESOLUTION * 5):
-            for w in self._frange(w_range[0], w_range[1], DWA_W_RESOLUTION * 5):
+        for v in self._dwa_v_samples:
+            for w in self._dwa_w_samples:
                 # Simulate trajectory in math convention
                 px, py, ph = rx, ry, rh
                 min_dist = float('inf')
@@ -781,8 +899,8 @@ class WaypointNavigator:
                     py += v * math.sin(ph) * DWA_DT  # y = forward * sin
                     ph += w * DWA_DT
 
-                    d = self._check_obstacle_distance(
-                        px, py, ph, lidar_ranges, rx, ry, rh)
+                    d = self._distance_to_obstacle_points(
+                        px, py, obstacle_points)
                     min_dist = min(min_dist, d)
 
                 if min_dist < CRITICAL_DISTANCE:
@@ -790,8 +908,6 @@ class WaypointNavigator:
                     # (end position further than start). This permits
                     # departure from docks where robot starts at 0.32m
                     # from shelf — ANY trajectory heading away is valid.
-                    start_obs_dist = self._check_obstacle_distance(
-                        rx, ry, rh, lidar_ranges, rx, ry, rh)
                     if min_dist < start_obs_dist * 0.8:
                         # Trajectory gets CLOSER to obstacle — reject
                         continue
@@ -867,11 +983,17 @@ class WaypointNavigator:
     def _check_obstacle_distance(self, px, py, ph,
                                   lidar_ranges, rx, ry, rh):
         """Estimate distance to nearest obstacle from a predicted position."""
+        points = self._lidar_obstacle_points(lidar_ranges, rx, ry, rh)
+        return self._distance_to_obstacle_points(px, py, points)
+
+    @staticmethod
+    def _lidar_obstacle_points(lidar_ranges, rx, ry, rh):
+        """Project the sampled scan once for all DWA candidates."""
         if not lidar_ranges:
-            return float('inf')
+            return ()
         
         # Simple approximation: use current LiDAR data offset by predicted motion
-        min_dist = float('inf')
+        points = []
         num_rays = len(lidar_ranges)
         
         for i in range(0, num_rays, max(1, num_rays // 36)):  # Check every 10 degrees
@@ -889,11 +1011,20 @@ class WaypointNavigator:
             ox = rx + r * math.cos(angle)
             oy = ry + r * math.sin(angle)
             
+            points.append((ox, oy))
+
+        return tuple(points)
+
+    @staticmethod
+    def _distance_to_obstacle_points(px, py, obstacle_points):
+        if not obstacle_points:
+            return float('inf')
+        min_dist = float('inf')
+        for ox, oy in obstacle_points:
             d = math.sqrt((px - ox)**2 + (py - oy)**2)
             min_dist = min(min_dist, d)
-        
         return min_dist
-    
+
     @staticmethod
     def _frange(start, stop, step):
         """Float range generator."""
@@ -933,6 +1064,11 @@ class RobotController:
         # Navigation
         self.navigator = WaypointNavigator()
         self.navigator.robot_id = self.robot_id
+        self._prepared_joint_plans = {}
+        self._active_plan_epoch = 0
+        self._highest_prepared_epoch = 0
+        self._scheduled_joint_plan = None
+        self._armed_joint_epoch = None
         
         # State
         self.position = (0.0, 0.0)
@@ -1046,10 +1182,6 @@ class RobotController:
             self.lidar = self.robot.getDevice("lidar")
             if self.lidar:
                 self.lidar.enable(self.timestep)
-                try:
-                    self.lidar.enablePointCloud()
-                except:
-                    pass
             
             # IMU
             self.imu = self.robot.getDevice("imu")
@@ -1090,6 +1222,97 @@ class RobotController:
             print(f"[Robot {self.robot_id}] Communication init error: {e}")
             self.emitter = None
             self.receiver = None
+
+    def _send_plan_ack(self, epoch, accepted, reason=""):
+        if not self.emitter:
+            return False
+        payload = {
+            "type": "PLAN_PREPARED",
+            "robot_id": self.robot_id,
+            "plan_epoch": int(epoch),
+            "accepted": bool(accepted),
+            "reason": reason,
+        }
+        try:
+            self.emitter.send(json.dumps(payload).encode("utf-8"))
+            return True
+        except Exception:
+            return False
+
+    def _send_plan_armed(self, epoch):
+        if not self.emitter:
+            return False
+        try:
+            self.emitter.send(json.dumps({
+                "type": "PLAN_ARMED", "robot_id": self.robot_id,
+                "plan_epoch": int(epoch), "armed": True,
+            }).encode("utf-8"))
+            return True
+        except Exception:
+            return False
+
+    def _send_plan_terminal(self, message_type, epoch):
+        if not self.emitter:
+            return False
+        try:
+            self.emitter.send(json.dumps({
+                "type": message_type, "robot_id": self.robot_id,
+                "plan_epoch": int(epoch),
+                "active_plan_epoch": self._active_plan_epoch,
+                "path_version": self.navigator.path_version,
+            }).encode("utf-8"))
+            return True
+        except Exception:
+            return False
+    def _activate_scheduled_joint_plan(self):
+        scheduled = self._scheduled_joint_plan
+        if not scheduled or self.robot.getTime() < scheduled['activate_at']:
+            return
+        prepared = self._prepared_joint_plans.get(scheduled['epoch'])
+        if (prepared is not None and prepared['path_version'] >=
+                self.navigator.path_version):
+            prepared['rollback_snapshot'] = {
+                'waypoints': list(self.navigator.waypoints),
+                'waypoint_index': self.navigator.current_waypoint_idx,
+                'navigation_active': self.navigator.navigation_active,
+                'paused_until': self.navigator.paused_until,
+                'planned_wait_until': self.navigator.planned_wait_until,
+                'planned_wait_reason': self.navigator.planned_wait_reason,
+                'waypoint_not_before': list(
+                    self.navigator.waypoint_not_before),
+                'plan_is_partial': self.navigator.plan_is_partial,
+                'joint_release_index': self.navigator.joint_release_index,
+                'waypoint_threshold': self.navigator.waypoint_threshold,
+                'joint_epoch_wait_deadline':
+                    self.navigator.joint_epoch_wait_deadline,
+                'replan_requested': self.navigator._replan_requested,
+                'emergency_stopped': self.navigator._emergency_stopped,
+                'active_epoch': self._active_plan_epoch,
+            }
+            self.navigator.path_version = prepared['path_version']
+            self.navigator.paused_until = 0.0
+            self.navigator.set_waypoints(prepared['waypoints'])
+            self.navigator.waypoint_not_before = [
+                scheduled['activate_at'] + float(offset)
+                for offset in prepared.get('waypoint_offsets', ())]
+            self.navigator.plan_is_partial = bool(
+                prepared.get('partial_plan', False))
+            # Execute the whole validated rolling prefix. Each waypoint still
+            # has its scheduled not-before time, and a partial plan still
+            # holds at its final cell until the next transaction is armed.
+            self.navigator.joint_release_index = max(
+                0, len(self.navigator.waypoints) - 1)
+            self.navigator.waypoint_threshold = 0.22
+            offsets = prepared.get('waypoint_offsets') or [0.0]
+            last_offset = float(offsets[-1]) if offsets else 0.0
+            self.navigator.joint_epoch_wait_deadline = (
+                scheduled['activate_at'] + last_offset + 10.0)
+            self.navigator.joint_coordinated = True
+            self.navigator._replan_requested = False
+            self.navigator._emergency_stopped = False
+            self._active_plan_epoch = scheduled['epoch']
+            self._send_plan_terminal("PLAN_ACTIVATED", scheduled['epoch'])
+        self._scheduled_joint_plan = None
     
     def _read_sensors(self):
         """Read current sensor values."""
@@ -1159,12 +1382,98 @@ class RobotController:
                 
                 command = msg.get('command', {})
                 cmd_type = command.get('type')
+
+                if cmd_type == 'prepare_plan':
+                    epoch = int(command.get('plan_epoch', 0))
+                    version = int(command.get('path_version', 0))
+                    waypoints = command.get('all_waypoints', [])
+                    waypoint_offsets = command.get(
+                        'waypoint_not_before_offsets', [])
+                    accepted = bool(
+                        epoch > self._active_plan_epoch and
+                        epoch > self._highest_prepared_epoch and
+                        version >= self.navigator.path_version and waypoints)
+                    if accepted:
+                        self._highest_prepared_epoch = epoch
+                        self._prepared_joint_plans = {
+                            epoch: {
+                                'path_version': version,
+                                'waypoints': [tuple(wp) for wp in waypoints],
+                                'waypoint_offsets': [float(value)
+                                                     for value in waypoint_offsets],
+                                'partial_plan': bool(command.get(
+                                    'partial_plan', False)),
+                            }
+                        }
+                    self._send_plan_ack(
+                        epoch, accepted,
+                        "" if accepted else "stale_or_empty")
+
+                elif cmd_type == 'arm_plan':
+                    epoch = int(command.get('plan_epoch', 0))
+                    prepared = self._prepared_joint_plans.get(epoch)
+                    if (prepared and epoch > self._active_plan_epoch and
+                            prepared['path_version'] >= self.navigator.path_version):
+                        self._armed_joint_epoch = epoch
+                        self._send_plan_armed(epoch)
+
+                elif cmd_type == 'commit_plan':
+                    epoch = int(command.get('plan_epoch', 0))
+                    activate_at = float(command.get('activate_at', 0.0))
+                    if (self._armed_joint_epoch == epoch and
+                            activate_at > self.robot.getTime()):
+                        self._scheduled_joint_plan = {
+                            'epoch': epoch, 'activate_at': activate_at}
+                        self._send_plan_terminal("PLAN_COMMITTED", epoch)
+
+                elif cmd_type == 'abort_plan':
+                    epoch = int(command.get('plan_epoch', 0))
+                    prepared = self._prepared_joint_plans.pop(epoch, None)
+                    if (prepared is not None and
+                            self._active_plan_epoch == epoch):
+                        snapshot = prepared.get('rollback_snapshot', {})
+                        self.navigator.path_version = max(
+                            self.navigator.path_version,
+                            prepared['path_version']) + 1
+                        self.navigator.waypoints = list(
+                            snapshot.get('waypoints', ()))
+                        self.navigator.current_waypoint_idx = min(
+                            snapshot.get('waypoint_index', 0),
+                            max(0, len(self.navigator.waypoints) - 1))
+                        self.navigator.navigation_active = snapshot.get(
+                            'navigation_active', False)
+                        self.navigator.paused_until = snapshot.get(
+                            'paused_until', 0.0)
+                        self.navigator.waypoint_not_before = list(
+                            snapshot.get('waypoint_not_before', ()))
+                        self.navigator.plan_is_partial = bool(
+                            snapshot.get('plan_is_partial', False))
+                        self.navigator.joint_release_index = int(
+                            snapshot.get('joint_release_index', 10 ** 9))
+                        self.navigator.waypoint_threshold = float(
+                            snapshot.get('waypoint_threshold', GOAL_THRESHOLD))
+                        self.navigator.joint_epoch_wait_deadline = float(
+                            snapshot.get('joint_epoch_wait_deadline', 0.0))
+                        self.navigator._replan_requested = snapshot.get(
+                            'replan_requested', False)
+                        self.navigator._emergency_stopped = snapshot.get(
+                            'emergency_stopped', False)
+                        self._active_plan_epoch = snapshot.get(
+                            'active_epoch', 0)
+                    if (self._scheduled_joint_plan and
+                            self._scheduled_joint_plan['epoch'] == epoch):
+                        self._scheduled_joint_plan = None
+                    if self._armed_joint_epoch == epoch:
+                        self._armed_joint_epoch = None
+                    self._send_plan_terminal("PLAN_ABORTED", epoch)
                 
-                if cmd_type == 'navigate':
+                elif cmd_type == 'navigate':
                     version = int(command.get('path_version', self.navigator.path_version + 1))
                     if version < self.navigator.path_version:
                         self.receiver.nextPacket()
                         continue
+                    getattr(self, '_prepared_joint_plans', {}).clear()
+                    self._scheduled_joint_plan = None
                     self.navigator.path_version = version
                     self.navigator.paused_until = 0.0
                     # Receive navigation waypoints
@@ -1182,6 +1491,13 @@ class RobotController:
                         target_pos = command.get('target')
                         if target_pos:
                             self.navigator.set_waypoints([tuple(target_pos)])
+
+                elif cmd_type == 'release_joint_waypoint':
+                    epoch = int(command.get('plan_epoch', 0))
+                    if epoch == self._active_plan_epoch:
+                        self.navigator.joint_release_index = max(
+                            self.navigator.joint_release_index,
+                            int(command.get('waypoint_index', 0)))
                 
                 elif cmd_type == 'stop':
                     self.navigator.navigation_active = False
@@ -1197,6 +1513,10 @@ class RobotController:
                             self.navigator.paused_until,
                             float(command.get('until', 0.0)))
                         self._set_motor_speeds(0, 0)
+
+                elif cmd_type == 'set_speed_scale':
+                    self.navigator.speed_scale = max(
+                        0.4, min(1.0, float(command.get('scale', 1.0))))
                 
                 elif cmd_type == 'charge':
                     # Navigate to charging station
@@ -1255,6 +1575,13 @@ class RobotController:
                 'battery': self.battery,
                 'navigating': self.navigator.navigation_active,
                 'emergency_braking': self.navigator._emergency_stopped,
+                'active_path_version': self.navigator.path_version,
+                'active_waypoint_index': self.navigator.current_waypoint_idx,
+                'active_plan_epoch': self._active_plan_epoch,
+                'paused_until': self.navigator.paused_until,
+                'planned_wait_until': self.navigator.planned_wait_until,
+                'planned_wait_reason': self.navigator.planned_wait_reason,
+                'speed_scale': self.navigator.speed_scale,
             }
             # Only INCLUDE reached_goal in the payload when actually True.
             # This way, supervisor's `msg.get('reached_goal') is True`
@@ -1310,6 +1637,7 @@ class RobotController:
             
             # 2. Receive commands from supervisor
             self._receive_commands()
+            self._activate_scheduled_joint_plan()
             
             # 3. Get LiDAR data
             lidar_ranges = self._get_lidar_ranges()
@@ -1323,6 +1651,8 @@ class RobotController:
                     self.position[0], self.position[1],
                     self.heading, lidar_ranges
                 )
+                left_speed *= self.navigator.speed_scale
+                right_speed *= self.navigator.speed_scale
                 self._set_motor_speeds(left_speed, right_speed)
                 
                 # Drain battery while moving

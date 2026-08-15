@@ -382,7 +382,13 @@ class GridAStar:
         g_score = {start: 0.0}
         
         while open_set:
-            current = heapq.heappop(open_set).node
+            item = heapq.heappop(open_set)
+            current = item.node
+            # Skip heap entries superseded by a lower-cost route.
+            if (current != start and
+                    item.priority > (g_score[current] +
+                                     self._octile(current, goal)) + 1e-12):
+                continue
             if current == goal:
                 # Reconstruct
                 cells: list = []

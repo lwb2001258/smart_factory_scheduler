@@ -22,12 +22,31 @@ AUTO_STOP_SIMULATION = os.environ.get(
 # minutes, so keep it opt-in until candidate adoption is implemented.
 ENABLE_RUNTIME_RHCR = os.environ.get(
     "SMART_FACTORY_ENABLE_RHCR", "0").strip().lower() in {"1", "true", "yes"}
+# Production navigation is coordinated as one rolling space-time plan.  The
+# legacy per-robot repair stack remains available only for A/B diagnostics.
+ENABLE_JOINT_RUNTIME = os.environ.get(
+    "SMART_FACTORY_ENABLE_JOINT_RUNTIME", "1"
+).strip().lower() in {"1", "true", "yes"}
+# The group speed optimizer remains available for controlled experiments, but
+# repeated Webots validation showed throughput and replan regressions when it
+# was enabled in the synchronous runtime loop. Keep the stable pairwise
+# predictor as the production default until a kinematic/DWA-aware joint model
+# is available.
+ENABLE_PROACTIVE_JOINT_SPEED = os.environ.get(
+    "SMART_FACTORY_ENABLE_JOINT_SPEED", "0"
+).strip().lower() in {"1", "true", "yes"}
 # The legacy 1.5-second interlock state machine overlaps the progress monitor
 # and can misclassify robots waiting for a reached-goal packet as deadlocked.
 # Keep the deterministic coordinator monitor plus 3s/10s recovery enabled;
 # expose the legacy layer only for controlled comparison experiments.
 ENABLE_LEGACY_INTERLOCK_RECOVERY = os.environ.get(
     "SMART_FACTORY_ENABLE_LEGACY_INTERLOCK", "0"
+).strip().lower() in {"1", "true", "yes"}
+# Moving Webots nodes hides coordination failures and is not physically
+# deployable. Keep teleport-style recovery available only for diagnostics;
+# formal experiments use planned retreat/replan recovery by default.
+ENABLE_NONPHYSICAL_RECOVERY = os.environ.get(
+    "SMART_FACTORY_ENABLE_NONPHYSICAL_RECOVERY", "0"
 ).strip().lower() in {"1", "true", "yes"}
 NUM_REPEATS = 5        # Number of runs per experiment with different seeds
 
@@ -105,8 +124,8 @@ PARKING_SPOTS = {
     4: ( 4.0, -3.0),  # ROBOT_4 → N14 (south corridor east)
     5: (-7.0,  0.0),  # ROBOT_5 → N6  (west vertical aisle)
     6: ( 7.0,  0.0),  # ROBOT_6 → N10 (east vertical aisle)
-    7: ( 0.0,  3.0),  # ROBOT_7 → N3  (north corridor centre)
-    8: ( 0.0, -3.0),  # ROBOT_8 → N13 (south corridor centre)
+    7: (-8.5,  1.2),  # ROBOT_7 → near CS1, clear of north workstations
+    8: ( 8.5, -1.2),  # ROBOT_8 → near CS2, clear of south workstations
 }
 
 # ----------------------------------------------------------------
@@ -473,8 +492,8 @@ ASSIGNMENT_FAILURE_TTL = 5.0  # seconds before retrying a failed robot/task pair
 # distance for this long is considered physically stuck.  Nearby stuck
 # robots are relocated as one group so their new positions are checked
 # against each other before any Webots node is moved.
-STALL_RELOCATION_TIMEOUT = 5.0   # seconds without meaningful motion
-STALL_PROGRESS_DISTANCE = 0.15   # metres considered meaningful progress
+STALL_RELOCATION_TIMEOUT = 10.0  # reserve physical escape for sustained stalls
+STALL_PROGRESS_DISTANCE = 0.10   # normal turning/slowdown still counts as progress
 STALL_GROUP_DISTANCE = 1.8       # metres joining stuck robots into one group
 RELOCATION_PEER_CLEARANCE = 0.7  # minimum landing-point centre separation
 

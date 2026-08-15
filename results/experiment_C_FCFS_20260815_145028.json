@@ -1,0 +1,1440 @@
+{
+  "experiment_info": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "num_robots": 8,
+    "sim_duration": 450.00000000018224,
+    "timestamp": "2026-08-15 14:57:34"
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.9333333333329553,
+    "total_tasks_completed": 7,
+    "total_tasks_generated": 47,
+    "avg_task_completion_time": 266.555428571466,
+    "avg_waiting_time": 8.761142857141982,
+    "avg_robot_idle_pct": 3.0853333333319797,
+    "total_distance_all_robots": 281.90784785817294,
+    "total_conflicts_resolved": 0,
+    "total_deadlocks": 25,
+    "min_pair_distance": 0.6177633342052604,
+    "pair_distance_violations": 0,
+    "max_completion_time": 381.04000000009944,
+    "min_completion_time": 65.37599999999519,
+    "workload_balance_cv": 0.5994789404140899,
+    "tasks_per_robot": [
+      2,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    "robot_idle_percentages": [
+      0.007111111111108232,
+      0.2737777777776671,
+      0.330666666666533,
+      2.1973333333324447,
+      5.144888888886633,
+      5.72444444444189,
+      5.223111111108814,
+      5.78133333333075
+    ],
+    "total_replans": 248,
+    "joint_plans_attempted": 288,
+    "joint_plans_accepted": 1,
+    "joint_plan_rollbacks": 0,
+    "longest_completion_plateau_seconds": 144.1759999999757,
+    "final_completion_plateau_seconds": 65.55200000008011,
+    "robots_without_completed_tasks": 2,
+    "scheduling_latency_mean_ms": 7.611339999129996,
+    "scheduling_latency_p50_ms": 6.7313000035937876,
+    "scheduling_latency_p95_ms": 14.558900002157316,
+    "scheduling_latency_p99_ms": 14.558900002157316,
+    "scheduling_latency_max_ms": 14.558900002157316,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0,
+    "native_scheduler_commits": 15,
+    "fallback_scheduler_commits": 0,
+    "scheduler_commits_by_algorithm": {
+      "FCFS": 15
+    },
+    "rl_policy_decisions": 0,
+    "rl_fallback_decisions": 0,
+    "rl_fallback_rate": 0.0,
+    "rl_timeout_count": 0,
+    "rl_inference_mean_ms": 0.0,
+    "rl_inference_p95_ms": 0.0,
+    "rl_inference_max_ms": 0.0
+  },
+  "task_stats": {
+    "total_generated": 47,
+    "pending": 32,
+    "active": 8,
+    "completed": 7,
+    "failed": 0,
+    "avg_completion_time": 266.555428571466,
+    "max_completion_time": 381.04000000009944,
+    "avg_waiting_time": 8.761142857141982,
+    "throughput": 7
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 25,
+    "total_replans": 248,
+    "joint_plans_attempted": 288,
+    "joint_plans_accepted": 1,
+    "joint_plan_rollbacks": 0
+  },
+  "task_completions": [
+    {
+      "task_id": 1,
+      "robot_id": 1,
+      "arrival_time": 0.016,
+      "assignment_time": 0.032,
+      "pickup_time": 20.91199999999947,
+      "completion_time": 65.39199999999519,
+      "waiting_time": 0.016,
+      "completion_duration": 65.37599999999519,
+      "execution_time": 65.3599999999952,
+      "pickup": "WS1",
+      "delivery": "S5"
+    },
+    {
+      "task_id": 4,
+      "robot_id": 4,
+      "arrival_time": 9.888000000000007,
+      "assignment_time": 9.888000000000007,
+      "pickup_time": 101.98400000000741,
+      "completion_time": 209.56799999997088,
+      "waiting_time": 0.0,
+      "completion_duration": 199.67999999997087,
+      "execution_time": 199.67999999997087,
+      "pickup": "WS2",
+      "delivery": "S8"
+    },
+    {
+      "task_id": 9,
+      "robot_id": 1,
+      "arrival_time": 51.215999999996136,
+      "assignment_time": 65.39199999999519,
+      "pickup_time": 255.32799999994552,
+      "completion_time": 276.2559999999699,
+      "waiting_time": 14.175999999999057,
+      "completion_duration": 225.03999999997376,
+      "execution_time": 210.8639999999747,
+      "pickup": "WS3",
+      "delivery": "S4"
+    },
+    {
+      "task_id": 8,
+      "robot_id": 8,
+      "arrival_time": 37.055999999997695,
+      "assignment_time": 56.63999999999554,
+      "pickup_time": 251.88799999994743,
+      "completion_time": 329.504000000035,
+      "waiting_time": 19.583999999997843,
+      "completion_duration": 292.44800000003727,
+      "execution_time": 272.8640000000394,
+      "pickup": "WS4",
+      "delivery": "S2"
+    },
+    {
+      "task_id": 5,
+      "robot_id": 5,
+      "arrival_time": 23.151999999999223,
+      "assignment_time": 23.151999999999223,
+      "pickup_time": 267.0719999999587,
+      "completion_time": 367.5840000000815,
+      "waiting_time": 0.0,
+      "completion_duration": 344.43200000008227,
+      "execution_time": 344.43200000008227,
+      "pickup": "S3",
+      "delivery": "WS6"
+    },
+    {
+      "task_id": 2,
+      "robot_id": 2,
+      "arrival_time": 1.2320000000000009,
+      "assignment_time": 1.2320000000000009,
+      "pickup_time": 235.27999999995663,
+      "completion_time": 382.27200000009947,
+      "waiting_time": 0.0,
+      "completion_duration": 381.04000000009944,
+      "execution_time": 381.04000000009944,
+      "pickup": "S2",
+      "delivery": "WS5"
+    },
+    {
+      "task_id": 7,
+      "robot_id": 7,
+      "arrival_time": 26.575999999998846,
+      "assignment_time": 54.127999999995815,
+      "pickup_time": 293.519999999991,
+      "completion_time": 384.4480000001021,
+      "waiting_time": 27.55199999999697,
+      "completion_duration": 357.8720000001033,
+      "execution_time": 330.3200000001063,
+      "pickup": "WS5",
+      "delivery": "WS3"
+    }
+  ],
+  "deadlock_events": [
+    {
+      "sim_time": 7.008000000000005,
+      "robots_involved": [
+        1
+      ]
+    },
+    {
+      "sim_time": 8.000000000000005,
+      "robots_involved": [
+        2
+      ]
+    },
+    {
+      "sim_time": 9.008000000000006,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 101.00800000000709,
+      "robots_involved": [
+        6
+      ]
+    },
+    {
+      "sim_time": 164.01599999999613,
+      "robots_involved": [
+        4,
+        7
+      ]
+    },
+    {
+      "sim_time": 165.00799999999558,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 170.0159999999928,
+      "robots_involved": [
+        7
+      ]
+    },
+    {
+      "sim_time": 268.01599999995983,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 274.01599999996716,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 280.0159999999745,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 292.01599999998916,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 301.00800000000015,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 302.00000000000136,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 315.00800000001726,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 339.0080000000466,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 345.0080000000539,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 351.00800000006126,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 357.0080000000686,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 381.0080000000979,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 389.0080000001077,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 395.00800000011503,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 413.00800000013703,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 425.0080000001517,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 437.00800000016636,
+      "robots_involved": [
+        4
+      ]
+    },
+    {
+      "sim_time": 449.008000000181,
+      "robots_involved": [
+        4
+      ]
+    }
+  ],
+  "safety_events": [],
+  "time_series": [
+    {
+      "sim_time": 291.19999999998817,
+      "tasks_completed": 3,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.650699362419374,
+      "min_pair_distance": 0.6497441726307611
+    },
+    {
+      "sim_time": 292.7999999999901,
+      "tasks_completed": 3,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.57714380686378,
+      "min_pair_distance": 0.6497441726307611
+    },
+    {
+      "sim_time": 294.3999999999921,
+      "tasks_completed": 3,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.5069215846415,
+      "min_pair_distance": 0.6497441726307611
+    },
+    {
+      "sim_time": 295.99999999999403,
+      "tasks_completed": 3,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.440254917974755,
+      "min_pair_distance": 0.6497441726307611
+    },
+    {
+      "sim_time": 297.599999999996,
+      "tasks_completed": 3,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.36369936241913,
+      "min_pair_distance": 0.6497441726307611
+    },
+    {
+      "sim_time": 299.19999999999794,
+      "tasks_completed": 3,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.28592158464129,
+      "min_pair_distance": 0.6497441726307611
+    },
+    {
+      "sim_time": 300.7999999999999,
+      "tasks_completed": 3,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.20814380686345,
+      "min_pair_distance": 0.6497441726307611
+    },
+    {
+      "sim_time": 302.40000000000185,
+      "tasks_completed": 3,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.13892158464121,
+      "min_pair_distance": 0.6931078792100187
+    },
+    {
+      "sim_time": 304.0000000000038,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.079366029085655,
+      "min_pair_distance": 0.7502230313634569
+    },
+    {
+      "sim_time": 305.60000000000576,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.025810473530086,
+      "min_pair_distance": 0.7502230317124354
+    },
+    {
+      "sim_time": 307.2000000000077,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.980032695752286,
+      "min_pair_distance": 0.7446013904595716
+    },
+    {
+      "sim_time": 308.8000000000097,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.927810473530016,
+      "min_pair_distance": 0.7238982956913457
+    },
+    {
+      "sim_time": 310.40000000001163,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.85592158464105,
+      "min_pair_distance": 0.6769810567019134
+    },
+    {
+      "sim_time": 312.0000000000136,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.78392158464103,
+      "min_pair_distance": 0.649193933566742
+    },
+    {
+      "sim_time": 313.60000000001554,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.7072549179743,
+      "min_pair_distance": 0.6494487042751111
+    },
+    {
+      "sim_time": 315.2000000000175,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.62947714019646,
+      "min_pair_distance": 0.6494487041418087
+    },
+    {
+      "sim_time": 316.80000000001945,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.55425491797419,
+      "min_pair_distance": 0.6494487041418094
+    },
+    {
+      "sim_time": 318.4000000000214,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.492699362418634,
+      "min_pair_distance": 0.6494487041418102
+    },
+    {
+      "sim_time": 320.00000000002336,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.43314380686304,
+      "min_pair_distance": 0.6494487041418102
+    },
+    {
+      "sim_time": 321.6000000000253,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.359921584640745,
+      "min_pair_distance": 0.6490509856536286
+    },
+    {
+      "sim_time": 323.2000000000273,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.282143806862905,
+      "min_pair_distance": 0.6490509855455884
+    },
+    {
+      "sim_time": 324.80000000002923,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.20436602908506,
+      "min_pair_distance": 0.6490509855455884
+    },
+    {
+      "sim_time": 326.4000000000312,
+      "tasks_completed": 3,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.12658825130722,
+      "min_pair_distance": 0.6490509855455893
+    },
+    {
+      "sim_time": 328.00000000003314,
+      "tasks_completed": 3,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.6982912667206,
+      "min_pair_distance": 0.6490509855455893
+    },
+    {
+      "sim_time": 329.6000000000351,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.61751348894267,
+      "min_pair_distance": 0.6491307961370597
+    },
+    {
+      "sim_time": 331.20000000003705,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.53973571116474,
+      "min_pair_distance": 0.6491307958680652
+    },
+    {
+      "sim_time": 332.800000000039,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.45940237783125,
+      "min_pair_distance": 0.6491307958680657
+    },
+    {
+      "sim_time": 334.40000000004096,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.37051348894223,
+      "min_pair_distance": 0.6491307958680665
+    },
+    {
+      "sim_time": 336.0000000000429,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.281624600053206,
+      "min_pair_distance": 0.6491307958680665
+    },
+    {
+      "sim_time": 337.6000000000449,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.192735711164175,
+      "min_pair_distance": 0.6363196912702527
+    },
+    {
+      "sim_time": 339.2000000000468,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.10406904449737,
+      "min_pair_distance": 0.6177633342052604
+    },
+    {
+      "sim_time": 340.8000000000488,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.03129126671952,
+      "min_pair_distance": 0.6177646085303012
+    },
+    {
+      "sim_time": 342.40000000005074,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.96295793338609,
+      "min_pair_distance": 0.6177974141475231
+    },
+    {
+      "sim_time": 344.0000000000527,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.87873571116373,
+      "min_pair_distance": 0.6177974565766069
+    },
+    {
+      "sim_time": 345.60000000005465,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.799735711163656,
+      "min_pair_distance": 0.6177974565767197
+    },
+    {
+      "sim_time": 347.2000000000566,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.7218468222747,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 348.80000000005856,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.63373571116345,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 350.4000000000605,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.57040237782999,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 352.00000000006247,
+      "tasks_completed": 4,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.514513488941006,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 353.6000000000644,
+      "tasks_completed": 4,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.44784682227425,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 355.2000000000664,
+      "tasks_completed": 4,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.38984682227415,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 356.80000000006834,
+      "tasks_completed": 4,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.332624600051744,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 358.4000000000703,
+      "tasks_completed": 4,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.27695793338496,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 360.00000000007225,
+      "tasks_completed": 4,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.22506904449597,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 361.6000000000742,
+      "tasks_completed": 4,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.16940237782921,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 363.20000000007616,
+      "tasks_completed": 4,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.10662460005134,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 364.8000000000781,
+      "tasks_completed": 4,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.02884682227341,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 366.40000000008007,
+      "tasks_completed": 4,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.951069044495476,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 368.000000000082,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.873291266717544,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 369.600000000084,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.808402377828564,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 371.20000000008594,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.75262460005069,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 372.8000000000879,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.69040237782838,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 374.40000000008985,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.63484682227272,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 376.0000000000918,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.56995793338375,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 377.60000000009376,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.503291266717,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 379.2000000000957,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.4332912667169,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 380.80000000009767,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.36662460005015,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 382.4000000000996,
+      "tasks_completed": 6,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.291513488938904,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 384.0000000001016,
+      "tasks_completed": 6,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.21951348893879,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 385.60000000010353,
+      "tasks_completed": 7,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.15284682227204,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 387.2000000001055,
+      "tasks_completed": 7,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.08606904449418,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 388.80000000010745,
+      "tasks_completed": 7,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.01940237782743,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 390.4000000001094,
+      "tasks_completed": 7,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.944291266716185,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 392.00000000011136,
+      "tasks_completed": 7,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.86651348893825,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 393.6000000001133,
+      "tasks_completed": 7,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.795069044493644,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 395.20000000011527,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.73529126671574,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 396.8000000001172,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.43243598605291,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 398.4000000001192,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.34621376383048,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 400.00000000012113,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.25732487494136,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 401.6000000001231,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.168435986052245,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 403.20000000012504,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.08665820827429,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 404.800000000127,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.01354709716302,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 406.40000000012895,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.93843598605168,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 408.0000000001309,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.85454709716256,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 409.60000000013287,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.77565820827343,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 411.2000000001348,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.70465820827323,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 412.8000000001368,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.6268804304953,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 414.40000000013873,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.540658208272866,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 416.0000000001407,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.461324874939294,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 417.60000000014264,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.39465820827237,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 419.2000000001446,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.3279915416055,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 420.80000000014655,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.25188043049423,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 422.4000000001485,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.1656582082718,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 424.00000000015046,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.08243598604934,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 425.6000000001524,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.00465820827132,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 427.2000000001544,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.926880430493355,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 428.80000000015633,
+      "tasks_completed": 7,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.85854709715986,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 430.4000000001583,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.78343598604852,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 432.00000000016024,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.707435986048274,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 433.6000000001622,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.62965820827025,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 435.20000000016415,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.55188043049229,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 436.8000000001661,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.47410265271436,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 438.40000000016806,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.387880430491926,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 440.00000000017,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.30854709715835,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 441.600000000172,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.24188043049142,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 443.20000000017393,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.17521376382456,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 444.8000000001759,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.099102652713285,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 446.40000000017784,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.01288043049085,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 448.0000000001798,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.92399154160174,
+      "min_pair_distance": 0.61779745657672
+    },
+    {
+      "sim_time": 449.60000000018175,
+      "tasks_completed": 7,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.84510265271261,
+      "min_pair_distance": 0.61779745657672
+    }
+  ]
+}

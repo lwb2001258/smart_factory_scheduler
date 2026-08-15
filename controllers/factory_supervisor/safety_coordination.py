@@ -71,3 +71,16 @@ class ReservationManager:
 
     def snapshot(self) -> tuple[Reservation, ...]:
         return tuple(self._items)
+
+    def snapshot_owner(self, owner: int) -> tuple[Reservation, ...]:
+        """Return an immutable snapshot of one owner's reservations."""
+        return tuple(item for item in self._items if item.owner == owner)
+
+    def restore_owner(self, owner: int,
+                      reservations: Iterable[Reservation]) -> None:
+        """Atomically replace one owner's entries with a prior snapshot."""
+        restored = list(reservations)
+        if any(item.owner != owner for item in restored):
+            raise ValueError("reservation snapshot owner mismatch")
+        self.release(owner)
+        self._items.extend(restored)

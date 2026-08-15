@@ -1,0 +1,4924 @@
+{
+  "experiment_info": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "num_robots": 8,
+    "sim_duration": 300.01599999999894,
+    "timestamp": "2026-08-15 20:08:01"
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.1999893339021926,
+    "total_tasks_completed": 1,
+    "total_tasks_generated": 39,
+    "avg_task_completion_time": 246.55999999995038,
+    "avg_waiting_time": 0.016,
+    "avg_robot_idle_pct": 4.629086448722595,
+    "total_distance_all_robots": 86.37305507648279,
+    "total_conflicts_resolved": 0,
+    "predicted_conflicts": 0,
+    "route_dispatches": 453,
+    "rapid_route_overrides": 0,
+    "audited_replans": 0,
+    "replan_requests": 0,
+    "physical_escapes": 0,
+    "unplanned_task_stops": 4,
+    "planned_wait_episodes": 0,
+    "planned_wait_total_seconds": 0.0,
+    "total_deadlocks": 0,
+    "min_pair_distance": 1.0186711761831433,
+    "pair_distance_violations": 0,
+    "max_completion_time": 246.55999999995038,
+    "min_completion_time": 246.55999999995038,
+    "workload_balance_cv": 0.33071891388307384,
+    "tasks_per_robot": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "robot_idle_percentages": [
+      0.010666097808116939,
+      0.4106447656125024,
+      0.49597354807743804,
+      3.295824222708136,
+      7.716921764172346,
+      8.58620873553378,
+      7.839581888965677,
+      8.676870566902764
+    ],
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "longest_completion_plateau_seconds": 246.57599999995037,
+    "final_completion_plateau_seconds": 53.44000000004857,
+    "robots_without_completed_tasks": 7,
+    "scheduling_latency_mean_ms": 5.367462499634712,
+    "scheduling_latency_p50_ms": 4.471600001124898,
+    "scheduling_latency_p95_ms": 8.771499999056687,
+    "scheduling_latency_p99_ms": 8.771499999056687,
+    "scheduling_latency_max_ms": 8.771499999056687,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0,
+    "native_scheduler_commits": 8,
+    "fallback_scheduler_commits": 0,
+    "scheduler_commits_by_algorithm": {
+      "FCFS": 8
+    },
+    "rl_policy_decisions": 0,
+    "rl_fallback_decisions": 0,
+    "rl_fallback_rate": 0.0,
+    "rl_timeout_count": 0,
+    "rl_inference_mean_ms": 0.0,
+    "rl_inference_p95_ms": 0.0,
+    "rl_inference_max_ms": 0.0
+  },
+  "task_stats": {
+    "total_generated": 39,
+    "pending": 31,
+    "active": 7,
+    "completed": 1,
+    "failed": 0,
+    "avg_completion_time": 246.55999999995038,
+    "max_completion_time": 246.55999999995038,
+    "avg_waiting_time": 0.016,
+    "throughput": 1
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 0,
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "joint_grid_candidates_attempted": 238,
+    "joint_grid_candidates_validated": 238,
+    "joint_grid_candidates_timed_out": 0,
+    "joint_grid_candidates_failed": 0,
+    "joint_transactions_attempted": 60,
+    "joint_transactions_activated": 60,
+    "joint_transactions_aborted": 0
+  },
+  "task_completions": [
+    {
+      "task_id": 1,
+      "robot_id": 1,
+      "arrival_time": 0.016,
+      "assignment_time": 0.032,
+      "pickup_time": 47.215999999996576,
+      "completion_time": 246.57599999995037,
+      "waiting_time": 0.016,
+      "completion_duration": 246.55999999995038,
+      "execution_time": 246.54399999995036,
+      "pickup": "WS1",
+      "delivery": "S5"
+    }
+  ],
+  "conflict_events": [],
+  "route_dispatch_events": [
+    {
+      "sim_time": 0.6400000000000005,
+      "robot_id": 1,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 1,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 3.968000000000003,
+      "robot_id": 1,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 3.968000000000003,
+      "robot_id": 2,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 3.968000000000003,
+      "robot_id": 3,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 10.048000000000007,
+      "robot_id": 1,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 10.048000000000007,
+      "robot_id": 2,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 10.048000000000007,
+      "robot_id": 3,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 14.688000000000011,
+      "robot_id": 1,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 14.688000000000011,
+      "robot_id": 2,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 14.688000000000011,
+      "robot_id": 3,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 14.688000000000011,
+      "robot_id": 4,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 19.64799999999961,
+      "robot_id": 1,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 19.64799999999961,
+      "robot_id": 2,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 19.64799999999961,
+      "robot_id": 3,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 19.64799999999961,
+      "robot_id": 4,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 24.287999999999098,
+      "robot_id": 1,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 24.287999999999098,
+      "robot_id": 2,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 24.287999999999098,
+      "robot_id": 3,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 24.287999999999098,
+      "robot_id": 4,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 24.287999999999098,
+      "robot_id": 5,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 24.287999999999098,
+      "robot_id": 7,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 1,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 2,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 3,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 4,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 5,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 6,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 7,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 29.407999999998534,
+      "robot_id": 8,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 1,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 3
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 2,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 3,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 4,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 5,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 6,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 7,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 34.04799999999803,
+      "robot_id": 8,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 1,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 2
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 2,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 3,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 4,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 5,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 6,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 7,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 39.00799999999748,
+      "robot_id": 8,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 1,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 2,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 3,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 4,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 5,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 6,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 7,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 44.44799999999688,
+      "robot_id": 8,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 1,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 2,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 3,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 4,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 5,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 6,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 7,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 47.80799999999651,
+      "robot_id": 8,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 1,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 2,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 3,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 4,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 5,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 6,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 7,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 51.96799999999605,
+      "robot_id": 8,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 1,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 2,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 3,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 4,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 5,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 6,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 7,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 56.92799999999551,
+      "robot_id": 8,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 1,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 2,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 3,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 4,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 5,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 6,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 7,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 3
+    },
+    {
+      "sim_time": 61.88799999999496,
+      "robot_id": 8,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 1,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 2,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 3,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 4,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 5,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 6,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 7,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 2
+    },
+    {
+      "sim_time": 67.32799999999584,
+      "robot_id": 8,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 3
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 1,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 2,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 3,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 4,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 5,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 6,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 7,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 72.2879999999975,
+      "robot_id": 8,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 16,
+      "waypoint_count": 2
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 1,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 2,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 3,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 4,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 5,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 6,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 7,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 75.66399999999862,
+      "robot_id": 8,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 17,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 1,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 2,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 3,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 4,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 5,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 6,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 7,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 79.02399999999975,
+      "robot_id": 8,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 18,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 1,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 2,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 3,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 4,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 5,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 6,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 7,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 83.16800000000113,
+      "robot_id": 8,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 19,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 1,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 2,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 3,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 4,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 5,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 6,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 7,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 90.36800000000353,
+      "robot_id": 8,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 20,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 1,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 2,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 3,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 4,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 5,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 6,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 7,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 96.92800000000572,
+      "robot_id": 8,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 21,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 1,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 2,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 3,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 4,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 5,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 6,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 7,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 101.88800000000738,
+      "robot_id": 8,
+      "path_version": 16,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 22,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 1,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 2,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 3,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 4,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 5,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 6,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 7,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 107.48800000000925,
+      "robot_id": 8,
+      "path_version": 17,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 23,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 1,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 2,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 3,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 4,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 5,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 6,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 7,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 113.88800000001139,
+      "robot_id": 8,
+      "path_version": 18,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 24,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 1,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 2,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 3,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 4,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 5,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 6,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 7,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 118.84800000001304,
+      "robot_id": 8,
+      "path_version": 19,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 25,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 1,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 2,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 3,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 4,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 5,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 6,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 7,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 124.44800000001491,
+      "robot_id": 8,
+      "path_version": 20,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 26,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 1,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 2,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 3,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 4,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 5,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 6,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 7,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 130.8480000000145,
+      "robot_id": 8,
+      "path_version": 21,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 27,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 1,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 2,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 3,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 4,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 5,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 6,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 7,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 135.80800000001176,
+      "robot_id": 8,
+      "path_version": 22,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 28,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 1,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 2,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 3,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 4,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 5,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 6,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 7,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 139.3280000000098,
+      "robot_id": 8,
+      "path_version": 23,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 29,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 1,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 2,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 3,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 4,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 5,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 6,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 7,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 143.16800000000768,
+      "robot_id": 8,
+      "path_version": 24,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 30,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 1,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 2,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 3,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 4,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 5,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 6,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 7,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 148.28800000000484,
+      "robot_id": 8,
+      "path_version": 25,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 31,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 1,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 2,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 3,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 4,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 5,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 6,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 7,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 153.408000000002,
+      "robot_id": 8,
+      "path_version": 26,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 32,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 1,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 2,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 3,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 3
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 4,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 5,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 6,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 7,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 159.80799999999846,
+      "robot_id": 8,
+      "path_version": 27,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 33,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 1,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 2,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 3,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 2
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 4,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 5,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 6,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 7,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 165.40799999999535,
+      "robot_id": 8,
+      "path_version": 28,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 34,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 1,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 2,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 3,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 4,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 5,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 6,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 7,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 172.60799999999136,
+      "robot_id": 8,
+      "path_version": 29,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 35,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 1,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 2,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 3,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 4,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 5,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 6,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 7,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 175.64799999998968,
+      "robot_id": 8,
+      "path_version": 30,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 36,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 1,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 2,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 3,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 4,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 5,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 6,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 7,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 180.76799999998684,
+      "robot_id": 8,
+      "path_version": 31,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 37,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 1,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 2,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 3,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 4,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 5,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 6,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 7,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 187.1679999999833,
+      "robot_id": 8,
+      "path_version": 32,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 38,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 1,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 2,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 3,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 4,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 5,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 6,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 7,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 192.28799999998046,
+      "robot_id": 8,
+      "path_version": 33,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 39,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 1,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 2,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 3,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 4,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 5,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 6,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 7,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 197.88799999997735,
+      "robot_id": 8,
+      "path_version": 34,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 40,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 1,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 2,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 3,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 4,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 5,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 6,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 7,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 204.2879999999738,
+      "robot_id": 8,
+      "path_version": 35,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 41,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 1,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 2,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 3,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 4,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 5,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 6,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 7,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 209.40799999997097,
+      "robot_id": 8,
+      "path_version": 36,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 42,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 1,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 2,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 3,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 4,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 5,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 6,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 7,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 215.00799999996786,
+      "robot_id": 8,
+      "path_version": 37,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 43,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 1,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 2,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 3,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 4,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 5,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 6,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 7,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 222.20799999996387,
+      "robot_id": 8,
+      "path_version": 38,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 44,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 1,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 2,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 3,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 4,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 5,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 6,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 7,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 227.80799999996077,
+      "robot_id": 8,
+      "path_version": 39,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 45,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 1,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 3
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 2,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 3,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 4,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 5,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 6,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 7,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 235.00799999995678,
+      "robot_id": 8,
+      "path_version": 40,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 46,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 1,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 2
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 2,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 3,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 4,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 3
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 5,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 6,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 7,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 239.16799999995447,
+      "robot_id": 8,
+      "path_version": 41,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 47,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 1,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 2,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 3,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 4,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 2
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 5,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 6,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 7,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 244.12799999995173,
+      "robot_id": 8,
+      "path_version": 42,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 48,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 1,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 2,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 3,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 4,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 5,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 6,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 7,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 247.16799999995004,
+      "robot_id": 8,
+      "path_version": 43,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 49,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 1,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 2,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 3,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 4,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 5,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 6,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 7,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 250.52799999994818,
+      "robot_id": 8,
+      "path_version": 44,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 50,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 1,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 2,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 3,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 4,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 5,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 6,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 7,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 255.1679999999456,
+      "robot_id": 8,
+      "path_version": 45,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 51,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 1,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 2,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 3,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 4,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 5,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 6,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 7,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 260.1279999999502,
+      "robot_id": 8,
+      "path_version": 46,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 52,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 1,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 2,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 3,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 4,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 5,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 6,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 7,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 263.9679999999549,
+      "robot_id": 8,
+      "path_version": 47,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 53,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 1,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 2,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 3,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 4,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 5,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 6,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 7,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 269.40799999996153,
+      "robot_id": 8,
+      "path_version": 48,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 54,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 1,
+      "path_version": 55,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 2,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 3,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 4,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 5,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 6,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 7,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 274.5279999999678,
+      "robot_id": 8,
+      "path_version": 49,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 55,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 1,
+      "path_version": 56,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 2,
+      "path_version": 55,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 3,
+      "path_version": 55,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 4,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 5,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 6,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 7,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 279.48799999997385,
+      "robot_id": 8,
+      "path_version": 50,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 56,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 1,
+      "path_version": 57,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 2,
+      "path_version": 56,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 3,
+      "path_version": 56,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 4,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 5,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 6,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 7,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 283.64799999997894,
+      "robot_id": 8,
+      "path_version": 51,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 57,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 1,
+      "path_version": 58,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 2,
+      "path_version": 57,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 3,
+      "path_version": 57,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 4,
+      "path_version": 55,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 5,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 6,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 7,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 288.7679999999852,
+      "robot_id": 8,
+      "path_version": 52,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 58,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 1,
+      "path_version": 59,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 2,
+      "path_version": 58,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 3,
+      "path_version": 58,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 4,
+      "path_version": 56,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 5,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 6,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 7,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 293.40799999999086,
+      "robot_id": 8,
+      "path_version": 53,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 59,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 1,
+      "path_version": 60,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 2,
+      "path_version": 59,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 3,
+      "path_version": 59,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 4,
+      "path_version": 57,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 5,
+      "path_version": 55,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 6,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 7,
+      "path_version": 55,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 298.8479999999975,
+      "robot_id": 8,
+      "path_version": 54,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 60,
+      "waypoint_count": 4
+    }
+  ],
+  "route_override_events": [],
+  "replan_events": [],
+  "replan_request_events": [],
+  "escape_events": [],
+  "unplanned_stop_events": [
+    {
+      "sim_time": 100.80000000000702,
+      "robot_id": 2,
+      "state": "en_route_pickup",
+      "stopped_seconds": 11.20000000000374,
+      "position": [
+        -1.1134274014285597,
+        -1.9617286635092117
+      ],
+      "path_version": 20,
+      "plan_epoch": 21,
+      "plan_source": "joint_grid_transaction",
+      "task_id": 2,
+      "goal_location": "S2",
+      "planned_wait": false
+    },
+    {
+      "sim_time": 187.19999999998328,
+      "robot_id": 3,
+      "state": "en_route_delivery",
+      "stopped_seconds": 11.199999999993793,
+      "position": [
+        -2.987541097647611,
+        1.6189738053093448
+      ],
+      "path_version": 37,
+      "plan_epoch": 38,
+      "plan_source": "joint_grid_transaction",
+      "task_id": 3,
+      "goal_location": "WS5",
+      "planned_wait": false
+    },
+    {
+      "sim_time": 249.5999999999487,
+      "robot_id": 6,
+      "state": "en_route_pickup",
+      "stopped_seconds": 11.199999999993793,
+      "position": [
+        0.10956270693295428,
+        -2.2014129661498005
+      ],
+      "path_version": 43,
+      "plan_epoch": 49,
+      "plan_source": "joint_grid_transaction",
+      "task_id": 6,
+      "goal_location": "S6",
+      "planned_wait": false
+    },
+    {
+      "sim_time": 292.7999999999901,
+      "robot_id": 8,
+      "state": "en_route_pickup",
+      "stopped_seconds": 11.200000000013688,
+      "position": [
+        0.8484092439845269,
+        -2.9329418565884606
+      ],
+      "path_version": 52,
+      "plan_epoch": 58,
+      "plan_source": "joint_grid_transaction",
+      "task_id": 8,
+      "goal_location": "WS4",
+      "planned_wait": false
+    }
+  ],
+  "planned_wait_events": [],
+  "deadlock_events": [],
+  "safety_events": [],
+  "time_series": [
+    {
+      "sim_time": 140.800000000009,
+      "tasks_completed": 0,
+      "tasks_pending": 15,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.20158825131155,
+      "min_pair_distance": 1.345770922113274
+    },
+    {
+      "sim_time": 142.4000000000081,
+      "tasks_completed": 0,
+      "tasks_pending": 15,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.112699362422525,
+      "min_pair_distance": 1.3031389156505604
+    },
+    {
+      "sim_time": 144.00000000000722,
+      "tasks_completed": 0,
+      "tasks_pending": 15,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 51.023810473533494,
+      "min_pair_distance": 1.27233221566532
+    },
+    {
+      "sim_time": 145.60000000000633,
+      "tasks_completed": 0,
+      "tasks_pending": 15,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.93492158464447,
+      "min_pair_distance": 1.1575588583111143
+    },
+    {
+      "sim_time": 147.20000000000545,
+      "tasks_completed": 0,
+      "tasks_pending": 16,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.84603269575544,
+      "min_pair_distance": 1.1494596059651307
+    },
+    {
+      "sim_time": 148.80000000000456,
+      "tasks_completed": 0,
+      "tasks_pending": 17,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.75714380686642,
+      "min_pair_distance": 1.2093128051900472
+    },
+    {
+      "sim_time": 150.40000000000367,
+      "tasks_completed": 0,
+      "tasks_pending": 17,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.668254917977386,
+      "min_pair_distance": 1.250105543807434
+    },
+    {
+      "sim_time": 152.00000000000279,
+      "tasks_completed": 0,
+      "tasks_pending": 17,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.57936602908836,
+      "min_pair_distance": 1.2839803023179603
+    },
+    {
+      "sim_time": 153.6000000000019,
+      "tasks_completed": 0,
+      "tasks_pending": 18,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.49047714019933,
+      "min_pair_distance": 1.2721918251447721
+    },
+    {
+      "sim_time": 155.200000000001,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.40158825131031,
+      "min_pair_distance": 1.1415804674059296
+    },
+    {
+      "sim_time": 156.80000000000013,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.31269936242128,
+      "min_pair_distance": 1.1218169175812864
+    },
+    {
+      "sim_time": 158.39999999999924,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.223810473532254,
+      "min_pair_distance": 1.1218169200937
+    },
+    {
+      "sim_time": 159.99999999999835,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.13492158464322,
+      "min_pair_distance": 1.1359046253703784
+    },
+    {
+      "sim_time": 161.59999999999746,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.0460326957542,
+      "min_pair_distance": 1.1738787587300497
+    },
+    {
+      "sim_time": 163.19999999999658,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.957143806865176,
+      "min_pair_distance": 1.199725540066288
+    },
+    {
+      "sim_time": 164.7999999999957,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.86825491797623,
+      "min_pair_distance": 1.1997255465961267
+    },
+    {
+      "sim_time": 166.3999999999948,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.7793660290873,
+      "min_pair_distance": 1.1957623391371948
+    },
+    {
+      "sim_time": 167.99999999999392,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.690477140198354,
+      "min_pair_distance": 1.3445912055651659
+    },
+    {
+      "sim_time": 169.59999999999303,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.60158825130942,
+      "min_pair_distance": 1.3476156881016934
+    },
+    {
+      "sim_time": 171.19999999999214,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.51269936242048,
+      "min_pair_distance": 1.3476156881095487
+    },
+    {
+      "sim_time": 172.79999999999126,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.423810473531546,
+      "min_pair_distance": 1.3534916643582093
+    },
+    {
+      "sim_time": 174.39999999999037,
+      "tasks_completed": 0,
+      "tasks_pending": 19,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.3349215846426,
+      "min_pair_distance": 1.515710499471359
+    },
+    {
+      "sim_time": 175.99999999998948,
+      "tasks_completed": 0,
+      "tasks_pending": 20,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.25092158464255,
+      "min_pair_distance": 1.5153446669098354
+    },
+    {
+      "sim_time": 177.5999999999886,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.16203269575361,
+      "min_pair_distance": 1.5204205024120043
+    },
+    {
+      "sim_time": 179.1999999999877,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.07314380686467,
+      "min_pair_distance": 1.520420498647479
+    },
+    {
+      "sim_time": 180.79999999998682,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.98425491797573,
+      "min_pair_distance": 1.5211204241311969
+    },
+    {
+      "sim_time": 182.39999999998594,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.895366029086794,
+      "min_pair_distance": 1.5879509876567766
+    },
+    {
+      "sim_time": 183.99999999998505,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.806477140197856,
+      "min_pair_distance": 1.5728626492155093
+    },
+    {
+      "sim_time": 185.59999999998416,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.71758825130892,
+      "min_pair_distance": 1.5366458676209445
+    },
+    {
+      "sim_time": 187.19999999998328,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.62869936241998,
+      "min_pair_distance": 1.521842021993264
+    },
+    {
+      "sim_time": 188.7999999999824,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.53981047353104,
+      "min_pair_distance": 1.543057417826109
+    },
+    {
+      "sim_time": 190.3999999999815,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.4509215846421,
+      "min_pair_distance": 1.5177722036805985
+    },
+    {
+      "sim_time": 191.99999999998062,
+      "tasks_completed": 0,
+      "tasks_pending": 21,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.362032695753165,
+      "min_pair_distance": 1.523647557369069
+    },
+    {
+      "sim_time": 193.59999999997973,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.273143806864226,
+      "min_pair_distance": 1.5404806460783296
+    },
+    {
+      "sim_time": 195.19999999997884,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.18425491797529,
+      "min_pair_distance": 1.5315082263941635
+    },
+    {
+      "sim_time": 196.79999999997796,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.09536602908635,
+      "min_pair_distance": 1.5306117724456143
+    },
+    {
+      "sim_time": 198.39999999997707,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.00647714019741,
+      "min_pair_distance": 1.5515010658365704
+    },
+    {
+      "sim_time": 199.99999999997618,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.91758825130847,
+      "min_pair_distance": 1.6049090566691746
+    },
+    {
+      "sim_time": 201.5999999999753,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.828699362419535,
+      "min_pair_distance": 1.5601759720827768
+    },
+    {
+      "sim_time": 203.1999999999744,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.739810473530596,
+      "min_pair_distance": 1.5254931222562578
+    },
+    {
+      "sim_time": 204.79999999997352,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.65092158464166,
+      "min_pair_distance": 1.4227290872225946
+    },
+    {
+      "sim_time": 206.39999999997264,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.56203269575272,
+      "min_pair_distance": 1.3226179040488033
+    },
+    {
+      "sim_time": 207.99999999997175,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.47314380686378,
+      "min_pair_distance": 1.3045461801840446
+    },
+    {
+      "sim_time": 209.59999999997086,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.38425491797484,
+      "min_pair_distance": 1.302160471703163
+    },
+    {
+      "sim_time": 211.19999999996998,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.295366029085905,
+      "min_pair_distance": 1.3276505387076314
+    },
+    {
+      "sim_time": 212.7999999999691,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.20647714019697,
+      "min_pair_distance": 1.2957214781753028
+    },
+    {
+      "sim_time": 214.3999999999682,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.11758825130803,
+      "min_pair_distance": 1.2957214779132826
+    },
+    {
+      "sim_time": 215.99999999996732,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.02869936241909,
+      "min_pair_distance": 1.302612646109948
+    },
+    {
+      "sim_time": 217.59999999996643,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.93981047353015,
+      "min_pair_distance": 1.2763852535052282
+    },
+    {
+      "sim_time": 219.19999999996554,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.85092158464121,
+      "min_pair_distance": 1.2768671844829842
+    },
+    {
+      "sim_time": 220.79999999996465,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.762032695752275,
+      "min_pair_distance": 1.2768671846332091
+    },
+    {
+      "sim_time": 222.39999999996377,
+      "tasks_completed": 0,
+      "tasks_pending": 22,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.67314380686334,
+      "min_pair_distance": 1.2734629860024944
+    },
+    {
+      "sim_time": 223.99999999996288,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.5842549179744,
+      "min_pair_distance": 1.2675974993099601
+    },
+    {
+      "sim_time": 225.599999999962,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.49536602908546,
+      "min_pair_distance": 1.2656310773558106
+    },
+    {
+      "sim_time": 227.1999999999611,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.40647714019652,
+      "min_pair_distance": 1.264673091327366
+    },
+    {
+      "sim_time": 228.79999999996022,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.31758825130758,
+      "min_pair_distance": 1.2506456802802988
+    },
+    {
+      "sim_time": 230.39999999995933,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.228699362418645,
+      "min_pair_distance": 1.2398532382626284
+    },
+    {
+      "sim_time": 231.99999999995845,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.13981047352971,
+      "min_pair_distance": 1.2389575993523254
+    },
+    {
+      "sim_time": 233.59999999995756,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 46.05092158464077,
+      "min_pair_distance": 1.2392014652576249
+    },
+    {
+      "sim_time": 235.19999999995667,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.96203269575183,
+      "min_pair_distance": 1.2373943554682485
+    },
+    {
+      "sim_time": 236.7999999999558,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.87314380686289,
+      "min_pair_distance": 1.2322825458879987
+    },
+    {
+      "sim_time": 238.3999999999549,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.78425491797395,
+      "min_pair_distance": 1.2138218458448542
+    },
+    {
+      "sim_time": 239.999999999954,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.695366029085015,
+      "min_pair_distance": 1.2462557402395178
+    },
+    {
+      "sim_time": 241.59999999995313,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.60647714019608,
+      "min_pair_distance": 1.2273750279150584
+    },
+    {
+      "sim_time": 243.19999999995224,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.51758825130714,
+      "min_pair_distance": 1.2265612681941034
+    },
+    {
+      "sim_time": 244.79999999995135,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.4286993624182,
+      "min_pair_distance": 1.187118768965094
+    },
+    {
+      "sim_time": 246.39999999995047,
+      "tasks_completed": 0,
+      "tasks_pending": 23,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.33981047352926,
+      "min_pair_distance": 1.182208158436413
+    },
+    {
+      "sim_time": 247.99999999994958,
+      "tasks_completed": 1,
+      "tasks_pending": 24,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.261699362418085,
+      "min_pair_distance": 1.2462557402405066
+    },
+    {
+      "sim_time": 249.5999999999487,
+      "tasks_completed": 1,
+      "tasks_pending": 24,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.183921584640245,
+      "min_pair_distance": 1.2462557402405066
+    },
+    {
+      "sim_time": 251.1999999999478,
+      "tasks_completed": 1,
+      "tasks_pending": 24,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.11047714019573,
+      "min_pair_distance": 1.2462557402405066
+    },
+    {
+      "sim_time": 252.79999999994692,
+      "tasks_completed": 1,
+      "tasks_pending": 24,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 45.03269936241789,
+      "min_pair_distance": 1.2462557402405066
+    },
+    {
+      "sim_time": 254.39999999994603,
+      "tasks_completed": 1,
+      "tasks_pending": 24,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.95492158464004,
+      "min_pair_distance": 1.2462557402405066
+    },
+    {
+      "sim_time": 255.99999999994515,
+      "tasks_completed": 1,
+      "tasks_pending": 24,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.87714380686219,
+      "min_pair_distance": 1.2462557402405066
+    },
+    {
+      "sim_time": 257.5999999999471,
+      "tasks_completed": 1,
+      "tasks_pending": 24,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.799366029084354,
+      "min_pair_distance": 1.2425878597175986
+    },
+    {
+      "sim_time": 259.19999999994906,
+      "tasks_completed": 1,
+      "tasks_pending": 25,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.721588251306514,
+      "min_pair_distance": 1.211200436089639
+    },
+    {
+      "sim_time": 260.799999999951,
+      "tasks_completed": 1,
+      "tasks_pending": 25,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.64381047352867,
+      "min_pair_distance": 1.1194776439530785
+    },
+    {
+      "sim_time": 262.39999999995297,
+      "tasks_completed": 1,
+      "tasks_pending": 25,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.56603269575082,
+      "min_pair_distance": 1.158712637543026
+    },
+    {
+      "sim_time": 263.9999999999549,
+      "tasks_completed": 1,
+      "tasks_pending": 25,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.48825491797298,
+      "min_pair_distance": 1.166768009620998
+    },
+    {
+      "sim_time": 265.5999999999569,
+      "tasks_completed": 1,
+      "tasks_pending": 25,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.41047714019514,
+      "min_pair_distance": 1.080729301265643
+    },
+    {
+      "sim_time": 267.19999999995883,
+      "tasks_completed": 1,
+      "tasks_pending": 25,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.332699362417294,
+      "min_pair_distance": 1.0186711761831433
+    },
+    {
+      "sim_time": 268.7999999999608,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.25492158463945,
+      "min_pair_distance": 1.018671307529893
+    },
+    {
+      "sim_time": 270.39999999996274,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.17714380686161,
+      "min_pair_distance": 1.0575514307168863
+    },
+    {
+      "sim_time": 271.9999999999647,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.09936602908377,
+      "min_pair_distance": 1.0375844217744414
+    },
+    {
+      "sim_time": 273.59999999996666,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.02158825130592,
+      "min_pair_distance": 1.037576419889107
+    },
+    {
+      "sim_time": 275.1999999999686,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.943810473528075,
+      "min_pair_distance": 1.04827037001006
+    },
+    {
+      "sim_time": 276.79999999997057,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.866032695750235,
+      "min_pair_distance": 1.1068233392732412
+    },
+    {
+      "sim_time": 278.3999999999725,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.788254917972395,
+      "min_pair_distance": 1.1277022402836188
+    },
+    {
+      "sim_time": 279.9999999999745,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.71047714019455,
+      "min_pair_distance": 1.0985156004829273
+    },
+    {
+      "sim_time": 281.59999999997643,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.6326993624167,
+      "min_pair_distance": 1.048376063021565
+    },
+    {
+      "sim_time": 283.1999999999784,
+      "tasks_completed": 1,
+      "tasks_pending": 28,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.55492158463886,
+      "min_pair_distance": 1.0397253111125273
+    },
+    {
+      "sim_time": 284.79999999998034,
+      "tasks_completed": 1,
+      "tasks_pending": 29,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.47714380686102,
+      "min_pair_distance": 1.0397253112526972
+    },
+    {
+      "sim_time": 286.3999999999823,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.399366029083176,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 287.99999999998425,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.32158825130533,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 289.5999999999862,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.24381047352749,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 291.19999999998817,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.16603269574965,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 292.7999999999901,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.0882549179718,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 294.3999999999921,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.010477140193956,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 295.99999999999403,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.932699362416116,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 297.599999999996,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.85492158463828,
+      "min_pair_distance": 1.039725311252697
+    },
+    {
+      "sim_time": 299.19999999999794,
+      "tasks_completed": 1,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.77714380686043,
+      "min_pair_distance": 1.039725311252697
+    }
+  ]
+}

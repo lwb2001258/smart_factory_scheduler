@@ -1,0 +1,4894 @@
+{
+  "experiment_info": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "num_robots": 8,
+    "sim_duration": 120.00000000001343,
+    "timestamp": "2026-08-15 23:10:27"
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.0,
+    "total_tasks_completed": 0,
+    "total_tasks_generated": 17,
+    "avg_task_completion_time": 0.0,
+    "avg_waiting_time": 0.0,
+    "avg_robot_idle_pct": 11.573333333331648,
+    "total_distance_all_robots": 55.75385361715017,
+    "total_conflicts_resolved": 0,
+    "predicted_conflicts": 0,
+    "route_dispatches": 100,
+    "rapid_route_overrides": 0,
+    "unauthorized_route_writes": 0,
+    "audited_replans": 0,
+    "replan_requests": 0,
+    "physical_escapes": 0,
+    "unplanned_task_stops": 0,
+    "planned_wait_episodes": 40,
+    "planned_wait_total_seconds": 91.20000000001892,
+    "total_deadlocks": 0,
+    "min_pair_distance": 0.7397823388236102,
+    "pair_distance_violations": 0,
+    "max_completion_time": 0,
+    "min_completion_time": 0,
+    "workload_balance_cv": 0.0,
+    "tasks_per_robot": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "robot_idle_percentages": [
+      0.02666666666666368,
+      1.0266666666665525,
+      1.2399999999998623,
+      8.239999999999084,
+      19.293333333330526,
+      21.46666666666338,
+      19.599999999997124,
+      21.693333333329996
+    ],
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "longest_completion_plateau_seconds": 120.00000000001343,
+    "final_completion_plateau_seconds": 120.00000000001343,
+    "robots_without_completed_tasks": 8,
+    "scheduling_latency_mean_ms": 4.874412500157632,
+    "scheduling_latency_p50_ms": 3.4666999999899417,
+    "scheduling_latency_p95_ms": 8.55270000101882,
+    "scheduling_latency_p99_ms": 8.55270000101882,
+    "scheduling_latency_max_ms": 8.55270000101882,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0,
+    "native_scheduler_commits": 8,
+    "fallback_scheduler_commits": 0,
+    "scheduler_commits_by_algorithm": {
+      "FCFS": 8
+    },
+    "rl_policy_decisions": 0,
+    "rl_fallback_decisions": 0,
+    "rl_fallback_rate": 0.0,
+    "rl_timeout_count": 0,
+    "rl_inference_mean_ms": 0.0,
+    "rl_inference_p95_ms": 0.0,
+    "rl_inference_max_ms": 0.0
+  },
+  "task_stats": {
+    "total_generated": 17,
+    "pending": 9,
+    "active": 8,
+    "completed": 0,
+    "failed": 0,
+    "avg_completion_time": 0,
+    "max_completion_time": 0,
+    "avg_waiting_time": 0,
+    "throughput": 0
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 0,
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "joint_grid_candidates_attempted": 18,
+    "joint_grid_candidates_validated": 18,
+    "joint_grid_candidates_timed_out": 0,
+    "joint_grid_candidates_failed": 0,
+    "joint_transactions_attempted": 15,
+    "joint_transactions_activated": 15,
+    "joint_transactions_aborted": 0
+  },
+  "task_completions": [],
+  "conflict_events": [],
+  "route_dispatch_events": [
+    {
+      "sim_time": 0.6400000000000005,
+      "robot_id": 1,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 1,
+      "waypoint_count": 10
+    },
+    {
+      "sim_time": 5.120000000000004,
+      "robot_id": 1,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 5.120000000000004,
+      "robot_id": 2,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 5.120000000000004,
+      "robot_id": 3,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 13.61600000000001,
+      "robot_id": 1,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 7
+    },
+    {
+      "sim_time": 13.61600000000001,
+      "robot_id": 2,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 13.61600000000001,
+      "robot_id": 3,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 13.61600000000001,
+      "robot_id": 4,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 20.6239999999995,
+      "robot_id": 1,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 5
+    },
+    {
+      "sim_time": 20.6239999999995,
+      "robot_id": 2,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 20.6239999999995,
+      "robot_id": 3,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 20.6239999999995,
+      "robot_id": 4,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 1,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 3
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 2,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 3,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 4,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 5,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 6,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 7,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 11
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 8,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 11
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 1,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 2,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 3,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 4,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 5,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 6,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 7,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 10
+    },
+    {
+      "sim_time": 30.767999999998384,
+      "robot_id": 8,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 10
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 1,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 2,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 3,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 4,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 5,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 6,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 7,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 34.11199999999802,
+      "robot_id": 8,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 1,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 2,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 3,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 4,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 5,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 6,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 7,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 56.127999999995595,
+      "robot_id": 8,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 1
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 1,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 2,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 3,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 4,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 5,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 6,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 7,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 8,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 1,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 2,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 3,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 4,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 5,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 6,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 7,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.62399999999761,
+      "robot_id": 8,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 1,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 2,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 3,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 4,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 5,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 6,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 7,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 8,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 1,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 2,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 3,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 4,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 5,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 6,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 7,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 91.92000000000405,
+      "robot_id": 8,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 1,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 2,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 3,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 4,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 5,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 6,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 7,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 93.61600000000462,
+      "robot_id": 8,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 1,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 2,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 3,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 4,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 5,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 6,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 7,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 98.60800000000629,
+      "robot_id": 8,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 14,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 1,
+      "path_version": 15,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 2,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 3,
+      "path_version": 14,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 4,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 5,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 6,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 7,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 115.1200000000118,
+      "robot_id": 8,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 15,
+      "waypoint_count": 12
+    }
+  ],
+  "route_override_events": [],
+  "unauthorized_route_write_events": [],
+  "replan_events": [],
+  "replan_request_events": [],
+  "escape_events": [],
+  "unplanned_stop_events": [],
+  "planned_wait_events": [
+    {
+      "robot_id": 2,
+      "started_at": 4.800000000000003,
+      "last_seen_at": 4.800000000000003,
+      "reason": "controller_hold",
+      "deadline": 5.328000000000003,
+      "max_deadline": 5.328000000000003,
+      "task_id": 2,
+      "plan_epoch": null,
+      "plan_source": null,
+      "path_version": 0,
+      "goal_location": "S2",
+      "ended_at": 6.400000000000005,
+      "duration": 1.6000000000000014,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 4.800000000000003,
+      "last_seen_at": 4.800000000000003,
+      "reason": "controller_hold",
+      "deadline": 5.328000000000003,
+      "max_deadline": 5.328000000000003,
+      "task_id": 3,
+      "plan_epoch": null,
+      "plan_source": null,
+      "path_version": 0,
+      "goal_location": "S1",
+      "ended_at": 6.400000000000005,
+      "duration": 1.6000000000000014,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 14.400000000000011,
+      "last_seen_at": 14.400000000000011,
+      "reason": "joint_slot_deadline",
+      "deadline": 14.78800000000001,
+      "max_deadline": 14.78800000000001,
+      "task_id": 3,
+      "plan_epoch": 3,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 2,
+      "goal_location": "S1",
+      "ended_at": 16.00000000000001,
+      "duration": 1.5999999999999996,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 20.799999999999482,
+      "last_seen_at": 20.799999999999482,
+      "reason": "controller_hold",
+      "deadline": 20.831999999999567,
+      "max_deadline": 20.831999999999567,
+      "task_id": 2,
+      "plan_epoch": 4,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 3,
+      "goal_location": "S2",
+      "ended_at": 22.399999999999306,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 27.199999999998777,
+      "last_seen_at": 27.199999999998777,
+      "reason": "controller_hold",
+      "deadline": 27.327999999998852,
+      "max_deadline": 27.327999999998852,
+      "task_id": 5,
+      "plan_epoch": 5,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 1,
+      "goal_location": "S3",
+      "ended_at": 28.7999999999986,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 27.199999999998777,
+      "last_seen_at": 27.199999999998777,
+      "reason": "controller_hold",
+      "deadline": 27.327999999998852,
+      "max_deadline": 27.327999999998852,
+      "task_id": null,
+      "plan_epoch": 5,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 1,
+      "goal_location": null,
+      "ended_at": 28.7999999999986,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 33.599999999998076,
+      "last_seen_at": 33.599999999998076,
+      "reason": "controller_hold",
+      "deadline": 34.31999999999808,
+      "max_deadline": 34.31999999999808,
+      "task_id": 1,
+      "plan_epoch": 6,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S5",
+      "ended_at": 35.1999999999979,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 35.1999999999979,
+      "last_seen_at": 35.1999999999979,
+      "reason": "joint_slot_deadline",
+      "deadline": 35.28399999999808,
+      "max_deadline": 35.28399999999808,
+      "task_id": 3,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S1",
+      "ended_at": 36.79999999999772,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 35.1999999999979,
+      "last_seen_at": 35.1999999999979,
+      "reason": "joint_slot_deadline",
+      "deadline": 35.28399999999808,
+      "max_deadline": 35.28399999999808,
+      "task_id": 4,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 5,
+      "goal_location": "WS2",
+      "ended_at": 36.79999999999772,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": 1,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 7,
+      "goal_location": "S5",
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": 2,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S2",
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": 3,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S1",
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": 4,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 5,
+      "goal_location": "WS2",
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": 5,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 3,
+      "goal_location": "S3",
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": 6,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 3,
+      "goal_location": "S6",
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": null,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 3,
+      "goal_location": null,
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 55.99999999999561,
+      "last_seen_at": 55.99999999999561,
+      "reason": "controller_hold",
+      "deadline": 56.03599999999566,
+      "max_deadline": 56.03599999999566,
+      "task_id": null,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 3,
+      "goal_location": null,
+      "ended_at": 57.59999999999543,
+      "duration": 1.5999999999998238,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 73.59999999999793,
+      "last_seen_at": 73.59999999999793,
+      "reason": "joint_slot_deadline",
+      "deadline": 73.79599999999743,
+      "max_deadline": 73.79599999999743,
+      "task_id": 3,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 9,
+      "goal_location": "S1",
+      "ended_at": 75.19999999999847,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 73.59999999999793,
+      "last_seen_at": 73.59999999999793,
+      "reason": "joint_slot_deadline",
+      "deadline": 73.79599999999743,
+      "max_deadline": 73.79599999999743,
+      "task_id": 5,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S3",
+      "ended_at": 75.19999999999847,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 73.59999999999793,
+      "last_seen_at": 73.59999999999793,
+      "reason": "joint_slot_deadline",
+      "deadline": 73.79599999999743,
+      "max_deadline": 73.79599999999743,
+      "task_id": 6,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S6",
+      "ended_at": 75.19999999999847,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 73.59999999999793,
+      "last_seen_at": 73.59999999999793,
+      "reason": "joint_slot_deadline",
+      "deadline": 73.79599999999743,
+      "max_deadline": 73.79599999999743,
+      "task_id": 7,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "WS5",
+      "ended_at": 75.19999999999847,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 73.59999999999793,
+      "last_seen_at": 73.59999999999793,
+      "reason": "joint_slot_deadline",
+      "deadline": 73.79599999999743,
+      "max_deadline": 73.79599999999743,
+      "task_id": 8,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "WS4",
+      "ended_at": 75.19999999999847,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 73.59999999999793,
+      "last_seen_at": 84.80000000000167,
+      "reason": "joint_slot_deadline",
+      "deadline": 73.79599999999743,
+      "max_deadline": 85.79599999999743,
+      "task_id": 2,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 9,
+      "goal_location": "S2",
+      "ended_at": 86.40000000000221,
+      "duration": 12.800000000004275,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 84.80000000000167,
+      "last_seen_at": 84.80000000000167,
+      "reason": "controller_hold",
+      "deadline": 85.32800000000158,
+      "max_deadline": 85.32800000000158,
+      "task_id": 4,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 8,
+      "goal_location": "WS2",
+      "ended_at": 86.40000000000221,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 88.00000000000274,
+      "last_seen_at": 89.60000000000328,
+      "reason": "joint_slot_deadline",
+      "deadline": 88.6920000000016,
+      "max_deadline": 89.8920000000016,
+      "task_id": 2,
+      "plan_epoch": 11,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 10,
+      "goal_location": "S2",
+      "ended_at": 91.20000000000381,
+      "duration": 3.2000000000010687,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 92.80000000000435,
+      "last_seen_at": 92.80000000000435,
+      "reason": "joint_slot_deadline",
+      "deadline": 93.09200000000388,
+      "max_deadline": 93.09200000000388,
+      "task_id": 2,
+      "plan_epoch": 12,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 11,
+      "goal_location": "S2",
+      "ended_at": 94.40000000000488,
+      "duration": 1.6000000000005343,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 92.80000000000435,
+      "last_seen_at": 92.80000000000435,
+      "reason": "joint_slot_deadline",
+      "deadline": 93.09200000000388,
+      "max_deadline": 93.09200000000388,
+      "task_id": 6,
+      "plan_epoch": 12,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 8,
+      "goal_location": "S6",
+      "ended_at": 94.40000000000488,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 92.80000000000435,
+      "last_seen_at": 92.80000000000435,
+      "reason": "joint_slot_deadline",
+      "deadline": 93.09200000000388,
+      "max_deadline": 93.09200000000388,
+      "task_id": 7,
+      "plan_epoch": 12,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 8,
+      "goal_location": "WS5",
+      "ended_at": 94.40000000000488,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 94.40000000000488,
+      "last_seen_at": 94.40000000000488,
+      "reason": "joint_slot_deadline",
+      "deadline": 94.78800000000444,
+      "max_deadline": 94.78800000000444,
+      "task_id": 2,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 12,
+      "goal_location": "S2",
+      "ended_at": 96.00000000000541,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 94.40000000000488,
+      "last_seen_at": 94.40000000000488,
+      "reason": "joint_slot_deadline",
+      "deadline": 94.78800000000444,
+      "max_deadline": 94.78800000000444,
+      "task_id": 8,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 9,
+      "goal_location": "WS4",
+      "ended_at": 96.00000000000541,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 97.60000000000595,
+      "last_seen_at": 97.60000000000595,
+      "reason": "joint_slot_deadline",
+      "deadline": 98.38800000000444,
+      "max_deadline": 98.38800000000444,
+      "task_id": 2,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 12,
+      "goal_location": "S2",
+      "ended_at": 99.20000000000648,
+      "duration": 1.6000000000005343,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 99.20000000000648,
+      "last_seen_at": 99.20000000000648,
+      "reason": "joint_slot_deadline",
+      "deadline": 99.78000000000611,
+      "max_deadline": 99.78000000000611,
+      "task_id": 3,
+      "plan_epoch": 14,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 13,
+      "goal_location": "WS5",
+      "ended_at": 100.80000000000702,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 99.20000000000648,
+      "last_seen_at": 99.20000000000648,
+      "reason": "joint_slot_deadline",
+      "deadline": 99.78000000000611,
+      "max_deadline": 99.78000000000611,
+      "task_id": 5,
+      "plan_epoch": 14,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 10,
+      "goal_location": "S3",
+      "ended_at": 100.80000000000702,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 99.20000000000648,
+      "last_seen_at": 99.20000000000648,
+      "reason": "joint_slot_deadline",
+      "deadline": 99.78000000000611,
+      "max_deadline": 99.78000000000611,
+      "task_id": 6,
+      "plan_epoch": 14,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 10,
+      "goal_location": "S6",
+      "ended_at": 100.80000000000702,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 99.20000000000648,
+      "last_seen_at": 99.20000000000648,
+      "reason": "joint_slot_deadline",
+      "deadline": 99.78000000000611,
+      "max_deadline": 99.78000000000611,
+      "task_id": 8,
+      "plan_epoch": 14,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 10,
+      "goal_location": "WS4",
+      "ended_at": 100.80000000000702,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 99.20000000000648,
+      "last_seen_at": 112.00000000001076,
+      "reason": "joint_slot_deadline",
+      "deadline": 99.78000000000611,
+      "max_deadline": 112.9800000000061,
+      "task_id": 2,
+      "plan_epoch": 14,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 13,
+      "goal_location": "S2",
+      "ended_at": 113.60000000001129,
+      "duration": 14.400000000004809,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 113.60000000001129,
+      "last_seen_at": 113.60000000001129,
+      "reason": "joint_window_endpoint",
+      "deadline": 113.94,
+      "max_deadline": 113.94,
+      "task_id": 2,
+      "plan_epoch": 14,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 13,
+      "goal_location": "S2",
+      "ended_at": 115.20000000001183,
+      "duration": 1.6000000000005343,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 115.20000000001183,
+      "last_seen_at": 115.20000000001183,
+      "reason": "controller_hold",
+      "deadline": 115.3280000000116,
+      "max_deadline": 115.3280000000116,
+      "task_id": 1,
+      "plan_epoch": 15,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 15,
+      "goal_location": "S5",
+      "ended_at": 116.80000000001236,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 115.20000000001183,
+      "last_seen_at": 115.20000000001183,
+      "reason": "joint_window_endpoint",
+      "deadline": 115.54,
+      "max_deadline": 115.54,
+      "task_id": 2,
+      "plan_epoch": 15,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 14,
+      "goal_location": "S2",
+      "ended_at": 116.80000000001236,
+      "duration": 1.6000000000005343,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 116.80000000001236,
+      "last_seen_at": 118.4000000000129,
+      "reason": "joint_slot_deadline",
+      "deadline": 117.49200000001163,
+      "max_deadline": 118.69200000001162,
+      "task_id": 2,
+      "plan_epoch": 15,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 14,
+      "goal_location": "S2",
+      "ended_at": null,
+      "duration": 3.2000000000010687,
+      "outcome": "active"
+    }
+  ],
+  "deadlock_events": [],
+  "safety_events": [],
+  "time_series": [
+    {
+      "sim_time": 1.6000000000000012,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 62.31241917010452,
+      "min_pair_distance": 1.921002816592449,
+      "robot_positions": {
+        "1": [
+          -4.062228692238238,
+          2.9585459214581915
+        ],
+        "2": [
+          -4.000046632831397,
+          -2.999999999890388
+        ],
+        "3": [
+          4.000046632831398,
+          2.999999999766643
+        ],
+        "4": [
+          4.000046632831397,
+          -3.0000000002333564
+        ],
+        "5": [
+          -6.999999999938324,
+          -4.6632831400536534e-05
+        ],
+        "6": [
+          7.000000000280906,
+          4.6632831399717745e-05
+        ],
+        "7": [
+          -8.500046632831395,
+          1.2000000001096105
+        ],
+        "8": [
+          8.500046632831397,
+          -1.200000000233355
+        ]
+      }
+    },
+    {
+      "sim_time": 3.2000000000000024,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.95349324493608,
+      "min_pair_distance": 1.9210028165924047,
+      "robot_positions": {
+        "1": [
+          -4.124838198010766,
+          2.975415224476513
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.999999999938329,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280911,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 4.800000000000003,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.942382133824985,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.218912562021232,
+          2.996566225039023
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      }
+    },
+    {
+      "sim_time": 6.400000000000005,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.915271022713846,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.313362625780172,
+          2.9868569794641866
+        ],
+        "2": [
+          -4.073997311258486,
+          -2.9442672540703283
+        ],
+        "3": [
+          3.8812241062768478,
+          3.000000042319528
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 8.000000000000005,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.88193768938047,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.367366632817408,
+          2.9840711701096843
+        ],
+        "2": [
+          -4.039468078024539,
+          -2.849616093264271
+        ],
+        "3": [
+          3.682783631457997,
+          3.000000030012413
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 9.600000000000007,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.8486043560471,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.4997123110480945,
+          2.982289823167403
+        ],
+        "2": [
+          -4.010809476617779,
+          -2.7093303849795656
+        ],
+        "3": [
+          3.5042493427521486,
+          3.0000000106103815
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 11.200000000000008,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.93451008274585,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.596073688493773,
+          2.9801616546296916
+        ],
+        "2": [
+          -3.9992785213780486,
+          -2.5827115604503152
+        ],
+        "3": [
+          3.353506124493078,
+          3.0000000030682403
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 12.80000000000001,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.90117674941248,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.659065835579888,
+          2.9810716110897797
+        ],
+        "2": [
+          -3.9867088407252194,
+          -2.441363336681764
+        ],
+        "3": [
+          3.1583099570512623,
+          3.0000000004030225
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 14.400000000000011,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.863287860523556,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.839272424751654,
+          2.9869742858446977
+        ],
+        "2": [
+          -3.983762338283483,
+          -2.385074166341308
+        ],
+        "3": [
+          3.0787622825389023,
+          3.000000001123604
+        ],
+        "4": [
+          4.047574382337909,
+          -2.9731153227455347
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 16.00000000000001,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.81884341607908,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.009491985110858,
+          2.9985969288426584
+        ],
+        "2": [
+          -3.9818880681381663,
+          -2.2610207145019685
+        ],
+        "3": [
+          2.9315717727786526,
+          3.000000000014909
+        ],
+        "4": [
+          4.042216066764968,
+          -2.8694092484857205
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      }
+    },
+    {
+      "sim_time": 17.599999999999834,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.77439897163462,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.113011182632975,
+          3.0058793677793054
+        ],
+        "2": [
+          -3.979382204412464,
+          -2.159558824002044
+        ],
+        "3": [
+          2.7523273515896496,
+          2.999999999425958
+        ],
+        "4": [
+          4.019466102120334,
+          -2.767344225738969
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 19.19999999999966,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.729954527190145,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.2472323146342665,
+          3.016161132611089
+        ],
+        "2": [
+          -3.980151250237848,
+          -2.1182143296229556
+        ],
+        "3": [
+          2.6007263501063034,
+          2.99999999996381
+        ],
+        "4": [
+          4.0036586957156794,
+          -2.6304887526492315
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      }
+    },
+    {
+      "sim_time": 20.799999999999482,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.68939897163459,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.332825867793018,
+          3.020741392944375
+        ],
+        "2": [
+          -3.971103514217385,
+          -2.144254390884236
+        ],
+        "3": [
+          2.4070657484883506,
+          2.9999999998978155
+        ],
+        "4": [
+          3.989100692870573,
+          -2.4696928678758843
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      }
+    },
+    {
+      "sim_time": 22.399999999999306,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.64495452719012,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.378353472298511,
+          3.0201769890324934
+        ],
+        "2": [
+          -3.9671440917695135,
+          -2.1527075371869
+        ],
+        "3": [
+          2.2774221423353196,
+          2.9999999999383067
+        ],
+        "4": [
+          3.9842124641722805,
+          -2.3985820061844265
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 23.99999999999913,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 5,
+      "robots_idle": 2,
+      "robots_active": 6,
+      "conflicts_total": 0,
+      "avg_battery": 55.205322340404734,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.566355859928498,
+          3.0127875965769135
+        ],
+        "2": [
+          -3.8641611171823023,
+          -2.0843605858071736
+        ],
+        "3": [
+          2.1242369124562077,
+          2.9999999994332645
+        ],
+        "4": [
+          3.9828798243735504,
+          -2.3215346869586706
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 25.599999999998953,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 5,
+      "robots_idle": 2,
+      "robots_active": 6,
+      "conflicts_total": 0,
+      "avg_battery": 55.16087789596027,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.59622178708236,
+          3.0254454394757424
+        ],
+        "2": [
+          -3.7341675061938955,
+          -2.0525576592381447
+        ],
+        "3": [
+          1.9228731464113678,
+          2.999999999664086
+        ],
+        "4": [
+          3.979899199739196,
+          -2.1793429837596405
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      }
+    },
+    {
+      "sim_time": 27.199999999998777,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.518032695765925,
+      "min_pair_distance": 1.9216860324107312,
+      "robot_positions": {
+        "1": [
+          -5.664056839426046,
+          3.131310636813134
+        ],
+        "2": [
+          -3.608547820289988,
+          -2.022392884921471
+        ],
+        "3": [
+          1.7403848480229978,
+          2.9999999998608615
+        ],
+        "4": [
+          3.979504841132681,
+          -2.1283776278451767
+        ],
+        "5": [
+          -6.999895707157623,
+          -0.0008234495024751487
+        ],
+        "6": [
+          6.999895664442464,
+          0.0008235744853849758
+        ],
+        "7": [
+          -8.500189200430857,
+          1.200008196151692
+        ],
+        "8": [
+          8.50018918438888,
+          -1.2000081950985002
+        ]
+      }
+    },
+    {
+      "sim_time": 28.7999999999986,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.43047714021023,
+      "min_pair_distance": 1.9499994517783956,
+      "robot_positions": {
+        "1": [
+          -5.710625645950483,
+          3.1214262707243607
+        ],
+        "2": [
+          -3.5764917577363,
+          -2.015859635154251
+        ],
+        "3": [
+          1.5841873227355727,
+          3.0000000006389427
+        ],
+        "4": [
+          3.9891806756249255,
+          -2.1420551935914895
+        ],
+        "5": [
+          -6.917846814299746,
+          -0.06325522944434238
+        ],
+        "6": [
+          6.917846655523586,
+          0.06325532547783447
+        ],
+        "7": [
+          -8.388320743371999,
+          1.2174493757846907
+        ],
+        "8": [
+          8.38832198962612,
+          -1.2174490363699375
+        ]
+      }
+    },
+    {
+      "sim_time": 30.399999999998425,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.341588251321205,
+      "min_pair_distance": 1.8812755280918434,
+      "robot_positions": {
+        "1": [
+          -5.853633442985135,
+          3.1882616567609725
+        ],
+        "2": [
+          -3.4616972681663927,
+          -1.9978287382802467
+        ],
+        "3": [
+          1.3996605124331527,
+          3.000000000425228
+        ],
+        "4": [
+          4.10158271538227,
+          -2.09923541442248
+        ],
+        "5": [
+          -6.825058068095294,
+          -0.033150131975630125
+        ],
+        "6": [
+          6.825057946482625,
+          0.03315022241415164
+        ],
+        "7": [
+          -8.208256537830373,
+          1.2419810792806003
+        ],
+        "8": [
+          8.208257146596967,
+          -1.2419806649277108
+        ]
+      }
+    },
+    {
+      "sim_time": 31.99999999999825,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.252699362432175,
+      "min_pair_distance": 1.9128723695832661,
+      "robot_positions": {
+        "1": [
+          -5.848935112934202,
+          3.1699289518301725
+        ],
+        "2": [
+          -3.3662531715645776,
+          -1.9905835364335067
+        ],
+        "3": [
+          1.3645597428672704,
+          2.999999999898942
+        ],
+        "4": [
+          4.146297033541231,
+          -2.062815004375253
+        ],
+        "5": [
+          -6.673256455955965,
+          -0.007384324924726636
+        ],
+        "6": [
+          6.673256351916738,
+          0.007384381046809188
+        ],
+        "7": [
+          -8.114696956609102,
+          1.2501255359950418
+        ],
+        "8": [
+          8.114696694824435,
+          -1.2501252372675957
+        ]
+      }
+    },
+    {
+      "sim_time": 33.599999999998076,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.16381047354315,
+      "min_pair_distance": 1.8995709619145575,
+      "robot_positions": {
+        "1": [
+          -5.804492841509859,
+          3.1134807568257425
+        ],
+        "2": [
+          -3.2477901344692657,
+          -1.9814896952897392
+        ],
+        "3": [
+          1.1632547112639682,
+          2.9999999996584896
+        ],
+        "4": [
+          4.1661751629590755,
+          -1.9323758028658697
+        ],
+        "5": [
+          -6.532738117711659,
+          0.005253804965769766
+        ],
+        "6": [
+          6.532738005004285,
+          -0.005253759873315684
+        ],
+        "7": [
+          -7.955272548928555,
+          1.264128955109591
+        ],
+        "8": [
+          7.955272248925598,
+          -1.2641287195973607
+        ]
+      }
+    },
+    {
+      "sim_time": 35.1999999999979,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.07881047354301,
+      "min_pair_distance": 1.930963999588789,
+      "robot_positions": {
+        "1": [
+          -5.781755987908849,
+          2.986969520632438
+        ],
+        "2": [
+          -3.159554935519787,
+          -1.9746312547267026
+        ],
+        "3": [
+          1.119339748670905,
+          2.9999999993452136
+        ],
+        "4": [
+          4.201273544979691,
+          -1.8589377072885256
+        ],
+        "5": [
+          -6.423265872007629,
+          0.014542566250405928
+        ],
+        "6": [
+          6.42326578452338,
+          -0.014542525274533988
+        ],
+        "7": [
+          -7.892620044698815,
+          1.2673878633191238
+        ],
+        "8": [
+          7.892619737275834,
+          -1.2673876590555104
+        ]
+      }
+    },
+    {
+      "sim_time": 36.79999999999772,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.98992158465398,
+      "min_pair_distance": 1.960304190514062,
+      "robot_positions": {
+        "1": [
+          -5.765248787976947,
+          2.868491301649266
+        ],
+        "2": [
+          -3.1165123922897124,
+          -1.9715013322514345
+        ],
+        "3": [
+          0.9254134079177141,
+          2.9999999995343174
+        ],
+        "4": [
+          4.226542347658168,
+          -1.736829962141175
+        ],
+        "5": [
+          -6.376099919977162,
+          0.016423876727481513
+        ],
+        "6": [
+          6.3760998451156565,
+          -0.01642383934722773
+        ],
+        "7": [
+          -7.892543808362083,
+          1.2586765052008158
+        ],
+        "8": [
+          7.892543466659475,
+          -1.2586763346258885
+        ]
+      }
+    },
+    {
+      "sim_time": 38.39999999999755,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.901032695764954,
+      "min_pair_distance": 1.9785019883361827,
+      "robot_positions": {
+        "1": [
+          -5.748148968894183,
+          2.691547302603986
+        ],
+        "2": [
+          -3.016148808241105,
+          -1.9655837692156217
+        ],
+        "3": [
+          0.7441618239464456,
+          3.0000000004276934
+        ],
+        "4": [
+          4.243756181122415,
+          -1.5909820678878068
+        ],
+        "5": [
+          -6.224175057303017,
+          0.018901413760146243
+        ],
+        "6": [
+          6.224175047758311,
+          -0.018901396792564387
+        ],
+        "7": [
+          -7.849405455660427,
+          1.1472174470960224
+        ],
+        "8": [
+          7.8494052740901346,
+          -1.1472173229708833
+        ]
+      }
+    },
+    {
+      "sim_time": 39.99999999999737,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.81214380687592,
+      "min_pair_distance": 1.9520509355252298,
+      "robot_positions": {
+        "1": [
+          -5.742697964464726,
+          2.6232865590178576
+        ],
+        "2": [
+          -2.9443323092888174,
+          -1.9610321799055512
+        ],
+        "3": [
+          0.5895485881331919,
+          3.0000000013309807
+        ],
+        "4": [
+          4.258580233208858,
+          -1.4381046603061578
+        ],
+        "5": [
+          -6.146671456610345,
+          0.020776072149669103
+        ],
+        "6": [
+          6.1466715218472485,
+          -0.02077607228092526
+        ],
+        "7": [
+          -7.811502514991786,
+          1.0400116380622522
+        ],
+        "8": [
+          7.811502393941814,
+          -1.0400115809862356
+        ]
+      }
+    },
+    {
+      "sim_time": 41.599999999997195,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.7232549179869,
+      "min_pair_distance": 1.9243537338143908,
+      "robot_positions": {
+        "1": [
+          -5.730860363146805,
+          2.477913669753228
+        ],
+        "2": [
+          -2.90184468293259,
+          -1.9587479807893944
+        ],
+        "3": [
+          0.40206128366239874,
+          3.0000000007651892
+        ],
+        "4": [
+          4.262770591065657,
+          -1.3819415937276007
+        ],
+        "5": [
+          -6.0536240310484235,
+          0.01834582529850317
+        ],
+        "6": [
+          6.053624255980127,
+          -0.018345899288179073
+        ],
+        "7": [
+          -7.773574208154801,
+          0.881427404109385
+        ],
+        "8": [
+          7.77357415567659,
+          -0.8814273759631883
+        ]
+      }
+    },
+    {
+      "sim_time": 43.19999999999702,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.63436602909787,
+      "min_pair_distance": 2.0093475295154115,
+      "robot_positions": {
+        "1": [
+          -5.728227642902418,
+          2.4047723384201274
+        ],
+        "2": [
+          -2.8666487602105706,
+          -1.9609454827862471
+        ],
+        "3": [
+          0.2114089812834764,
+          3.0000000001286766
+        ],
+        "4": [
+          4.268986844133889,
+          -1.2518213342764655
+        ],
+        "5": [
+          -5.889056056754855,
+          0.010947271647952915
+        ],
+        "6": [
+          5.889056687655713,
+          -0.010947468930521651
+        ],
+        "7": [
+          -7.698204746211593,
+          0.8852820403597325
+        ],
+        "8": [
+          7.698204715310777,
+          -0.885282020690589
+        ]
+      }
+    },
+    {
+      "sim_time": 44.79999999999684,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.545477140208845,
+      "min_pair_distance": 1.853656926885652,
+      "robot_positions": {
+        "1": [
+          -5.730846188789194,
+          2.334757367636774
+        ],
+        "2": [
+          -2.725566895385764,
+          -1.9709689339740597
+        ],
+        "3": [
+          0.04388749062725231,
+          2.999999999015342
+        ],
+        "4": [
+          4.272467811688212,
+          -1.1638047961429847
+        ],
+        "5": [
+          -5.713168321158895,
+          -0.002568276162550067
+        ],
+        "6": [
+          5.713168425121064,
+          0.0025681052249116212
+        ],
+        "7": [
+          -7.616463181585634,
+          0.8015572793867648
+        ],
+        "8": [
+          7.616463167199583,
+          -0.8015572691479348
+        ]
+      }
+    },
+    {
+      "sim_time": 46.399999999996666,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.456588251319815,
+      "min_pair_distance": 1.7689486908002918,
+      "robot_positions": {
+        "1": [
+          -5.740022275272888,
+          2.1502971742548764
+        ],
+        "2": [
+          -2.560249315325588,
+          -1.989444257522249
+        ],
+        "3": [
+          -0.11838847902213684,
+          2.9999999991861763
+        ],
+        "4": [
+          4.270670195590901,
+          -1.1190230600095314
+        ],
+        "5": [
+          -5.633525493346818,
+          -0.008720654999412021
+        ],
+        "6": [
+          5.633525253291826,
+          0.008720511190532425
+        ],
+        "7": [
+          -7.577016292109256,
+          0.6681417697804539
+        ],
+        "8": [
+          7.577016284775122,
+          -0.6681417627593901
+        ]
+      }
+    },
+    {
+      "sim_time": 47.99999999999649,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.36769936243079,
+      "min_pair_distance": 1.5592728397433802,
+      "robot_positions": {
+        "1": [
+          -5.752214982564906,
+          1.9760291341018241
+        ],
+        "2": [
+          -2.429493530856867,
+          -2.0020866590305566
+        ],
+        "3": [
+          -0.3170428857206265,
+          2.9999999995260036
+        ],
+        "4": [
+          4.261673048781622,
+          -0.9210435074159038
+        ],
+        "5": [
+          -5.506439326520881,
+          -0.018046228403363163
+        ],
+        "6": [
+          5.50643908873268,
+          0.01804610201758696
+        ],
+        "7": [
+          -7.513433981851135,
+          0.6521886588611334
+        ],
+        "8": [
+          7.513433977173979,
+          -0.6521886552868915
+        ]
+      }
+    },
+    {
+      "sim_time": 49.599999999996314,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.27881047354176,
+      "min_pair_distance": 1.40254992503319,
+      "robot_positions": {
+        "1": [
+          -5.758605226559103,
+          1.886774807230698
+        ],
+        "2": [
+          -2.3748800296896113,
+          -2.0069507819484333
+        ],
+        "3": [
+          -0.49567297230407453,
+          3.00000000039015
+        ],
+        "4": [
+          4.24962697401371,
+          -0.751264103010801
+        ],
+        "5": [
+          -5.419658564721433,
+          -0.022152332717342692
+        ],
+        "6": [
+          5.419658377334888,
+          0.022152219194052317
+        ],
+        "7": [
+          -7.378811667442485,
+          0.569877758157338
+        ],
+        "8": [
+          7.37881166519303,
+          -0.5698777566587161
+        ]
+      }
+    },
+    {
+      "sim_time": 51.19999999999614,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.18992158465274,
+      "min_pair_distance": 1.312325976027718,
+      "robot_positions": {
+        "1": [
+          -5.7669767813763615,
+          1.765551598305905
+        ],
+        "2": [
+          -2.24828936827783,
+          -2.018256360961647
+        ],
+        "3": [
+          -0.6464590884941148,
+          3.000000001123701
+        ],
+        "4": [
+          4.241920121179628,
+          -0.6458934230424798
+        ],
+        "5": [
+          -5.372219319807563,
+          -0.020907537814447114
+        ],
+        "6": [
+          5.3722192140941445,
+          0.02090746771406588
+        ],
+        "7": [
+          -7.369038833986689,
+          0.4749407625873741
+        ],
+        "8": [
+          7.369038832902757,
+          -0.47494076139263713
+        ]
+      }
+    },
+    {
+      "sim_time": 52.79999999999596,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.101032695763706,
+      "min_pair_distance": 1.1054705268655354,
+      "robot_positions": {
+        "1": [
+          -5.771773923536107,
+          1.672364408621007
+        ],
+        "2": [
+          -2.1712381593101187,
+          -2.0219110729045733
+        ],
+        "3": [
+          -0.8416744622750565,
+          3.0000000006724283
+        ],
+        "4": [
+          4.235191931779458,
+          -0.5502191181999159
+        ],
+        "5": [
+          -5.185232179904824,
+          -0.012460270784126759
+        ],
+        "6": [
+          5.186706750015452,
+          0.012528282012372598
+        ],
+        "7": [
+          -7.299069916614986,
+          0.3616386241376066
+        ],
+        "8": [
+          7.2990699161351085,
+          -0.361638623576613
+        ]
+      }
+    },
+    {
+      "sim_time": 54.399999999995785,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.01214380687468,
+      "min_pair_distance": 1.015979596319022,
+      "robot_positions": {
+        "1": [
+          -5.7708825731289055,
+          1.6238330388845876
+        ],
+        "2": [
+          -2.1243481243536166,
+          -2.0210312951411336
+        ],
+        "3": [
+          -1.02991238866731,
+          3.0000000000741
+        ],
+        "4": [
+          4.22847613160291,
+          -0.43606207846777045
+        ],
+        "5": [
+          -5.018691009836946,
+          -0.0008757058265387776
+        ],
+        "6": [
+          5.148834181000267,
+          -0.0057649705922310016
+        ],
+        "7": [
+          -7.176571433622647,
+          0.34350807291703306
+        ],
+        "8": [
+          7.176571433279616,
+          -0.3435080727690527
+        ]
+      }
+    },
+    {
+      "sim_time": 55.99999999999561,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.940143806874566,
+      "min_pair_distance": 0.9613897239646941,
+      "robot_positions": {
+        "1": [
+          -5.765139329582931,
+          1.4890496904260873
+        ],
+        "2": [
+          -1.997139027659445,
+          -2.01617840503913
+        ],
+        "3": [
+          -1.1265805702190843,
+          2.999999999495886
+        ],
+        "4": [
+          4.227908805565464,
+          -0.39427462696770166
+        ],
+        "5": [
+          -4.923382393589301,
+          0.006036604869018157
+        ],
+        "6": [
+          5.131201874847933,
+          -0.06513661285938172
+        ],
+        "7": [
+          -7.11515196100767,
+          0.29834810718493976
+        ],
+        "8": [
+          7.1151519608115406,
+          -0.29834810709811
+        ]
+      }
+    },
+    {
+      "sim_time": 57.59999999999543,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.86192158465222,
+      "min_pair_distance": 0.9264013118796005,
+      "robot_positions": {
+        "1": [
+          -5.756678626012576,
+          1.3739200597977232
+        ],
+        "2": [
+          -1.856778418570089,
+          -2.0074524008151164
+        ],
+        "3": [
+          -1.1767227492325354,
+          2.999999998895625
+        ],
+        "4": [
+          4.231074998303791,
+          -0.3227493517152377
+        ],
+        "5": [
+          -4.871246826566442,
+          0.009842905232887195
+        ],
+        "6": [
+          5.1199395637764535,
+          -0.06171453622247611
+        ],
+        "7": [
+          -7.092951328769892,
+          0.1773226721816093
+        ],
+        "8": [
+          7.092951328407658,
+          -0.17732267207902025
+        ]
+      }
+    },
+    {
+      "sim_time": 59.199999999995256,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.778588251318745,
+      "min_pair_distance": 0.8177115007742677,
+      "robot_positions": {
+        "1": [
+          -5.662140935999336,
+          1.3640821476451022
+        ],
+        "2": [
+          -1.6832261609832375,
+          -1.9947793296662553
+        ],
+        "3": [
+          -1.3552255812332152,
+          2.9999999993093946
+        ],
+        "4": [
+          4.2381948815855175,
+          -0.17660866327595554
+        ],
+        "5": [
+          -4.719301618967551,
+          0.020323280623325488
+        ],
+        "6": [
+          5.055074300377939,
+          -0.1397289445695849
+        ],
+        "7": [
+          -7.054145895700269,
+          0.10602234076052033
+        ],
+        "8": [
+          7.054145895481712,
+          -0.10602234070456298
+        ]
+      }
+    },
+    {
+      "sim_time": 60.79999999999508,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.69347714020749,
+      "min_pair_distance": 0.8164814497072374,
+      "robot_positions": {
+        "1": [
+          -5.659701064722663,
+          1.3495327284967658
+        ],
+        "2": [
+          -1.5983386766355192,
+          -1.9885063072146623
+        ],
+        "3": [
+          -1.4243490931398437,
+          3.000000000525463
+        ],
+        "4": [
+          4.2440631293795565,
+          -0.09008312703330361
+        ],
+        "5": [
+          -4.649766147993139,
+          0.022274625391735286
+        ],
+        "6": [
+          5.041396667519902,
+          -0.26587046068573117
+        ],
+        "7": [
+          -6.94616666011189,
+          0.10437089369723021
+        ],
+        "8": [
+          6.9461666599641605,
+          -0.10437089349360021
+        ]
+      }
+    },
+    {
+      "sim_time": 62.399999999994904,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.60458825131846,
+      "min_pair_distance": 0.8649938227528431,
+      "robot_positions": {
+        "1": [
+          -5.639990763724227,
+          1.2758671495490228
+        ],
+        "2": [
+          -1.4837591758565563,
+          -1.979793408425734
+        ],
+        "3": [
+          -1.6041625596799083,
+          3.0000000001718248
+        ],
+        "4": [
+          4.253256026529495,
+          0.03840927303706736
+        ],
+        "5": [
+          -4.558466725542677,
+          0.018175798699680907
+        ],
+        "6": [
+          5.014942598050964,
+          -0.3715271612603098
+        ],
+        "7": [
+          -6.845101697632996,
+          0.059078505528611575
+        ],
+        "8": [
+          6.845101697577505,
+          -0.059078505402946305
+        ]
+      }
+    },
+    {
+      "sim_time": 63.99999999999473,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.51569936242944,
+      "min_pair_distance": 0.8186432800656898,
+      "robot_positions": {
+        "1": [
+          -5.563336751657144,
+          1.1347427038220812
+        ],
+        "2": [
+          -1.4016596789315214,
+          -1.9734628941034589
+        ],
+        "3": [
+          -1.585749367926099,
+          2.9656253491608657
+        ],
+        "4": [
+          4.257943807949359,
+          0.10253238093346309
+        ],
+        "5": [
+          -4.38830579104419,
+          0.008778203515285861
+        ],
+        "6": [
+          4.909182453843869,
+          -0.3935170582257773
+        ],
+        "7": [
+          -6.677264528064068,
+          0.02027989767937364
+        ],
+        "8": [
+          6.677264528109925,
+          -0.020279897615851635
+        ]
+      }
+    },
+    {
+      "sim_time": 65.59999999999526,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.42681047354041,
+      "min_pair_distance": 0.791450035990874,
+      "robot_positions": {
+        "1": [
+          -5.475545029365894,
+          1.127746311071978
+        ],
+        "2": [
+          -1.3576245031441416,
+          -1.97050744452355
+        ],
+        "3": [
+          -1.67739739497648,
+          2.8534226456957255
+        ],
+        "4": [
+          4.260284946842604,
+          0.1349593186753033
+        ],
+        "5": [
+          -4.3994724699868275,
+          0.054291303225123454
+        ],
+        "6": [
+          4.81252897729077,
+          -0.4319795583690579
+        ],
+        "7": [
+          -6.50903677391943,
+          0.0014801500850564597
+        ],
+        "8": [
+          6.509036773754586,
+          -0.0014801501231008832
+        ]
+      }
+    },
+    {
+      "sim_time": 67.1999999999958,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.33792158465138,
+      "min_pair_distance": 0.8273829893925098,
+      "robot_positions": {
+        "1": [
+          -5.358131456170676,
+          1.0533405434727219
+        ],
+        "2": [
+          -1.2591035002657622,
+          -1.9646210907182178
+        ],
+        "3": [
+          -1.8023002545806581,
+          2.837373747166667
+        ],
+        "4": [
+          4.268891481687408,
+          0.2634489809199314
+        ],
+        "5": [
+          -4.3257499514702324,
+          0.16166632733163844
+        ],
+        "6": [
+          4.642087954253028,
+          -0.4749865301442811
+        ],
+        "7": [
+          -6.4008981546297425,
+          -0.007657432105155258
+        ],
+        "8": [
+          6.400898153938034,
+          0.007657431972833388
+        ]
+      }
+    },
+    {
+      "sim_time": 68.79999999999633,
+      "tasks_completed": 0,
+      "tasks_pending": 3,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.24903269576235,
+      "min_pair_distance": 0.8436497178306349,
+      "robot_positions": {
+        "1": [
+          -5.342671422234841,
+          0.9298730075707169
+        ],
+        "2": [
+          -1.190927149649152,
+          -1.9602654340644947
+        ],
+        "3": [
+          -1.8602490015568731,
+          2.775694206915403
+        ],
+        "4": [
+          4.271711292023781,
+          0.3241399771162052
+        ],
+        "5": [
+          -4.287782072348761,
+          0.3173203017806865
+        ],
+        "6": [
+          4.461147695563671,
+          -0.4979662784308389
+        ],
+        "7": [
+          -6.31720783278601,
+          -0.01377097358141833
+        ],
+        "8": [
+          6.3172078321434215,
+          0.013770973391846637
+        ]
+      }
+    },
+    {
+      "sim_time": 70.39999999999687,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.16014380687333,
+      "min_pair_distance": 0.8751873484913083,
+      "robot_positions": {
+        "1": [
+          -5.273536285949141,
+          0.8931647815516138
+        ],
+        "2": [
+          -1.1500539303584758,
+          -1.9582432847793625
+        ],
+        "3": [
+          -1.9172529036816042,
+          2.6490394420319636
+        ],
+        "4": [
+          4.271772604648452,
+          0.36440165149373566
+        ],
+        "5": [
+          -4.25826358555206,
+          0.4790430989348739
+        ],
+        "6": [
+          4.374759793105243,
+          -0.5047050933730914
+        ],
+        "7": [
+          -6.19411915708931,
+          -0.021470651628144804
+        ],
+        "8": [
+          6.194119156458824,
+          0.021470651395948184
+        ]
+      }
+    },
+    {
+      "sim_time": 71.9999999999974,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.0712549179843,
+      "min_pair_distance": 0.9490049494296682,
+      "robot_positions": {
+        "1": [
+          -5.165417502452519,
+          0.8368689189657452
+        ],
+        "2": [
+          -1.113984252744432,
+          -1.96174916402804
+        ],
+        "3": [
+          -1.9918677974083605,
+          2.641193977722974
+        ],
+        "4": [
+          4.267696130567028,
+          0.4611256762820276
+        ],
+        "5": [
+          -4.248786380097614,
+          0.5911093218542729
+        ],
+        "6": [
+          4.384134185112016,
+          -0.5704999076779262
+        ],
+        "7": [
+          -6.135855275142819,
+          -0.0219268772870967
+        ],
+        "8": [
+          6.135855274437699,
+          0.02192687702101237
+        ]
+      }
+    },
+    {
+      "sim_time": 73.59999999999793,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.9901438068731,
+      "min_pair_distance": 0.8783960763244212,
+      "robot_positions": {
+        "1": [
+          -5.106443989474613,
+          0.8047807108956004
+        ],
+        "2": [
+          -1.1130018680281746,
+          -1.9620792798005544
+        ],
+        "3": [
+          -2.0562325798093006,
+          2.5995838814304864
+        ],
+        "4": [
+          4.260260720694651,
+          0.5971190687387967
+        ],
+        "5": [
+          -4.24553262357772,
+          0.6303923885466417
+        ],
+        "6": [
+          4.357430312158656,
+          -0.5510405939500835
+        ],
+        "7": [
+          -6.118029032084007,
+          -0.02047464544689147
+        ],
+        "8": [
+          6.1180290312604795,
+          0.020474645146429972
+        ]
+      }
+    },
+    {
+      "sim_time": 75.19999999999847,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.901254917984076,
+      "min_pair_distance": 0.8782815502088122,
+      "robot_positions": {
+        "1": [
+          -5.1112172501038975,
+          0.7078888131917807
+        ],
+        "2": [
+          -1.1123735939207626,
+          -1.9623035198169696
+        ],
+        "3": [
+          -2.130649124511544,
+          2.543933382257713
+        ],
+        "4": [
+          4.250409533234922,
+          0.7382255337321906
+        ],
+        "5": [
+          -4.23440682171484,
+          0.7587017456538205
+        ],
+        "6": [
+          4.324767599388118,
+          -0.6336432771093898
+        ],
+        "7": [
+          -5.9379459931989205,
+          -0.01286461065914207
+        ],
+        "8": [
+          5.9361681202865295,
+          0.012790240115565713
+        ]
+      }
+    },
+    {
+      "sim_time": 76.799999999999,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.812366029095045,
+      "min_pair_distance": 0.8371264099635152,
+      "robot_positions": {
+        "1": [
+          -5.042800739862667,
+          0.6226372083222999
+        ],
+        "2": [
+          -1.1120595119539276,
+          -1.962417718685992
+        ],
+        "3": [
+          -2.1610288177813675,
+          2.418333036506834
+        ],
+        "4": [
+          4.243379038349291,
+          0.8359857070301604
+        ],
+        "5": [
+          -4.230471986672348,
+          0.8248811773267305
+        ],
+        "6": [
+          4.292759240033715,
+          -0.769037838497097
+        ],
+        "7": [
+          -5.772386493139932,
+          -0.0012119100153750598
+        ],
+        "8": [
+          5.770426211788912,
+          0.0010811347502029762
+        ]
+      }
+    },
+    {
+      "sim_time": 78.39999999999954,
+      "tasks_completed": 0,
+      "tasks_pending": 5,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.72347714020602,
+      "min_pair_distance": 0.7397823388236102,
+      "robot_positions": {
+        "1": [
+          -4.915403782069533,
+          0.5862036353147647
+        ],
+        "2": [
+          -1.1117453582431909,
+          -1.9625332887642724
+        ],
+        "3": [
+          -2.230158996970624,
+          2.397406116983747
+        ],
+        "4": [
+          4.24041656235946,
+          0.876622172284897
+        ],
+        "5": [
+          -4.2297421398284465,
+          0.8639553611322418
+        ],
+        "6": [
+          4.264773349653239,
+          -0.9114157929789536
+        ],
+        "7": [
+          -5.653467662820145,
+          0.007545546901678422
+        ],
+        "8": [
+          5.652812503219996,
+          -0.007600011968220565
+        ]
+      }
+    },
+    {
+      "sim_time": 80.00000000000007,
+      "tasks_completed": 0,
+      "tasks_pending": 5,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.63458825131699,
+      "min_pair_distance": 0.7887316675961177,
+      "robot_positions": {
+        "1": [
+          -4.898298636631342,
+          0.5180974996782399
+        ],
+        "2": [
+          -1.1111164981386685,
+          -1.9627685850438576
+        ],
+        "3": [
+          -2.3673256289853017,
+          2.3180991104085975
+        ],
+        "4": [
+          4.231522019134246,
+          1.0009932726049935
+        ],
+        "5": [
+          -4.231556684503707,
+          0.9394676608690672
+        ],
+        "6": [
+          4.249794275917508,
+          -1.062579131144976
+        ],
+        "7": [
+          -5.6025171399740215,
+          0.011107650429363373
+        ],
+        "8": [
+          5.569268838773549,
+          -0.013627010794411882
+        ]
+      }
+    },
+    {
+      "sim_time": 81.6000000000006,
+      "tasks_completed": 0,
+      "tasks_pending": 6,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.54569936242797,
+      "min_pair_distance": 0.7493882621276978,
+      "robot_positions": {
+        "1": [
+          -4.8180850992560575,
+          0.38237744452475864
+        ],
+        "2": [
+          -1.1108016162165595,
+          -1.9628883446634866
+        ],
+        "3": [
+          -2.3754452570814606,
+          2.228077056449985
+        ],
+        "4": [
+          4.228101706376458,
+          1.0686125815279583
+        ],
+        "5": [
+          -4.236216524121382,
+          1.070891354768152
+        ],
+        "6": [
+          4.244777972392971,
+          -1.1237733402970678
+        ],
+        "7": [
+          -5.4736494907157764,
+          0.019309825389122313
+        ],
+        "8": [
+          5.445122470377973,
+          -0.021469121013414923
+        ]
+      }
+    },
+    {
+      "sim_time": 83.20000000000114,
+      "tasks_completed": 0,
+      "tasks_pending": 6,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.45681047353894,
+      "min_pair_distance": 0.771861721244903,
+      "robot_positions": {
+        "1": [
+          -4.726779239900563,
+          0.3738455518976861
+        ],
+        "2": [
+          -1.110486332603856,
+          -1.963009492277885
+        ],
+        "3": [
+          -2.4480800896798693,
+          2.1091908865748192
+        ],
+        "4": [
+          4.227812247063371,
+          1.1095880006263406
+        ],
+        "5": [
+          -4.243245777585524,
+          1.1772369450221423
+        ],
+        "6": [
+          4.233974752577985,
+          -1.2508959667141384
+        ],
+        "7": [
+          -5.413603754713086,
+          0.02164872826679805
+        ],
+        "8": [
+          5.3863340193007545,
+          -0.0219635183130339
+        ]
+      }
+    },
+    {
+      "sim_time": 84.80000000000167,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.36869936242769,
+      "min_pair_distance": 0.8120449541807636,
+      "robot_positions": {
+        "1": [
+          -4.6085375846737335,
+          0.3016789496222891
+        ],
+        "2": [
+          -1.1098542480204925,
+          -1.9632559912363174
+        ],
+        "3": [
+          -2.5698321613821484,
+          2.0948591570176753
+        ],
+        "4": [
+          4.229840279563309,
+          1.1409427352102162
+        ],
+        "5": [
+          -4.252171353055497,
+          1.300608798659738
+        ],
+        "6": [
+          4.2298455869500655,
+          -1.32028602933699
+        ],
+        "7": [
+          -5.370317718450999,
+          0.020417442492838934
+        ],
+        "8": [
+          5.244417677337956,
+          -0.015103320053399535
+        ]
+      }
+    },
+    {
+      "sim_time": 86.40000000000221,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.28292158464977,
+      "min_pair_distance": 0.7898461333220348,
+      "robot_positions": {
+        "1": [
+          -4.594450658232328,
+          0.1799478852489414
+        ],
+        "2": [
+          -1.1095371950580382,
+          -1.9633813087303569
+        ],
+        "3": [
+          -2.6479879166136757,
+          2.0567290728504988
+        ],
+        "4": [
+          4.235393694934932,
+          1.2711841591398483
+        ],
+        "5": [
+          -4.25665073713246,
+          1.361326547607787
+        ],
+        "6": [
+          4.229120447134286,
+          -1.3612453237211193
+        ],
+        "7": [
+          -5.367939638182339,
+          0.020036308996119984
+        ],
+        "8": [
+          5.106166564892113,
+          -0.006543011276776405
+        ]
+      }
+    },
+    {
+      "sim_time": 88.00000000000274,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.199588251316335,
+      "min_pair_distance": 0.8093588874880351,
+      "robot_positions": {
+        "1": [
+          -4.52438176898813,
+          0.14313331004277205
+        ],
+        "2": [
+          -1.1092196189249839,
+          -1.9635081598526938
+        ],
+        "3": [
+          -2.8015353501686575,
+          2.023923260728971
+        ],
+        "4": [
+          4.241441169079859,
+          1.3691924343139632
+        ],
+        "5": [
+          -4.262566053940366,
+          1.4370928398567875
+        ],
+        "6": [
+          4.229635084376026,
+          -1.3754818144270364
+        ],
+        "7": [
+          -5.323735969086163,
+          0.016268533443815916
+        ],
+        "8": [
+          4.934290331285456,
+          0.005479829351510853
+        ]
+      }
+    },
+    {
+      "sim_time": 89.60000000000328,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.110699362427304,
+      "min_pair_distance": 0.8274901844101441,
+      "robot_positions": {
+        "1": [
+          -4.391194868313292,
+          0.07305410809373883
+        ],
+        "2": [
+          -1.1089011657644423,
+          -1.9636363591661503
+        ],
+        "3": [
+          -2.848020944590654,
+          1.9967875301226035
+        ],
+        "4": [
+          4.250882231304463,
+          1.50560671610849
+        ],
+        "5": [
+          -4.269772786289016,
+          1.534666593340256
+        ],
+        "6": [
+          4.234340077877985,
+          -1.5074833458696622
+        ],
+        "7": [
+          -5.216064376033732,
+          0.007249089074118045
+        ],
+        "8": [
+          4.873905133834349,
+          0.009760228961233115
+        ]
+      }
+    },
+    {
+      "sim_time": 91.20000000000381,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.02181047353828,
+      "min_pair_distance": 0.7676470942508293,
+      "robot_positions": {
+        "1": [
+          -4.384042874559582,
+          -0.007766394711278386
+        ],
+        "2": [
+          -1.108261548179594,
+          -1.9638969398389463
+        ],
+        "3": [
+          -2.9360528233853658,
+          1.8663341782695302
+        ],
+        "4": [
+          4.256703945960317,
+          1.5874283182682676
+        ],
+        "5": [
+          -4.271682756866667,
+          1.588774572756466
+        ],
+        "6": [
+          4.240441144724774,
+          -1.6129990905659461
+        ],
+        "7": [
+          -5.151629283267978,
+          0.001885883666872398
+        ],
+        "8": [
+          4.725216868445703,
+          0.019818833521188423
+        ]
+      }
+    },
+    {
+      "sim_time": 92.80000000000435,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.93292158464925,
+      "min_pair_distance": 0.8247139773715219,
+      "robot_positions": {
+        "1": [
+          -4.3067863032591225,
+          -0.13887350501435158
+        ],
+        "2": [
+          -1.1082616400035308,
+          -1.9638970108064824
+        ],
+        "3": [
+          -3.029228666796793,
+          1.8824131636025303
+        ],
+        "4": [
+          4.2594137600806805,
+          1.6245495308425826
+        ],
+        "5": [
+          -4.2709299095464095,
+          1.6246379556431807
+        ],
+        "6": [
+          4.244209719761774,
+          -1.6663599037205084
+        ],
+        "7": [
+          -5.119851356188898,
+          -0.0007490532461835201
+        ],
+        "8": [
+          4.653257471056271,
+          0.022130106216737076
+        ]
+      }
+    },
+    {
+      "sim_time": 94.40000000000488,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.85181047353802,
+      "min_pair_distance": 0.793615565343143,
+      "robot_positions": {
+        "1": [
+          -4.281675291730877,
+          -0.25699136732333994
+        ],
+        "2": [
+          -1.107940428454496,
+          -1.9640294632811304
+        ],
+        "3": [
+          -2.9522591345880764,
+          1.966359283473266
+        ],
+        "4": [
+          4.265085631696574,
+          1.7036716079494316
+        ],
+        "5": [
+          -4.267708586115512,
+          1.7259484708967663
+        ],
+        "6": [
+          4.252369916527872,
+          -1.7746125529806824
+        ],
+        "7": [
+          -5.035201037805769,
+          -0.007943951040429205
+        ],
+        "8": [
+          4.617870591176043,
+          0.020288009384559942
+        ]
+      }
+    },
+    {
+      "sim_time": 96.00000000000541,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.76292158464899,
+      "min_pair_distance": 0.803523475608915,
+      "robot_positions": {
+        "1": [
+          -4.26344571204414,
+          -0.37945636406403416
+        ],
+        "2": [
+          -1.107618161460892,
+          -1.9641633351366272
+        ],
+        "3": [
+          -2.8515702022501843,
+          1.953937840477646
+        ],
+        "4": [
+          4.271012503391436,
+          1.7938177113658598
+        ],
+        "5": [
+          -4.260663974014899,
+          1.8567091086933907
+        ],
+        "6": [
+          4.257958305018965,
+          -1.8484171398042069
+        ],
+        "7": [
+          -4.978387957137752,
+          -0.012703638054892523
+        ],
+        "8": [
+          4.454097672057543,
+          0.013130774359793831
+        ]
+      }
+    },
+    {
+      "sim_time": 97.60000000000595,
+      "tasks_completed": 0,
+      "tasks_pending": 8,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.67403269575997,
+      "min_pair_distance": 0.8375815863642212,
+      "robot_positions": {
+        "1": [
+          -4.248074823123607,
+          -0.5362417218521643
+        ],
+        "2": [
+          -1.1069702085705602,
+          -1.9644353378980082
+        ],
+        "3": [
+          -2.682592527186556,
+          1.9864809517237754
+        ],
+        "4": [
+          4.272340300422727,
+          1.8454611487234944
+        ],
+        "5": [
+          -4.217617351025342,
+          1.8393199610454307
+        ],
+        "6": [
+          4.260293383440589,
+          -1.880605000004972
+        ],
+        "7": [
+          -4.905556885310496,
+          -0.01733879093070399
+        ],
+        "8": [
+          4.397788577104307,
+          -0.00462125941606676
+        ]
+      }
+    },
+    {
+      "sim_time": 99.20000000000648,
+      "tasks_completed": 0,
+      "tasks_pending": 8,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.589032695759855,
+      "min_pair_distance": 0.8585790730431688,
+      "robot_positions": {
+        "1": [
+          -4.2421949310877505,
+          -0.605238547382695
+        ],
+        "2": [
+          -1.1066443854714887,
+          -1.964573466176768
+        ],
+        "3": [
+          -2.5892159279361784,
+          1.9958720725022563
+        ],
+        "4": [
+          4.270727830415911,
+          1.8794543388980942
+        ],
+        "5": [
+          -4.157137473737234,
+          1.9264173571327274
+        ],
+        "6": [
+          4.259108005372842,
+          -1.8809440629370089
+        ],
+        "7": [
+          -4.868470646815386,
+          -0.01792538342542056
+        ],
+        "8": [
+          4.359136899237115,
+          -0.0491975331065573
+        ]
+      }
+    },
+    {
+      "sim_time": 100.80000000000702,
+      "tasks_completed": 0,
+      "tasks_pending": 8,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.50014380687083,
+      "min_pair_distance": 0.8140840051297712,
+      "robot_positions": {
+        "1": [
+          -4.238188316976899,
+          -0.6611812030177648
+        ],
+        "2": [
+          -1.1063172641392431,
+          -1.964713008977164
+        ],
+        "3": [
+          -2.5011589391619005,
+          2.0047831736203845
+        ],
+        "4": [
+          4.240683824717126,
+          1.8316280258118105
+        ],
+        "5": [
+          -4.105585604083742,
+          1.9388317874557137
+        ],
+        "6": [
+          4.218837931051615,
+          -1.8405339235575329
+        ],
+        "7": [
+          -4.736266802318881,
+          -0.017247518662329018
+        ],
+        "8": [
+          4.338211273941285,
+          -0.1102341633987931
+        ]
+      }
+    },
+    {
+      "sim_time": 102.40000000000755,
+      "tasks_completed": 0,
+      "tasks_pending": 8,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.4112549179818,
+      "min_pair_distance": 0.8639126840725379,
+      "robot_positions": {
+        "1": [
+          -4.23024802629657,
+          -0.7805593187838862
+        ],
+        "2": [
+          -1.1056588781447507,
+          -1.9649963185904862
+        ],
+        "3": [
+          -2.4162670290341928,
+          2.0126336434827126
+        ],
+        "4": [
+          4.116460773964661,
+          1.9231663199527833
+        ],
+        "5": [
+          -3.972159987400325,
+          1.9630805726150509
+        ],
+        "6": [
+          4.1014084116320015,
+          -1.9317997116051704
+        ],
+        "7": [
+          -4.630980141743981,
+          -0.01521044581779943
+        ],
+        "8": [
+          4.301690519872044,
+          -0.2244893018999728
+        ]
+      }
+    },
+    {
+      "sim_time": 104.00000000000809,
+      "tasks_completed": 0,
+      "tasks_pending": 8,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.32236602909278,
+      "min_pair_distance": 0.8568689783217581,
+      "robot_positions": {
+        "1": [
+          -4.228197256629171,
+          -0.836074746717724
+        ],
+        "2": [
+          -1.105327488851707,
+          -1.9651401100844774
+        ],
+        "3": [
+          -2.374225935295596,
+          2.014712484345244
+        ],
+        "4": [
+          3.9790563681129507,
+          1.9563498973597315
+        ],
+        "5": [
+          -3.816836813920839,
+          1.9897701757894684
+        ],
+        "6": [
+          3.9529759108449873,
+          -1.961329318921578
+        ],
+        "7": [
+          -4.449503307675056,
+          -0.008277623153834223
+        ],
+        "8": [
+          4.270376320550461,
+          -0.37268643265320867
+        ]
+      }
+    },
+    {
+      "sim_time": 105.60000000000862,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.233477140203746,
+      "min_pair_distance": 0.877598951696491,
+      "robot_positions": {
+        "1": [
+          -4.228674418131942,
+          -0.8708928499911408
+        ],
+        "2": [
+          -1.10499457274941,
+          -1.9652852896527995
+        ],
+        "3": [
+          -2.227013746840652,
+          2.0191568041419763
+        ],
+        "4": [
+          3.8287785913386467,
+          1.9863025674492516
+        ],
+        "5": [
+          -3.6626717696350903,
+          2.002748127726938
+        ],
+        "6": [
+          3.790081088766834,
+          -1.990916343979124
+        ],
+        "7": [
+          -4.3780216029438375,
+          -0.006094990137439787
+        ],
+        "8": [
+          4.251342997511908,
+          -0.5379406135595067
+        ]
+      }
+    },
+    {
+      "sim_time": 107.20000000000915,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.14458825131472,
+      "min_pair_distance": 0.9286958091228434,
+      "robot_positions": {
+        "1": [
+          -4.233298105107344,
+          -0.9819047034947033
+        ],
+        "2": [
+          -1.1043239461970398,
+          -1.965579826022196
+        ],
+        "3": [
+          -2.1547401159092314,
+          2.0216313357747615
+        ],
+        "4": [
+          3.663183124599252,
+          2.0016285758608254
+        ],
+        "5": [
+          -3.561315213625321,
+          2.010993531421724
+        ],
+        "6": [
+          3.648744455429241,
+          -2.002445102458484
+        ],
+        "7": [
+          -4.386815938665169,
+          -0.06598539446030757
+        ],
+        "8": [
+          4.245198688506908,
+          -0.6130875780610734
+        ]
+      }
+    },
+    {
+      "sim_time": 108.80000000000969,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 53.05569936242569,
+      "min_pair_distance": 0.9375785333230499,
+      "robot_positions": {
+        "1": [
+          -4.2398799486809455,
+          -1.096835930999215
+        ],
+        "2": [
+          -1.10398612324761,
+          -1.9657292068872427
+        ],
+        "3": [
+          -2.0896854921027614,
+          2.0191985285425518
+        ],
+        "4": [
+          3.5512486816586435,
+          2.010610532501347
+        ],
+        "5": [
+          -3.4418513939481987,
+          2.0196510218048744
+        ],
+        "6": [
+          3.5198060254869863,
+          -2.012818883562651
+        ],
+        "7": [
+          -4.326767963018716,
+          -0.1632921563894538
+        ],
+        "8": [
+          4.236309083372176,
+          -0.7180794182948923
+        ]
+      }
+    },
+    {
+      "sim_time": 110.40000000001022,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 52.96681047353667,
+      "min_pair_distance": 0.924726399981594,
+      "robot_positions": {
+        "1": [
+          -4.2483026264451675,
+          -1.219650479461478
+        ],
+        "2": [
+          -1.1036465707179315,
+          -1.9658799540117868
+        ],
+        "3": [
+          -1.9023949447282593,
+          2.009829964802973
+        ],
+        "4": [
+          3.4359953192780517,
+          2.018946275478443
+        ],
+        "5": [
+          -3.385646157488083,
+          2.0207815579163593
+        ],
+        "6": [
+          3.42354357150694,
+          -2.019180669296077
+        ],
+        "7": [
+          -4.292231846771475,
+          -0.29596809983932576
+        ],
+        "8": [
+          4.230184969390905,
+          -0.8042273378657591
+        ]
+      }
+    },
+    {
+      "sim_time": 112.00000000001076,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 52.87792158464764,
+      "min_pair_distance": 0.9158033548938155,
+      "robot_positions": {
+        "1": [
+          -4.255398203823525,
+          -1.3195636841106855
+        ],
+        "2": [
+          -1.1029620886309857,
+          -1.9661855536578574
+        ],
+        "3": [
+          -1.7314432417172876,
+          1.9981926054630768
+        ],
+        "4": [
+          3.382814259366327,
+          2.020089470951996
+        ],
+        "5": [
+          -3.247876644321465,
+          2.016301841169329
+        ],
+        "6": [
+          3.37584717711511,
+          -2.0197605578824303
+        ],
+        "7": [
+          -4.268853857229631,
+          -0.4038591847080765
+        ],
+        "8": [
+          4.22890183406261,
+          -0.8516480083111154
+        ]
+      }
+    },
+    {
+      "sim_time": 113.60000000001129,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 52.789032695758614,
+      "min_pair_distance": 0.8422018421199766,
+      "robot_positions": {
+        "1": [
+          -4.258846088653281,
+          -1.3669233675399863
+        ],
+        "2": [
+          -1.1029620838495051,
+          -1.9661855722413706
+        ],
+        "3": [
+          -1.6072338878199273,
+          1.9895966167312027
+        ],
+        "4": [
+          3.2379979834467907,
+          2.0161091012013723
+        ],
+        "5": [
+          -3.099378855475795,
+          2.007519723139754
+        ],
+        "6": [
+          3.2050485798235364,
+          -2.014421440815197
+        ],
+        "7": [
+          -4.25369650509962,
+          -0.5247372689492379
+        ],
+        "8": [
+          4.229987821812037,
+          -0.8809847893918944
+        ]
+      }
+    },
+    {
+      "sim_time": 115.20000000001183,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 52.703699362425134,
+      "min_pair_distance": 0.8107219512557404,
+      "robot_positions": {
+        "1": [
+          -4.260596546746485,
+          -1.3912825077435536
+        ],
+        "2": [
+          -1.1029620838494902,
+          -1.966185572241349
+        ],
+        "3": [
+          -1.4887670415787384,
+          1.9809885826278015
+        ],
+        "4": [
+          3.107113507133187,
+          2.008887628038688
+        ],
+        "5": [
+          -2.929487916393154,
+          1.9946264376054084
+        ],
+        "6": [
+          3.058648686168634,
+          -2.0047869042751594
+        ],
+        "7": [
+          -4.248263051590518,
+          -0.5806543765112647
+        ],
+        "8": [
+          4.2357757857278004,
+          -1.036460399438966
+        ]
+      }
+    },
+    {
+      "sim_time": 116.80000000001236,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 52.61514380686944,
+      "min_pair_distance": 0.8999238945811194,
+      "robot_positions": {
+        "1": [
+          -4.269073976493792,
+          -1.5164874353375524
+        ],
+        "2": [
+          -1.102617063838837,
+          -1.9663404267586662
+        ],
+        "3": [
+          -1.4020509199651803,
+          1.9745396511066453
+        ],
+        "4": [
+          3.0387249845768145,
+          2.003305983194565
+        ],
+        "5": [
+          -2.8309163191644098,
+          1.9870650804300327
+        ],
+        "6": [
+          3.0014889272304988,
+          -2.00010973489515
+        ],
+        "7": [
+          -4.244850877227616,
+          -0.6168896043597366
+        ],
+        "8": [
+          4.241582870305096,
+          -1.1292150216820556
+        ]
+      }
+    },
+    {
+      "sim_time": 118.4000000000129,
+      "tasks_completed": 0,
+      "tasks_pending": 9,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 52.52625491798041,
+      "min_pair_distance": 0.8861722906394232,
+      "robot_positions": {
+        "1": [
+          -4.271735399211406,
+          -1.5760304932503941
+        ],
+        "2": [
+          -1.102270125439037,
+          -1.9664966371707477
+        ],
+        "3": [
+          -1.3535694549100752,
+          1.9711460024754766
+        ],
+        "4": [
+          2.8969235602450474,
+          1.992233606014258
+        ],
+        "5": [
+          -2.721102811650725,
+          1.9784713408255423
+        ],
+        "6": [
+          2.876198726795891,
+          -1.990319751370728
+        ],
+        "7": [
+          -4.237993979795234,
+          -0.6905007956609207
+        ],
+        "8": [
+          4.251886032936447,
+          -1.2723006114387159
+        ]
+      }
+    }
+  ]
+}

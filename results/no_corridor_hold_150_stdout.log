@@ -1,0 +1,34 @@
+
+############################################################
+SMART FACTORY MULTI-ROBOT EXPERIMENT SUITE
+Scenarios: ['C']
+Schedulers: ['FCFS']
+Seeds: [42]
+Total experiments: 1
+############################################################
+
+
+[1/1] 
+============================================================
+Running: Scenario C | Scheduler: FCFS | Seed: 42
+============================================================
+Launching Webots simulation (wall timeout: 600s)...
+
+================================================================================
+EXPERIMENTAL COMPARISON REPORT
+Learning-Based vs Rule-Based Scheduling for Multi-Robot Coordination
+================================================================================
+
+©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+SCENARIO C: 8 robots, high task arrival rate (1 task per 8 seconds)
+©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+Scheduler              Throughput    Avg Compl     Avg Wait     Idle %  Conflicts
+                      (tasks/min)    (seconds)    (seconds)                      
+--------------------------------------------------------------------------------
+FCFS                         0.40        62.27         0.02        9.3        0.0
+  valid seeds=1/1; throughput std=0.000, median=0.400, min=0.400, max=0.400
+  scheduling latency across runs: P95 mean=10.6998 ms, P99 mean=10.6998 ms
+
+================================================================================
+
+Report saved to: D:\code\smart_factory_scheduler\scripts\..\results\comparison_report.txt

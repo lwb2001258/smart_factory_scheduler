@@ -9,6 +9,7 @@ Implements:
 """
 
 import heapq
+import itertools
 import math
 import time
 from typing import List, Dict, Tuple, Optional, Set
@@ -23,6 +24,7 @@ from config import (
 )
 from cbs_planner import CBSPlanner, LifelongPlanner
 from grid_planner import OccupancyGrid, GridAStar, subsample_path
+from joint_grid_planner import JointGridPlan, JointGridPlanner
 from safety_coordination import ReservationManager, priority_key
 
 
@@ -249,6 +251,19 @@ class MotionCoordinator:
         # of being forced through hand-placed corridor nodes.
         self.grid = OccupancyGrid(num_active_robots=self.num_active_robots if hasattr(self, 'num_active_robots') else 8)
         self.grid_planner = GridAStar(self.grid)
+        # Primary rolling plan: a longer prefix keeps the transaction rate
+        # low enough for useful progress. The short fallback preserves
+        # robustness when a dense eight-robot start configuration exceeds
+        # the primary search budget.
+        self.joint_grid_planner = JointGridPlanner(
+            self.grid, horizon_slots=12, time_slot_seconds=1.2,
+            separation_cells=3)
+        self.joint_grid_planner_short = JointGridPlanner(
+            self.grid, horizon_slots=4, time_slot_seconds=1.2,
+            separation_cells=3)
+        self.joint_grid_planner_soft = JointGridPlanner(
+            self.grid, horizon_slots=8, time_slot_seconds=1.2,
+            separation_cells=2)
         
         # Grid path-cell reservations: maps robot_id → set of (col, row) cells
         # currently reserved by that robot's active path. When planning for
@@ -256,6 +271,8 @@ class MotionCoordinator:
         # as TEMPORARY OBSTACLES so A* routes around active peers.
         self._grid_path_reservations = {}
         self._dispatch_delays: Dict[int, float] = {}
+        self._pending_plan_backups = {}
+        self.current_time_seconds = 0.0
         
         # Current robot paths: robot_id -> list of PathSteps
         self.robot_paths: Dict[int, List[PathStep]] = {}
@@ -275,8 +292,63 @@ class MotionCoordinator:
         self.conflicts_resolved: int = 0
         self.deadlocks_detected: int = 0
         self.total_replans: int = 0
+        self.joint_plans_attempted: int = 0
+        self.joint_plans_accepted: int = 0
+        self.joint_plan_rollbacks: int = 0
         self._deadlock_break_count = 0
         self._priority_order = list(range(1, num_active_robots + 1))
+        self.joint_grid_candidates_attempted = 0
+        self.joint_grid_candidates_validated = 0
+        self.joint_grid_candidates_timed_out = 0
+        self.joint_grid_candidates_failed = 0
+        self.joint_transactions_attempted = 0
+        self.joint_transactions_activated = 0
+        self.joint_transactions_aborted = 0
+
+    def plan_joint_grid_candidate(
+            self, agents: Dict[int, Tuple[Tuple[float, float],
+                                          Tuple[float, float]]],
+            *, max_seconds: float = 0.20) -> Optional[JointGridPlan]:
+        """Build and independently validate one all-active space-time plan."""
+        self.joint_grid_candidates_attempted += 1
+        started = time.perf_counter()
+        primary_budget = min(max_seconds, 0.90)
+        candidate = self.joint_grid_planner.plan(
+            agents, max_seconds=primary_budget)
+        if candidate is not None and self.joint_grid_planner.validate(
+                candidate, self.joint_grid_planner.separation_cells):
+            self.joint_grid_candidates_validated += 1
+            return candidate
+
+        # Keep a usable shorter-horizon path when the dense primary search
+        # times out. This is a temporary throughput degradation, not a stop.
+        remaining = max(0.02, max_seconds - (time.perf_counter() - started))
+        candidate = self.joint_grid_planner_short.plan(
+            agents, max_seconds=remaining)
+        if candidate is not None and self.joint_grid_planner_short.validate(
+                candidate, self.joint_grid_planner_short.separation_cells):
+            self.joint_grid_candidates_validated += 1
+            return candidate
+
+        # Dense starts and duplicate business goals can make the strict
+        # 3-cell separation plan unsolvable even though the factory has ample
+        # free space.  Use the softer 2-cell plan as a rolling fallback; the
+        # supervisor's predictive joint speed shield then restores the
+        # physical clearance envelope before any pair can approach.
+        remaining = max(0.02, max_seconds - (time.perf_counter() - started))
+        candidate = self.joint_grid_planner_soft.plan(
+            agents, max_seconds=remaining)
+        if candidate is not None and self.joint_grid_planner_soft.validate(
+                candidate, self.joint_grid_planner_soft.separation_cells):
+            candidate.is_relaxed = True
+            self.joint_grid_candidates_validated += 1
+            return candidate
+
+        if self.joint_grid_planner.last_failure_reason == "timeout":
+            self.joint_grid_candidates_timed_out += 1
+        else:
+            self.joint_grid_candidates_failed += 1
+        return None
 
     def set_priorities(self, robot_ids: List[int]):
         """
@@ -923,6 +995,10 @@ class MotionCoordinator:
         if robot_id in self.robot_paths:
             del self.robot_paths[robot_id]
 
+    def record_runtime_replan(self) -> None:
+        """Count a replacement path only after controller dispatch succeeds."""
+        self.total_replans += 1
+
     def lifelong_tick(self, n: int = 1) -> None:
         """
         Advance the lifelong planner's global clock by `n` ticks.
@@ -1128,7 +1204,9 @@ class MotionCoordinator:
             else:
                 last_pos, ticks = prev
                 d = math.hypot(pos[0] - last_pos[0], pos[1] - last_pos[1])
-                if d > self._stuck_position_eps:
+                speed_scale = max(
+                    0.5, min(1.0, float(rs.get("speed_scale", 1.0))))
+                if d > self._stuck_position_eps * speed_scale:
                     # Robot moved — reset stuck counter
                     self._stuck_state[rid] = (pos, 0)
                 else:
@@ -1263,22 +1341,40 @@ class MotionCoordinator:
                                     start_delay=0.0):
         """Atomically reserve a grid route at its expected traversal times."""
         seconds_per_cell = 0.25 / 0.22
+        turn_seconds = 0.5
+        arrivals = [0.0]
+        previous_direction = None
+        for first, second in zip(ordered_cells, ordered_cells[1:]):
+            first_xy = self.grid.grid_to_world(*first)
+            second_xy = self.grid.grid_to_world(*second)
+            travel = math.hypot(
+                second_xy[0] - first_xy[0],
+                second_xy[1] - first_xy[1]) / 0.22
+            direction = (second[0] - first[0], second[1] - first[1])
+            turn = (turn_seconds if previous_direction is not None and
+                    direction != previous_direction else 0.0)
+            arrivals.append(arrivals[-1] + turn + travel)
+            previous_direction = direction
         timed = []
         for index, cell in enumerate(ordered_cells):
-            start_t = (self.lifelong.global_t + start_delay +
-                       index * seconds_per_cell)
+            start_t = (self.current_time_seconds + start_delay +
+                       arrivals[index])
+            occupancy = (arrivals[index + 1] - arrivals[index]
+                         if index + 1 < len(arrivals)
+                         else seconds_per_cell)
             timed.append((('grid', cell), start_t,
-                          start_t + seconds_per_cell))
+                          start_t + max(seconds_per_cell, occupancy)))
         for index, (a, b) in enumerate(zip(ordered_cells,
                                            ordered_cells[1:])):
-            start_t = (self.lifelong.global_t + start_delay +
-                       index * seconds_per_cell)
+            start_t = (self.current_time_seconds + start_delay +
+                       arrivals[index])
             timed.append((('grid_edge', a, b), start_t,
-                          start_t + seconds_per_cell))
+                          self.current_time_seconds + start_delay +
+                          arrivals[index + 1]))
         return self.resource_reservations.reserve_batch(robot_id, timed)
 
     def _plan_space_time_detour(self, robot_id, start_cell, goal_cell,
-                                baseline_cells):
+                                baseline_cells, minimum_delay=0.0):
         """Find a modest grid detour around existing timed reservations.
 
         The returned route contains no intermediate wait actions because the
@@ -1290,7 +1386,9 @@ class MotionCoordinator:
         deadline = time.perf_counter() + SPACE_TIME_DETOUR_BUDGET_SECONDS
         expansions = 0
         max_steps = max(8, int(math.ceil(max(1, baseline_cells) * 1.8)))
-        start_delays = [step * 0.5 for step in range(0, 41)]
+        first_delay_step = max(0, int(math.ceil(float(minimum_delay) / 0.5)))
+        start_delays = [step * 0.5
+                        for step in range(first_delay_step, 41)]
         moves = (
             (-1, -1), (0, -1), (1, -1),
             (-1, 0),            (1, 0),
@@ -1347,9 +1445,10 @@ class MotionCoordinator:
                     if not self.grid.in_bounds(*nxt) or not self.grid.is_free(*nxt):
                         continue
                     next_steps = steps + 1
-                    start_t = (self.lifelong.global_t + initial_delay +
-                               steps * seconds_per_cell)
-                    end_t = start_t + seconds_per_cell
+                    step_cost = math.sqrt(2.0) if dc and dr else 1.0
+                    start_t = (self.current_time_seconds + initial_delay +
+                               cost * seconds_per_cell)
+                    end_t = start_t + step_cost * seconds_per_cell
                     if self.resource_reservations.owner_at(
                             ('grid_edge', cell, nxt), start_t, end_t,
                             exclude_owner=robot_id) is not None:
@@ -1357,7 +1456,6 @@ class MotionCoordinator:
                     if not node_has_clearance(nxt, start_t, end_t):
                         continue
 
-                    step_cost = math.sqrt(2.0) if dc and dr else 1.0
                     new_cost = cost + step_cost
                     next_state = (nxt, next_steps)
                     if new_cost >= best_cost.get(next_state, math.inf):
@@ -1406,6 +1504,53 @@ class MotionCoordinator:
             kept.append(cells[-1])
         return [self.grid.grid_to_world(*cell) for cell in kept]
 
+    def _rasterize_polyline(self, points):
+        """Return an ordered super-cover approximation of a world polyline.
+
+        ``world_to_grid`` rounds to the nearest cell centre. Sampling only
+        once per 0.25 m cell can therefore jump over cells touched by a
+        diagonal segment. A twentieth-cell step is deliberately conservative:
+        every controller segment is represented by all cells it can traverse,
+        while consecutive duplicates are removed for timing calculations.
+        """
+        from grid_planner import GRID_RES
+        ordered = []
+        for first, second in zip(points, points[1:]):
+            distance = math.hypot(
+                second[0] - first[0], second[1] - first[1])
+            samples = max(2, int(math.ceil(distance / (GRID_RES * 0.05))))
+            for index in range(samples + 1):
+                ratio = index / samples
+                cell = self.grid.world_to_grid(
+                    first[0] + ratio * (second[0] - first[0]),
+                    first[1] + ratio * (second[1] - first[1]))
+                if not ordered or ordered[-1] != cell:
+                    ordered.append(cell)
+        return ordered
+
+    @staticmethod
+    def _polyline_prefix(points, max_distance: float):
+        """Clip a polyline to a physical near-term planning window."""
+        if not points:
+            return []
+        result = [tuple(points[0])]
+        remaining = max(0.0, float(max_distance))
+        for first, second in zip(points, points[1:]):
+            first = tuple(first)
+            second = tuple(second)
+            length = math.hypot(second[0] - first[0],
+                                second[1] - first[1])
+            if length <= remaining + 1e-9:
+                result.append(second)
+                remaining -= length
+                continue
+            if length > 1e-9 and remaining > 0.0:
+                ratio = remaining / length
+                result.append((first[0] + ratio * (second[0] - first[0]),
+                               first[1] + ratio * (second[1] - first[1])))
+            break
+        return result
+
     # ────────────────────────────────────────────────────────
     # Grid-based path planning — replaces corridor graph for path
     # length optimization. Still uses LifelongPlanner reservation
@@ -1422,7 +1567,8 @@ class MotionCoordinator:
         Cooperative A* (Silver 2005).
         
         Algorithm:
-          1. Release this robot's previous reservation (re-planning).
+          1. Retain this robot's active reservation while computing a
+             replacement candidate (transactional re-planning).
           2. Temporarily mark OTHER robots' active path cells (+1-cell
              inflation) as TEMPORARY OBSTACLES in the OccupancyGrid.
           3. Run GridAStar — A* naturally routes around peers' paths.
@@ -1440,6 +1586,19 @@ class MotionCoordinator:
         Returns:
             List of (x, y) waypoints, or None if no path found.
         """
+        # Snapshot the active plan. A successful candidate temporarily
+        # replaces these structures; the dispatcher then commits it or calls
+        # rollback_robot_plan() if command delivery fails.
+        active_backup = {
+            "grid": (set(self._grid_path_reservations[robot_id])
+                     if robot_id in self._grid_path_reservations else None),
+            "coordinates": (list(self.coordinate_paths[robot_id])
+                            if robot_id in self.coordinate_paths else None),
+            "timed": self.resource_reservations.snapshot_owner(robot_id),
+            "delay_present": robot_id in self._dispatch_delays,
+            "delay": self._dispatch_delays.get(robot_id, 0.0),
+        }
+
         # Resolve goal world coordinates
         if (isinstance(goal_location, (tuple, list)) and
                 len(goal_location) >= 2):
@@ -1453,15 +1612,37 @@ class MotionCoordinator:
         else:
             return None
         
-        # ── Step 1: release this robot's old reservation ──────
-        self.release_robot_grid(robot_id)
+        # ── Step 1: retain this robot's active reservation ─────
+        # Planning is synchronous, but it is still a transaction: callers
+        # keep executing the current controller path until a replacement is
+        # successfully produced and dispatched.  Releasing here used to make
+        # a failed replan expose that still-active path to other robots.  All
+        # reservation queries already exclude ``robot_id`` and
+        # ReservationManager.reserve_batch() replaces this owner's entries
+        # atomically on success, so the old reservation can safely remain
+        # installed while the candidate is computed.
         
         # ── Step 2: gather all OTHER robots' reserved cells ───
         other_cells = set()
         for rid, cells in self._grid_path_reservations.items():
             if rid == robot_id:
                 continue
-            other_cells |= cells
+            coordinates = self.coordinate_paths.get(rid)
+            if coordinates and len(coordinates) >= 2:
+                # Only the next 4 m is a hard spatial obstacle. Far-future
+                # sharing is serialized by absolute-time reservations; using
+                # the entire remaining route here caused permanent corridor
+                # ownership whenever a robot stopped.
+                prefix = self._polyline_prefix(coordinates, 4.0)
+                centreline = self._rasterize_polyline(prefix)
+                for col, row in centreline:
+                    for dc in range(-1, 2):
+                        for dr in range(-1, 2):
+                            other_cells.add((col + dc, row + dr))
+            else:
+                # Static home/rest reservations have no coordinate path and
+                # remain fully blocked.
+                other_cells |= cells
         
         # ── Step 3: temporarily occlude other robots' cells ────
         # We avoid blocking cells too close to THIS robot's start
@@ -1472,15 +1653,16 @@ class MotionCoordinator:
         start_col, start_row = self.grid.world_to_grid(*current_position)
         goal_col, goal_row = self.grid.world_to_grid(*goal_xy)
         
-        # Inflate peer reservations by 2 cells (0.5m) to guarantee
-        # minimum 0.75m separation between robots' planned paths.
-        # This ensures robots use DIFFERENT corridors when one is taken.
-        # 2-cell inflation blocks entire corridor width (corridors are ~1m),
-        # forcing the second robot to find an alternative route.
+        # Stored spatial reservations already include a one-cell footprint
+        # around the controller centreline. Inflate them by one additional
+        # cell here, preserving the original two-cell (~0.5m) safety band
+        # without over-blocking narrow corridors.
+        # This keeps approximately 0.5 m of centreline separation while
+        # still allowing the planner to use alternate factory corridors.
         inflated_peer_cells = set()
         for (c, r) in other_cells:
-            for dc in range(-2, 3):
-                for dr in range(-2, 3):
+            for dc in range(-1, 2):
+                for dr in range(-1, 2):
                     inflated_peer_cells.add((c + dc, r + dr))
         
         # Start proximity = 2 cells (forces robot onto different corridor)
@@ -1558,29 +1740,37 @@ class MotionCoordinator:
             if raw_path is None or len(raw_path) == 0:
                 return None
         
-        # ── Step 5: record THIS robot's new reservation ────────
-        my_cells = set()
-        ordered_cells = []
-        for i in range(len(raw_path) - 1):
-            p1 = raw_path[i]
-            p2 = raw_path[i + 1]
-            dx, dy = p2[0]-p1[0], p2[1]-p1[1]
-            dist = math.hypot(dx, dy)
-            n_steps = max(2, int(dist / 0.25) + 1)
-            for k in range(n_steps + 1):
-                t = k / n_steps
-                x = p1[0] + t * dx
-                y = p1[1] + t * dy
-                col, row = self.grid.world_to_grid(x, y)
-                my_cells.add((col, row))
-                if not ordered_cells or ordered_cells[-1] != (col, row):
-                    ordered_cells.append((col, row))
+        # ── Step 5: produce the FINAL controller path ──────────
+        # Every geometric transform must happen before rasterization and
+        # reservation.  Reserving raw_path and then shifting/subsampling it
+        # made the physical robot travel through cells that no plan owned.
+        preserve_detour = peer_cost_detour
+        path = (list(raw_path) if preserve_detour else
+                subsample_path(raw_path, step_m=1.5))
+        if (len(path) > 1 and
+                abs(path[0][0] - current_position[0]) < 0.05 and
+                abs(path[0][1] - current_position[1]) < 0.05):
+            path = path[1:]
+        if not preserve_detour:
+            path = self._apply_lane_separation(path)
+
+        # ── Step 6: rasterize the FINAL controller path ────────
+        final_polyline = [current_position] + list(path)
+        ordered_cells = self._rasterize_polyline(final_polyline)
+        my_cells = set(ordered_cells)
+
+        # Compute coordinate-path delay before committing timed resources;
+        # the final reservation must never precede any safety constraint.
+        self._inject_delay_if_temporal_conflict(
+            robot_id, current_position, path)
+        minimum_delay = self._dispatch_delays.get(robot_id, 0.0)
 
         # Reserve continuous traversal windows. A grid cell is 0.25m and
         # nominal speed is 0.22m/s; search a bounded start delay when an
         # active node or reverse-edge window conflicts.
         accepted_delay = None
-        for delay_step in range(41):  # bounded 0..20s cooperative horizon
+        first_delay_step = max(0, int(math.ceil(minimum_delay / 0.5)))
+        for delay_step in range(first_delay_step, 41):
             delay = delay_step * 0.5
             if self._reserve_ordered_grid_cells(robot_id, ordered_cells,
                                                 delay):
@@ -1590,52 +1780,91 @@ class MotionCoordinator:
         if accepted_delay is None:
             detour = self._plan_space_time_detour(
                 robot_id, (start_col, start_row), (goal_col, goal_row),
-                len(ordered_cells))
+                len(ordered_cells), minimum_delay=minimum_delay)
             if detour is None:
                 return None
             ordered_cells, accepted_delay = detour
             my_cells = set(ordered_cells)
             raw_path = self._cells_to_turning_waypoints(ordered_cells)
             space_time_detour = True
+            path = list(raw_path)
+            if (len(path) > 1 and
+                    abs(path[0][0] - current_position[0]) < 0.05 and
+                    abs(path[0][1] - current_position[1]) < 0.05):
+                path = path[1:]
         if accepted_delay > 0:
             self._dispatch_delays[robot_id] = max(
                 accepted_delay, self._dispatch_delays.get(robot_id, 0.0))
-        self._grid_path_reservations[robot_id] = my_cells
-        # Store waypoints for temporal conflict detection by future planners
-        # (coordinate_paths stored after lane separation — see below)
-        # 日志: 规划结果
-        
-        # ── Step 6: subsample + drop-first ─────────────────────
-        # A space-time detour must retain its turns; generic line-of-sight
-        # subsampling could cut back across the reservation it was avoiding.
-        preserve_detour = space_time_detour or peer_cost_detour
-        path = (list(raw_path) if preserve_detour else
-                subsample_path(raw_path, step_m=1.5))
-        if (len(path) > 1 and
-                abs(path[0][0] - current_position[0]) < 0.05 and
-                abs(path[0][1] - current_position[1]) < 0.05):
-            path = path[1:]
-        
-        # ── Step 6b: Lane separation — prevent head-on corridor conflicts ──
-        # When two robots use the same corridor in opposite directions,
-        # shift one to an adjacent lane (0.5m offset). This is cheaper
-        # than serializing with dispatch delays.
-        # Rules:
-        #   West corridor (x ≈ -4.25): southbound stays, northbound → x=-4.75
-        #   East corridor (x ≈ +4.25): southbound stays, northbound → x=+4.75
-        if not preserve_detour:
-            path = self._apply_lane_separation(path)
-        
-        # Store final path (WITH lane separation) for temporal conflict detection
+        # Spatial reservations represent the robot footprint, not an
+        # infinitely thin centreline. Include the immediate neighbouring
+        # cells so lines on rounding boundaries remain conservatively owned.
+        footprint_cells = set()
+        for col, row in my_cells:
+            for dc in range(-1, 2):
+                for dr in range(-1, 2):
+                    candidate = (col + dc, row + dr)
+                    if self.grid.in_bounds(*candidate):
+                        footprint_cells.add(candidate)
+        self._grid_path_reservations[robot_id] = footprint_cells
+        # Store exactly the final dispatched polyline for future planners.
         self.coordinate_paths[robot_id] = [current_position] + list(path)
-        
-        # ── Step 7: Temporal conflict detection & delay injection ──
-        # Simulate this robot and all active peers forward in time.
-        # If conflict (distance < 0.5m at same time), delay this robot.
-        path = self._inject_delay_if_temporal_conflict(
-            robot_id, current_position, path)
+        self._pending_plan_backups[robot_id] = active_backup
+
+        # Independent post-plan gate: validate the exact polyline that will be
+        # dispatched, after lane shifts, subsampling and any space-time
+        # detour. A failed gate restores the prior active plan transaction.
+        if not self.validate_candidate_plan(
+                robot_id, current_position, path):
+            self.rollback_robot_plan(robot_id)
+            return None
         
         return path
+
+    def validate_candidate_plan(self, robot_id: int, current_position,
+                                path) -> bool:
+        """Recheck final geometry, spatial coverage and timed conflicts."""
+        if not path:
+            return False
+        points = [tuple(current_position)] + [tuple(point) for point in path]
+        if any(not self._segment_clear(first, second)
+               for first, second in zip(points, points[1:])):
+            return False
+        travelled = set(self._rasterize_polyline(points))
+        if not travelled.issubset(
+                self._grid_path_reservations.get(robot_id, set())):
+            return False
+        owned = self.resource_reservations.snapshot_owner(robot_id)
+        if not owned:
+            return False
+        for item in owned:
+            if self.resource_reservations.owner_at(
+                    item.resource, item.start, item.end,
+                    exclude_owner=robot_id) is not None:
+                return False
+        return True
+
+    def commit_robot_plan(self, robot_id: int) -> None:
+        """Accept the most recently proposed reservation replacement."""
+        self._pending_plan_backups.pop(robot_id, None)
+
+    def rollback_robot_plan(self, robot_id: int) -> None:
+        """Restore the active plan after candidate dispatch failure."""
+        backup = self._pending_plan_backups.pop(robot_id, None)
+        if backup is None:
+            return
+        if backup["grid"] is None:
+            self._grid_path_reservations.pop(robot_id, None)
+        else:
+            self._grid_path_reservations[robot_id] = set(backup["grid"])
+        if backup["coordinates"] is None:
+            self.coordinate_paths.pop(robot_id, None)
+        else:
+            self.coordinate_paths[robot_id] = list(backup["coordinates"])
+        self.resource_reservations.restore_owner(robot_id, backup["timed"])
+        if backup["delay_present"]:
+            self._dispatch_delays[robot_id] = backup["delay"]
+        else:
+            self._dispatch_delays.pop(robot_id, None)
     
     def _apply_lane_separation(self, path):
         """Enforce corridor lane discipline for the ENTIRE path — all 6 corridors.
@@ -1741,6 +1970,50 @@ class MotionCoordinator:
                 return path
         return new_path
 
+    @staticmethod
+    def _simulate_polyline(start, waypoints, speed=0.22, dt=0.5,
+                           total_time=10.0, start_delay=0.0):
+        """Return a fixed-length trajectory, remaining stopped after arrival."""
+        x, y = float(start[0]), float(start[1])
+        targets = [tuple(point) for point in waypoints]
+        index = 0
+        result = []
+        for step_index in range(int(total_time / dt)):
+            now = (step_index + 1) * dt
+            budget = 0.0 if now <= start_delay else speed * dt
+            while budget > 1e-9 and index < len(targets):
+                tx, ty = targets[index]
+                distance = math.hypot(tx - x, ty - y)
+                if distance < 0.01:
+                    index += 1
+                    continue
+                travelled = min(budget, distance)
+                x += (tx - x) / distance * travelled
+                y += (ty - y) / distance * travelled
+                budget -= travelled
+                if travelled >= distance - 1e-9:
+                    index += 1
+            result.append((x, y))
+        return result
+
+    def _joint_trajectory_delay(self, start_pos, path, peer_path,
+                                minimum_distance=0.65,
+                                max_delay=20.0, dt=0.5):
+        """Find the earliest safe delay in the rolling 10-second horizon."""
+        if not path or not peer_path:
+            return 0.0
+        peer_positions = self._simulate_polyline(
+            peer_path[0], peer_path[1:], dt=dt)
+        for delay_step in range(int(max_delay / dt) + 1):
+            delay = delay_step * dt
+            own_positions = self._simulate_polyline(
+                start_pos, path, dt=dt, start_delay=delay)
+            if all(math.hypot(own[0] - peer[0], own[1] - peer[1]) >=
+                   minimum_distance
+                   for own, peer in zip(own_positions, peer_positions)):
+                return delay
+        return None
+
     def _inject_delay_if_temporal_conflict(self, robot_id, start_pos, path):
         """
         Check if this robot's path has temporal conflicts with active peers.
@@ -1750,106 +2023,13 @@ class MotionCoordinator:
         Also returns modified path — no hold waypoints needed since supervisor
         handles the timing directly.
         """
-        if not path:
-            return path
-        
-        CONFLICT_RADIUS = 0.5  # m — minimum safe distance between robots
-        ROBOT_SPEED = 0.22     # m/s
-        DT = 0.5              # s — simulation timestep
-        MAX_T = 80.0          # s
-        
-        # Get active peer paths
-        active_peers = {}
-        for rid, rdata in self.coordinate_paths.items():
-            if rid == robot_id:
-                continue
-            if rdata and len(rdata) > 0:
-                active_peers[rid] = rdata
-        
-        if not active_peers:
-            return path
-        
-        def simulate_positions(start, waypoints, speed, dt, total_time):
-            positions = []
-            if hasattr(start, 'position'):
-                x, y = start.position
-            elif isinstance(start, (list, tuple)) and len(start) >= 2:
-                x, y = start[0], start[1]
-            else:
-                return positions
-            wp_idx = 0
-            for _ in range(int(total_time / dt)):
-                if wp_idx < len(waypoints):
-                    wp = waypoints[wp_idx]
-                    tx, ty = (wp.position if hasattr(wp, 'position') else 
-                              (wp[0], wp[1]) if isinstance(wp, (list, tuple)) else (0,0))
-                    dist = math.hypot(tx - x, ty - y)
-                    if dist < 0.35:
-                        wp_idx += 1
-                        if wp_idx >= len(waypoints):
-                            break
-                        wp = waypoints[wp_idx]
-                        tx, ty = (wp.position if hasattr(wp, 'position') else 
-                                  (wp[0], wp[1]) if isinstance(wp, (list, tuple)) else (0,0))
-                        dist = math.hypot(tx - x, ty - y)
-                    if dist > 0.01:
-                        step = min(speed * dt, dist)
-                        x += (tx - x) / dist * step
-                        y += (ty - y) / dist * step
-                positions.append((x, y))
-            return positions
-        
-        my_positions = simulate_positions(start_pos, path, ROBOT_SPEED, DT, MAX_T)
-        
-        # Check against each active peer
-        max_delay_needed = 0.0
-        for peer_id, peer_path in active_peers.items():
-            if not peer_path:
-                continue
-            peer_start = peer_path[0]
-            peer_wps = peer_path[1:] if len(peer_path) > 1 else peer_path
-            peer_positions = simulate_positions(peer_start, peer_wps, ROBOT_SPEED, DT, MAX_T)
-            
-            # Find ALL time steps where paths are within conflict radius.
-            # The required delay = time until NO MORE conflicts exist even
-            # if we shift our start time later and later.
-            n = min(len(my_positions), len(peer_positions))
-            
-            # Strategy: find the time when the peer has EXITED the area
-            # that our path passes through. This means the peer's position
-            # must be > CONFLICT_RADIUS from ALL points on our path.
-            # Simplification: find when peer is far from our FIRST waypoint
-            # (the entrance to the shared corridor).
-            if len(my_positions) > 0:
-                # Our entry point to potential conflict zone
-                my_entry = my_positions[0]  # our first step
-                
-                # Find the LAST time the peer is near our entry region
-                last_peer_near_our_entry = -1
-                for t in range(n):
-                    # Check if peer is near ANY of our early positions
-                    for my_t in range(min(t+1, len(my_positions))):
-                        d = math.hypot(my_positions[my_t][0] - peer_positions[t][0],
-                                      my_positions[my_t][1] - peer_positions[t][1])
-                        if d < CONFLICT_RADIUS:
-                            last_peer_near_our_entry = t
-                            break
-                
-                if last_peer_near_our_entry >= 0:
-                    # Must wait until peer clears + safety margin
-                    delay = (last_peer_near_our_entry + 8) * DT
-                    max_delay_needed = max(max_delay_needed, delay)
-        
-        # Store dispatch delay for supervisor to use.
-        # Cap at 10s — with proactive braking + progress monitoring,
-        # we don't need large delays. If conflict persists, the progress
-        # monitor will trigger dynamic replanning.
-        MAX_DISPATCH_DELAY = 10.0
-        if not hasattr(self, '_dispatch_delays'):
-            self._dispatch_delays = {}
-        if max_delay_needed > 0:
-            self._dispatch_delays[robot_id] = min(max_delay_needed, MAX_DISPATCH_DELAY)
-        
+        # Hard activation is decided immediately afterwards by atomic grid
+        # node/reverse-edge reservations over 0..20 seconds. Nominal-speed
+        # trajectory matching is intentionally not a hard gate: Webots DWA,
+        # turns and station transitions make it produce false conflicts and
+        # repeated legal-path delays. The supervisor still uses measured
+        # rolling trajectories to assign one proactive yielder before robots
+        # enter the safety radius.
         return path
     
     def get_dispatch_delay(self, robot_id):
@@ -1858,6 +2038,33 @@ class MotionCoordinator:
         if not hasattr(self, '_dispatch_delays'):
             return 0.0
         return self._dispatch_delays.pop(robot_id, 0.0)
+
+    def set_sim_time(self, now: float) -> None:
+        """Set the authoritative absolute simulation-seconds time domain."""
+        value = float(now)
+        if not math.isfinite(value) or value < self.current_time_seconds:
+            raise ValueError("simulation time must be finite and monotonic")
+        self.current_time_seconds = value
+        # Keep a short grace window so a slow/held robot can refresh its
+        # remaining traversal before nominal windows disappear. Expired
+        # intervals do not conflict with future queries.
+        self.resource_reservations.prune(max(0.0, value - 30.0))
+
+    def refresh_active_plan_timing(self, robot_id: int, current_position,
+                                   remaining_waypoints,
+                                   not_before: float = 0.0) -> bool:
+        """Re-anchor timed reservations to measured physical progress."""
+        if not remaining_waypoints:
+            return False
+        ordered = self._rasterize_polyline(
+            [current_position] + list(remaining_waypoints))
+        delay = max(0.0, float(not_before) - self.current_time_seconds)
+        refreshed = self._reserve_ordered_grid_cells(
+            robot_id, ordered, delay)
+        if refreshed:
+            self.coordinate_paths[robot_id] = (
+                [tuple(current_position)] + list(remaining_waypoints))
+        return refreshed
     
     def release_robot_grid(self, robot_id: int) -> None:
         """Clear this robot's grid path reservation. Call when robot
@@ -1865,6 +2072,8 @@ class MotionCoordinator:
         other robots can plan through cells it no longer occupies."""
         self._grid_path_reservations.pop(robot_id, None)
         self.coordinate_paths.pop(robot_id, None)
+        self._pending_plan_backups.pop(robot_id, None)
+        self._dispatch_delays.pop(robot_id, None)
         self.resource_reservations.release(robot_id)
     
     def get_statistics(self) -> dict:
@@ -1874,6 +2083,19 @@ class MotionCoordinator:
             "conflicts_resolved": self.conflicts_resolved,
             "deadlocks_detected": self.deadlocks_detected,
             "total_replans": self.total_replans,
+            "joint_plans_attempted": self.joint_plans_attempted,
+            "joint_plans_accepted": self.joint_plans_accepted,
+            "joint_plan_rollbacks": self.joint_plan_rollbacks,
+            "joint_grid_candidates_attempted":
+                self.joint_grid_candidates_attempted,
+            "joint_grid_candidates_validated":
+                self.joint_grid_candidates_validated,
+            "joint_grid_candidates_timed_out":
+                self.joint_grid_candidates_timed_out,
+            "joint_grid_candidates_failed": self.joint_grid_candidates_failed,
+            "joint_transactions_attempted": self.joint_transactions_attempted,
+            "joint_transactions_activated": self.joint_transactions_activated,
+            "joint_transactions_aborted": self.joint_transactions_aborted,
         }
 
     def get_path_length(self, robot_id: int) -> float:

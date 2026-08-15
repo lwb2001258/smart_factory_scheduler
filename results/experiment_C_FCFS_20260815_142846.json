@@ -1,0 +1,2241 @@
+{
+  "experiment_info": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "num_robots": 8,
+    "sim_duration": 450.00000000018224,
+    "timestamp": "2026-08-15 14:40:15"
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.6666666666663966,
+    "total_tasks_completed": 5,
+    "total_tasks_generated": 47,
+    "avg_task_completion_time": 238.62400000002125,
+    "avg_waiting_time": 36.23039999999413,
+    "avg_robot_idle_pct": 3.0853333333319797,
+    "total_distance_all_robots": 246.05812975125966,
+    "total_conflicts_resolved": 0,
+    "total_deadlocks": 40,
+    "min_pair_distance": 0.48643244841941047,
+    "pair_distance_violations": 67,
+    "max_completion_time": 330.8800000000385,
+    "min_completion_time": 66.15999999999545,
+    "workload_balance_cv": 0.6959705453537527,
+    "tasks_per_robot": [
+      1,
+      0,
+      1,
+      2,
+      0,
+      0,
+      0,
+      1
+    ],
+    "robot_idle_percentages": [
+      0.007111111111108232,
+      0.2737777777776671,
+      0.330666666666533,
+      2.1973333333324447,
+      5.144888888886633,
+      5.72444444444189,
+      5.223111111108814,
+      5.78133333333075
+    ],
+    "total_replans": 254,
+    "joint_plans_attempted": 2704,
+    "joint_plans_accepted": 30,
+    "joint_plan_rollbacks": 0,
+    "longest_completion_plateau_seconds": 146.97599999997345,
+    "final_completion_plateau_seconds": 98.64000000012055,
+    "robots_without_completed_tasks": 4,
+    "scheduling_latency_mean_ms": 6.164671427021468,
+    "scheduling_latency_p50_ms": 4.60190000012517,
+    "scheduling_latency_p95_ms": 14.779599994653836,
+    "scheduling_latency_p99_ms": 14.779599994653836,
+    "scheduling_latency_max_ms": 14.779599994653836,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0,
+    "native_scheduler_commits": 14,
+    "fallback_scheduler_commits": 0,
+    "scheduler_commits_by_algorithm": {
+      "FCFS": 14
+    },
+    "rl_policy_decisions": 0,
+    "rl_fallback_decisions": 0,
+    "rl_fallback_rate": 0.0,
+    "rl_timeout_count": 0,
+    "rl_inference_mean_ms": 0.0,
+    "rl_inference_p95_ms": 0.0,
+    "rl_inference_max_ms": 0.0
+  },
+  "task_stats": {
+    "total_generated": 47,
+    "pending": 33,
+    "active": 8,
+    "completed": 5,
+    "failed": 1,
+    "avg_completion_time": 238.62400000002125,
+    "max_completion_time": 330.8800000000385,
+    "avg_waiting_time": 36.23039999999413,
+    "throughput": 5
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 40,
+    "total_replans": 254,
+    "joint_plans_attempted": 2704,
+    "joint_plans_accepted": 30,
+    "joint_plan_rollbacks": 0
+  },
+  "task_completions": [
+    {
+      "task_id": 1,
+      "robot_id": 1,
+      "arrival_time": 0.016,
+      "assignment_time": 0.032,
+      "pickup_time": 20.91199999999947,
+      "completion_time": 66.17599999999545,
+      "waiting_time": 0.016,
+      "completion_duration": 66.15999999999545,
+      "execution_time": 66.14399999999546,
+      "pickup": "WS1",
+      "delivery": "S5"
+    },
+    {
+      "task_id": 4,
+      "robot_id": 4,
+      "arrival_time": 9.888000000000007,
+      "assignment_time": 9.888000000000007,
+      "pickup_time": 103.07200000000778,
+      "completion_time": 213.1519999999689,
+      "waiting_time": 0.0,
+      "completion_duration": 203.2639999999689,
+      "execution_time": 203.2639999999689,
+      "pickup": "WS2",
+      "delivery": "S8"
+    },
+    {
+      "task_id": 8,
+      "robot_id": 8,
+      "arrival_time": 37.055999999997695,
+      "assignment_time": 56.63999999999554,
+      "pickup_time": 268.0799999999599,
+      "completion_time": 330.1120000000357,
+      "waiting_time": 19.583999999997843,
+      "completion_duration": 293.056000000038,
+      "execution_time": 273.47200000004017,
+      "pickup": "WS4",
+      "delivery": "S2"
+    },
+    {
+      "task_id": 3,
+      "robot_id": 3,
+      "arrival_time": 1.488000000000001,
+      "assignment_time": 1.488000000000001,
+      "pickup_time": 39.679999999997406,
+      "completion_time": 332.3680000000385,
+      "waiting_time": 0.0,
+      "completion_duration": 330.8800000000385,
+      "execution_time": 330.8800000000385,
+      "pickup": "S1",
+      "delivery": "WS5"
+    },
+    {
+      "task_id": 10,
+      "robot_id": 4,
+      "arrival_time": 51.59999999999609,
+      "assignment_time": 213.1519999999689,
+      "pickup_time": 299.5039999999983,
+      "completion_time": 351.3600000000617,
+      "waiting_time": 161.5519999999728,
+      "completion_duration": 299.7600000000656,
+      "execution_time": 138.2080000000928,
+      "pickup": "S5",
+      "delivery": "WS1"
+    }
+  ],
+  "deadlock_events": [
+    {
+      "sim_time": 7.008000000000005,
+      "robots_involved": [
+        1
+      ]
+    },
+    {
+      "sim_time": 8.000000000000005,
+      "robots_involved": [
+        2
+      ]
+    },
+    {
+      "sim_time": 9.008000000000006,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 89.00800000000308,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 91.00800000000375,
+      "robots_involved": [
+        6
+      ]
+    },
+    {
+      "sim_time": 130.00000000001498,
+      "robots_involved": [
+        5
+      ]
+    },
+    {
+      "sim_time": 158.01599999999945,
+      "robots_involved": [
+        1
+      ]
+    },
+    {
+      "sim_time": 160.01599999999834,
+      "robots_involved": [
+        2
+      ]
+    },
+    {
+      "sim_time": 164.01599999999613,
+      "robots_involved": [
+        5
+      ]
+    },
+    {
+      "sim_time": 290.0159999999867,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 323.00800000002704,
+      "robots_involved": [
+        5
+      ]
+    },
+    {
+      "sim_time": 345.0080000000539,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 351.00800000006126,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 357.0080000000686,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 363.0080000000759,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 365.00800000007837,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 369.00800000008326,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 373.00800000008815,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 375.0080000000906,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 381.0080000000979,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 382.00000000009913,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 387.00800000010526,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 389.0080000001077,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 393.0080000001126,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 397.0080000001175,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 399.0080000001199,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 405.00800000012725,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 406.00000000012847,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 411.0080000001346,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 413.00800000013703,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 417.0080000001419,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 421.0080000001468,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 423.00800000014925,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 429.0080000001566,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 430.0000000001578,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 435.0080000001639,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 437.00800000016636,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 441.00800000017125,
+      "robots_involved": [
+        3
+      ]
+    },
+    {
+      "sim_time": 445.00800000017614,
+      "robots_involved": [
+        8
+      ]
+    },
+    {
+      "sim_time": 447.0080000001786,
+      "robots_involved": [
+        3
+      ]
+    }
+  ],
+  "safety_events": [
+    {
+      "event_id": "distance-3-6-344.000",
+      "sim_time": 344.0000000000527,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.4936036479606655,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-345.600",
+      "sim_time": 345.60000000005465,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48687564554071944,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-347.200",
+      "sim_time": 347.2000000000566,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.4866828783731033,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-348.800",
+      "sim_time": 348.80000000005856,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.4865462203965806,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-350.400",
+      "sim_time": 350.4000000000605,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48651983944969057,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-352.000",
+      "sim_time": 352.00000000006247,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48646365977046757,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-353.600",
+      "sim_time": 353.6000000000644,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48645870990135676,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-355.200",
+      "sim_time": 355.2000000000664,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48645379392494625,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-356.800",
+      "sim_time": 356.80000000006834,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.4864489120533565,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-358.400",
+      "sim_time": 358.4000000000703,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48644406391261874,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-360.000",
+      "sim_time": 360.00000000007225,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643924912868314,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-361.600",
+      "sim_time": 361.6000000000742,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.486434508206978,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-363.200",
+      "sim_time": 363.20000000007616,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643244841941047,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-364.800",
+      "sim_time": 364.8000000000781,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.4864345377169464,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-366.400",
+      "sim_time": 366.40000000008007,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627575131826,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-368.000",
+      "sim_time": 368.000000000082,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.4864362755710035,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-369.600",
+      "sim_time": 369.600000000084,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100144,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-371.200",
+      "sim_time": 371.20000000008594,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-372.800",
+      "sim_time": 372.8000000000879,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-374.400",
+      "sim_time": 374.40000000008985,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-376.000",
+      "sim_time": 376.0000000000918,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-377.600",
+      "sim_time": 377.60000000009376,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-379.200",
+      "sim_time": 379.2000000000957,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-380.800",
+      "sim_time": 380.80000000009767,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-382.400",
+      "sim_time": 382.4000000000996,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-384.000",
+      "sim_time": 384.0000000001016,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-385.600",
+      "sim_time": 385.60000000010353,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-387.200",
+      "sim_time": 387.2000000001055,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-388.800",
+      "sim_time": 388.80000000010745,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-390.400",
+      "sim_time": 390.4000000001094,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-392.000",
+      "sim_time": 392.00000000011136,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-393.600",
+      "sim_time": 393.6000000001133,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-395.200",
+      "sim_time": 395.20000000011527,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-396.800",
+      "sim_time": 396.8000000001172,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-398.400",
+      "sim_time": 398.4000000001192,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-400.000",
+      "sim_time": 400.00000000012113,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-401.600",
+      "sim_time": 401.6000000001231,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-403.200",
+      "sim_time": 403.20000000012504,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-404.800",
+      "sim_time": 404.800000000127,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-406.400",
+      "sim_time": 406.40000000012895,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-408.000",
+      "sim_time": 408.0000000001309,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-409.600",
+      "sim_time": 409.60000000013287,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-411.200",
+      "sim_time": 411.2000000001348,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-412.800",
+      "sim_time": 412.8000000001368,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-414.400",
+      "sim_time": 414.40000000013873,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-416.000",
+      "sim_time": 416.0000000001407,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-417.600",
+      "sim_time": 417.60000000014264,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-419.200",
+      "sim_time": 419.2000000001446,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-420.800",
+      "sim_time": 420.80000000014655,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-422.400",
+      "sim_time": 422.4000000001485,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-424.000",
+      "sim_time": 424.00000000015046,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-425.600",
+      "sim_time": 425.6000000001524,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-427.200",
+      "sim_time": 427.2000000001544,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-428.800",
+      "sim_time": 428.80000000015633,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-430.400",
+      "sim_time": 430.4000000001583,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-432.000",
+      "sim_time": 432.00000000016024,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-433.600",
+      "sim_time": 433.6000000001622,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-435.200",
+      "sim_time": 435.20000000016415,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-436.800",
+      "sim_time": 436.8000000001661,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-438.400",
+      "sim_time": 438.40000000016806,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-440.000",
+      "sim_time": 440.00000000017,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-441.600",
+      "sim_time": 441.600000000172,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-443.200",
+      "sim_time": 443.20000000017393,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-444.800",
+      "sim_time": 444.8000000001759,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-446.400",
+      "sim_time": 446.40000000017784,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-448.000",
+      "sim_time": 448.0000000001798,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    },
+    {
+      "event_id": "distance-3-6-449.600",
+      "sim_time": 449.60000000018175,
+      "event_type": "pair_distance_violation",
+      "robot_id": 3,
+      "peer_id": 6,
+      "path_version": 0,
+      "decision": "observed",
+      "minimum_distance": 0.48643627557100133,
+      "ttc": null
+    }
+  ],
+  "time_series": [
+    {
+      "sim_time": 291.19999999998817,
+      "tasks_completed": 2,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.15836602908603,
+      "min_pair_distance": 0.6504635733677094
+    },
+    {
+      "sim_time": 292.7999999999901,
+      "tasks_completed": 2,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.0941438068638,
+      "min_pair_distance": 0.6498282392163341
+    },
+    {
+      "sim_time": 294.3999999999921,
+      "tasks_completed": 2,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 44.03169936241936,
+      "min_pair_distance": 0.6498282392461336
+    },
+    {
+      "sim_time": 295.99999999999403,
+      "tasks_completed": 2,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.970366029085994,
+      "min_pair_distance": 0.6492793571944545
+    },
+    {
+      "sim_time": 297.599999999996,
+      "tasks_completed": 2,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.90714380686378,
+      "min_pair_distance": 0.6492793574384683
+    },
+    {
+      "sim_time": 299.19999999999794,
+      "tasks_completed": 2,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.83514380686375,
+      "min_pair_distance": 0.6492793574384705
+    },
+    {
+      "sim_time": 300.7999999999999,
+      "tasks_completed": 2,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.75981047353042,
+      "min_pair_distance": 0.6492793574384697
+    },
+    {
+      "sim_time": 302.40000000000185,
+      "tasks_completed": 2,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.69314380686376,
+      "min_pair_distance": 0.6492793574384695
+    },
+    {
+      "sim_time": 304.0000000000038,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.6206993624193,
+      "min_pair_distance": 0.6492793574384695
+    },
+    {
+      "sim_time": 305.60000000000576,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.55292158464154,
+      "min_pair_distance": 0.6492793574384695
+    },
+    {
+      "sim_time": 307.2000000000077,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.48092158464151,
+      "min_pair_distance": 0.6492793574384695
+    },
+    {
+      "sim_time": 308.8000000000097,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.40558825130818,
+      "min_pair_distance": 0.6492793574384695
+    },
+    {
+      "sim_time": 310.40000000001163,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.33725491797486,
+      "min_pair_distance": 0.6492793574384695
+    },
+    {
+      "sim_time": 312.0000000000136,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.25592158464153,
+      "min_pair_distance": 0.6492793574384695
+    },
+    {
+      "sim_time": 313.60000000001554,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.189143806863754,
+      "min_pair_distance": 0.6485352337630991
+    },
+    {
+      "sim_time": 315.2000000000175,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.12825491797482,
+      "min_pair_distance": 0.6490443665627027
+    },
+    {
+      "sim_time": 316.80000000001945,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.06658825130814,
+      "min_pair_distance": 0.649044820960581
+    },
+    {
+      "sim_time": 318.4000000000214,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 43.00858825130814,
+      "min_pair_distance": 0.6490448209620864
+    },
+    {
+      "sim_time": 320.00000000002336,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.95803269575263,
+      "min_pair_distance": 0.6490448209620878
+    },
+    {
+      "sim_time": 321.6000000000253,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.90592158464159,
+      "min_pair_distance": 0.649044820962088
+    },
+    {
+      "sim_time": 323.2000000000273,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.834143806863786,
+      "min_pair_distance": 0.6489373948461301
+    },
+    {
+      "sim_time": 324.80000000002923,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.76369936241927,
+      "min_pair_distance": 0.6489377506233379
+    },
+    {
+      "sim_time": 326.4000000000312,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.70203269575255,
+      "min_pair_distance": 0.6489377506238074
+    },
+    {
+      "sim_time": 328.00000000003314,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.645143806863715,
+      "min_pair_distance": 0.6489377506238091
+    },
+    {
+      "sim_time": 329.6000000000351,
+      "tasks_completed": 2,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.57781047353043,
+      "min_pair_distance": 0.6485917230986891
+    },
+    {
+      "sim_time": 331.20000000003705,
+      "tasks_completed": 3,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.51258825130822,
+      "min_pair_distance": 0.6500071818033999
+    },
+    {
+      "sim_time": 332.800000000039,
+      "tasks_completed": 4,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.44414380686386,
+      "min_pair_distance": 0.649458137619784
+    },
+    {
+      "sim_time": 334.40000000004096,
+      "tasks_completed": 4,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.3811438068639,
+      "min_pair_distance": 0.6494581223203636
+    },
+    {
+      "sim_time": 336.0000000000429,
+      "tasks_completed": 4,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.31447714019724,
+      "min_pair_distance": 0.6003823661776186
+    },
+    {
+      "sim_time": 337.6000000000449,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.241366029086095,
+      "min_pair_distance": 0.5530910965213222
+    },
+    {
+      "sim_time": 339.2000000000468,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.16692158464166,
+      "min_pair_distance": 0.5347182314246596
+    },
+    {
+      "sim_time": 340.8000000000488,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.091810473530565,
+      "min_pair_distance": 0.5191314347137216
+    },
+    {
+      "sim_time": 342.40000000005074,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 42.019032695752756,
+      "min_pair_distance": 0.5053902534071731
+    },
+    {
+      "sim_time": 344.0000000000527,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.951254917974985,
+      "min_pair_distance": 0.4936036479606655
+    },
+    {
+      "sim_time": 345.60000000005465,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.87814380686384,
+      "min_pair_distance": 0.48687564554071944
+    },
+    {
+      "sim_time": 347.2000000000566,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.80558825130829,
+      "min_pair_distance": 0.4866828783731033
+    },
+    {
+      "sim_time": 348.80000000005856,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.73725491797495,
+      "min_pair_distance": 0.4865462203965806
+    },
+    {
+      "sim_time": 350.4000000000605,
+      "tasks_completed": 4,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.66692158464158,
+      "min_pair_distance": 0.48651983944969057
+    },
+    {
+      "sim_time": 352.00000000006247,
+      "tasks_completed": 5,
+      "tasks_pending": 28,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.5932549179749,
+      "min_pair_distance": 0.48646365977046757
+    },
+    {
+      "sim_time": 353.6000000000644,
+      "tasks_completed": 5,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.520143806863736,
+      "min_pair_distance": 0.48645870990135676
+    },
+    {
+      "sim_time": 355.2000000000664,
+      "tasks_completed": 5,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.44758825130817,
+      "min_pair_distance": 0.48645379392494625
+    },
+    {
+      "sim_time": 356.80000000006834,
+      "tasks_completed": 5,
+      "tasks_pending": 29,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.37481047353035,
+      "min_pair_distance": 0.4864489120533565
+    },
+    {
+      "sim_time": 358.4000000000703,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.302032695752516,
+      "min_pair_distance": 0.48644406391261874
+    },
+    {
+      "sim_time": 360.00000000007225,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.22836602908585,
+      "min_pair_distance": 0.48643924912868314
+    },
+    {
+      "sim_time": 361.6000000000742,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.161699362419164,
+      "min_pair_distance": 0.486434508206978
+    },
+    {
+      "sim_time": 363.20000000007616,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.08969936241916,
+      "min_pair_distance": 0.48643244841941047
+    },
+    {
+      "sim_time": 364.8000000000781,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 41.02047714019692,
+      "min_pair_distance": 0.4864345377169464
+    },
+    {
+      "sim_time": 366.40000000008007,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.96381047353018,
+      "min_pair_distance": 0.48643627575131826
+    },
+    {
+      "sim_time": 368.000000000082,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.89547714019677,
+      "min_pair_distance": 0.4864362755710035
+    },
+    {
+      "sim_time": 369.600000000084,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.831810473530034,
+      "min_pair_distance": 0.48643627557100144
+    },
+    {
+      "sim_time": 371.20000000008594,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.770921584641144,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 372.8000000000879,
+      "tasks_completed": 5,
+      "tasks_pending": 30,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.71281047353003,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 374.40000000008985,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.65969936241885,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 376.0000000000918,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.602477140196626,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 377.60000000009376,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.53692158464099,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 379.2000000000957,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.475477140196546,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 380.80000000009767,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.418254917974316,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 382.4000000000996,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.36436602908542,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 384.0000000001016,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.312921584640954,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 385.60000000010353,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.252032695752014,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 387.2000000001055,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.1833660290853,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 388.80000000010745,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.115032695751886,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 390.4000000001094,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.06547714019629,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 392.00000000011136,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 40.01403269575188,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 393.6000000001133,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 7,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 39.96314380686301,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 395.20000000011527,
+      "tasks_completed": 5,
+      "tasks_pending": 31,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.16606904449806,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 396.8000000001172,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.10340237783135,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 398.4000000001192,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 50.039180155608996,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 400.00000000012113,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.97084682227558,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 401.6000000001231,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.89418015560885,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 403.20000000012504,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.82384682227544,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 404.800000000127,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.7562912667198,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 406.40000000012895,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.68473571116412,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 408.0000000001309,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.629180155608466,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 409.60000000013287,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.54662460005277,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 411.2000000001348,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.47940237783047,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 412.8000000001368,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.40840237783039,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 414.40000000013873,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.34762460005252,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 416.0000000001407,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.2862912667191,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 417.60000000014264,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.206180155607875,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 419.2000000001446,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.1317357111633,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 420.80000000014655,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 49.04962460005204,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 422.4000000001485,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.986291266718595,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 424.00000000015046,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.92495793338517,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 425.6000000001524,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.84484682227395,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 427.2000000001544,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.777624600051645,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 428.80000000015633,
+      "tasks_completed": 5,
+      "tasks_pending": 32,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.702180155607095,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 430.4000000001583,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.6284023778292,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 432.00000000016024,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.57284682227355,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 433.6000000001622,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.500291266717916,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 435.20000000016415,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.43362460005117,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 436.8000000001661,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.3617357111622,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 438.40000000016806,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.2931801556065,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 440.00000000017,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.22118015560634,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 441.600000000172,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.15051348893953,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 443.20000000017393,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.08773571116167,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 444.8000000001759,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 48.02618015560601,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 446.40000000017784,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.96973571116143,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 448.0000000001798,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.919291266716876,
+      "min_pair_distance": 0.48643627557100133
+    },
+    {
+      "sim_time": 449.60000000018175,
+      "tasks_completed": 5,
+      "tasks_pending": 33,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 47.84551348893895,
+      "min_pair_distance": 0.48643627557100133
+    }
+  ]
+}

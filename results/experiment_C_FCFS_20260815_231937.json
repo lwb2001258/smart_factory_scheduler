@@ -1,0 +1,6612 @@
+{
+  "experiment_info": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "num_robots": 8,
+    "sim_duration": 90.00000000000341,
+    "timestamp": "2026-08-15 23:20:15"
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.0,
+    "total_tasks_completed": 0,
+    "total_tasks_generated": 15,
+    "avg_task_completion_time": 0.0,
+    "avg_waiting_time": 0.0,
+    "avg_robot_idle_pct": 15.431111111110006,
+    "total_distance_all_robots": 37.70201267082215,
+    "total_conflicts_resolved": 0,
+    "predicted_conflicts": 0,
+    "route_dispatches": 93,
+    "rapid_route_overrides": 0,
+    "unauthorized_route_writes": 0,
+    "audited_replans": 0,
+    "replan_requests": 1,
+    "physical_escapes": 0,
+    "unplanned_task_stops": 3,
+    "planned_wait_episodes": 23,
+    "planned_wait_total_seconds": 43.60000000001456,
+    "total_deadlocks": 0,
+    "min_pair_distance": 0.6703840785213011,
+    "pair_distance_violations": 0,
+    "max_completion_time": 0,
+    "min_completion_time": 0,
+    "workload_balance_cv": 0.0,
+    "tasks_per_robot": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "robot_idle_percentages": [
+      0.03555555555555421,
+      1.368888888888838,
+      1.653333333333272,
+      10.98666666666626,
+      25.724444444442607,
+      28.622222222219957,
+      26.133333333331432,
+      28.92444444444213
+    ],
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "longest_completion_plateau_seconds": 90.00000000000341,
+    "final_completion_plateau_seconds": 90.00000000000341,
+    "robots_without_completed_tasks": 8,
+    "scheduling_latency_mean_ms": 5.848187499395863,
+    "scheduling_latency_p50_ms": 5.750200001784833,
+    "scheduling_latency_p95_ms": 8.641000000352506,
+    "scheduling_latency_p99_ms": 8.641000000352506,
+    "scheduling_latency_max_ms": 8.641000000352506,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0,
+    "native_scheduler_commits": 8,
+    "fallback_scheduler_commits": 0,
+    "scheduler_commits_by_algorithm": {
+      "FCFS": 8
+    },
+    "rl_policy_decisions": 0,
+    "rl_fallback_decisions": 0,
+    "rl_fallback_rate": 0.0,
+    "rl_timeout_count": 0,
+    "rl_inference_mean_ms": 0.0,
+    "rl_inference_p95_ms": 0.0,
+    "rl_inference_max_ms": 0.0
+  },
+  "task_stats": {
+    "total_generated": 15,
+    "pending": 7,
+    "active": 8,
+    "completed": 0,
+    "failed": 0,
+    "avg_completion_time": 0,
+    "max_completion_time": 0,
+    "avg_waiting_time": 0,
+    "throughput": 0
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 0,
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "joint_grid_candidates_attempted": 13,
+    "joint_grid_candidates_validated": 13,
+    "joint_grid_candidates_timed_out": 0,
+    "joint_grid_candidates_failed": 0,
+    "joint_transactions_attempted": 13,
+    "joint_transactions_activated": 13,
+    "joint_transactions_aborted": 0
+  },
+  "task_completions": [],
+  "conflict_events": [],
+  "route_dispatch_events": [
+    {
+      "sim_time": 0.6400000000000005,
+      "robot_id": 1,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 1,
+      "waypoint_count": 10
+    },
+    {
+      "sim_time": 20.495999999999515,
+      "robot_id": 1,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 5
+    },
+    {
+      "sim_time": 20.495999999999515,
+      "robot_id": 2,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 20.495999999999515,
+      "robot_id": 3,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 20.495999999999515,
+      "robot_id": 4,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 1,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 2,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 3,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 4,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 5,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 6,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 7,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 11
+    },
+    {
+      "sim_time": 27.231999999998774,
+      "robot_id": 8,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 11
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 1,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 2,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 3,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 4,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 5,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 6,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 7,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 49.24799999999635,
+      "robot_id": 8,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 4
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 1,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 2,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 3,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 4,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 5,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 6,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 7,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 59.34399999999524,
+      "robot_id": 8,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 1,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 2,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 3,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 4,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 5,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 6,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 7,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 65.1199999999951,
+      "robot_id": 8,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 1,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 2,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 3,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 4,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 5,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 6,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 7,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 68.62399999999627,
+      "robot_id": 8,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 1,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 2,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 3,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 4,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 5,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 6,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 7,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 72.11199999999744,
+      "robot_id": 8,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 1,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 2,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 3,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 4,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 5,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 6,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 7,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 75.11999999999844,
+      "robot_id": 8,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 1,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 2,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 3,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 4,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 5,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 6,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 7,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 78.62399999999961,
+      "robot_id": 8,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 1,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 2,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 3,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 11
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 4,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 5,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 6,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 7,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 82.11200000000078,
+      "robot_id": 8,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 11,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 1,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 2,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 3,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 10
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 4,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 5,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 6,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 7,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 85.12000000000178,
+      "robot_id": 8,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 12,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 1,
+      "path_version": 13,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 2,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 3,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 4,
+      "path_version": 12,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 5,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 6,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 7,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    },
+    {
+      "sim_time": 88.60800000000295,
+      "robot_id": 8,
+      "path_version": 11,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 13,
+      "waypoint_count": 12
+    }
+  ],
+  "route_override_events": [],
+  "unauthorized_route_write_events": [],
+  "replan_events": [],
+  "replan_request_events": [
+    {
+      "sim_time": 64.4959999999949,
+      "robot_id": 6,
+      "path_version": 3,
+      "plan_epoch": 5
+    }
+  ],
+  "escape_events": [],
+  "unplanned_stop_events": [
+    {
+      "sim_time": 12.80000000000001,
+      "robot_id": 2,
+      "state": "en_route_pickup",
+      "stopped_seconds": 11.200000000000008,
+      "position": [
+        -4.000046632831366,
+        -2.9999999998903824
+      ],
+      "path_version": 0,
+      "plan_epoch": null,
+      "plan_source": null,
+      "task_id": 2,
+      "goal_location": "S2",
+      "planned_wait": false
+    },
+    {
+      "sim_time": 12.80000000000001,
+      "robot_id": 3,
+      "state": "en_route_pickup",
+      "stopped_seconds": 11.200000000000008,
+      "position": [
+        4.000046632831367,
+        2.999999999766638
+      ],
+      "path_version": 0,
+      "plan_epoch": null,
+      "plan_source": null,
+      "task_id": 3,
+      "goal_location": "S1",
+      "planned_wait": false
+    },
+    {
+      "sim_time": 20.799999999999482,
+      "robot_id": 4,
+      "state": "en_route_pickup",
+      "stopped_seconds": 11.199999999999475,
+      "position": [
+        4.010737915515512,
+        -2.997391422508386
+      ],
+      "path_version": 1,
+      "plan_epoch": 2,
+      "plan_source": "joint_grid_transaction",
+      "task_id": 4,
+      "goal_location": "WS2",
+      "planned_wait": false
+    }
+  ],
+  "planned_wait_events": [
+    {
+      "robot_id": 3,
+      "started_at": 65.59999999999526,
+      "last_seen_at": 65.59999999999526,
+      "reason": "joint_slot_deadline",
+      "deadline": 66.29199999999493,
+      "max_deadline": 66.29199999999493,
+      "task_id": 3,
+      "plan_epoch": 6,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 5,
+      "goal_location": "S1",
+      "ended_at": 67.1999999999958,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 65.59999999999526,
+      "last_seen_at": 65.59999999999526,
+      "reason": "joint_slot_deadline",
+      "deadline": 66.29199999999493,
+      "max_deadline": 66.29199999999493,
+      "task_id": 4,
+      "plan_epoch": 6,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 5,
+      "goal_location": "WS2",
+      "ended_at": 67.1999999999958,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 65.59999999999526,
+      "last_seen_at": 65.59999999999526,
+      "reason": "joint_slot_deadline",
+      "deadline": 66.29199999999493,
+      "max_deadline": 66.29199999999493,
+      "task_id": 7,
+      "plan_epoch": 6,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 4,
+      "goal_location": "WS5",
+      "ended_at": 67.1999999999958,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 65.59999999999526,
+      "last_seen_at": 65.59999999999526,
+      "reason": "joint_slot_deadline",
+      "deadline": 66.29199999999493,
+      "max_deadline": 66.29199999999493,
+      "task_id": 8,
+      "plan_epoch": 6,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 4,
+      "goal_location": "WS4",
+      "ended_at": 67.1999999999958,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 65.59999999999526,
+      "last_seen_at": 67.1999999999958,
+      "reason": "controller_hold",
+      "deadline": 66.01999999999524,
+      "max_deadline": 67.52399999999574,
+      "task_id": 6,
+      "plan_epoch": 6,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 4,
+      "goal_location": "S6",
+      "ended_at": 68.79999999999633,
+      "duration": 3.2000000000010687,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 68.79999999999633,
+      "last_seen_at": 68.79999999999633,
+      "reason": "joint_slot_deadline",
+      "deadline": 69.7959999999961,
+      "max_deadline": 69.7959999999961,
+      "task_id": 1,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 7,
+      "goal_location": "S5",
+      "ended_at": 70.39999999999687,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 68.79999999999633,
+      "last_seen_at": 68.79999999999633,
+      "reason": "joint_slot_deadline",
+      "deadline": 69.7959999999961,
+      "max_deadline": 69.7959999999961,
+      "task_id": 3,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S1",
+      "ended_at": 70.39999999999687,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 68.79999999999633,
+      "last_seen_at": 68.79999999999633,
+      "reason": "joint_slot_deadline",
+      "deadline": 69.7959999999961,
+      "max_deadline": 69.7959999999961,
+      "task_id": 5,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 5,
+      "goal_location": "S3",
+      "ended_at": 70.39999999999687,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 68.79999999999633,
+      "last_seen_at": 71.9999999999974,
+      "reason": "controller_hold",
+      "deadline": 69.02799999999624,
+      "max_deadline": 72.01999999999724,
+      "task_id": 6,
+      "plan_epoch": 7,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 5,
+      "goal_location": "S6",
+      "ended_at": 73.59999999999793,
+      "duration": 4.800000000001603,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 73.59999999999793,
+      "last_seen_at": 73.59999999999793,
+      "reason": "controller_hold",
+      "deadline": 74.0199999999979,
+      "max_deadline": 74.0199999999979,
+      "task_id": 6,
+      "plan_epoch": 8,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 6,
+      "goal_location": "S6",
+      "ended_at": 75.19999999999847,
+      "duration": 1.6000000000005343,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 75.19999999999847,
+      "last_seen_at": 78.39999999999954,
+      "reason": "controller_hold",
+      "deadline": 75.52399999999841,
+      "max_deadline": 78.53199999999941,
+      "task_id": 6,
+      "plan_epoch": 9,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 7,
+      "goal_location": "S6",
+      "ended_at": 80.00000000000007,
+      "duration": 4.800000000001603,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 80.00000000000007,
+      "last_seen_at": 81.6000000000006,
+      "reason": "controller_hold",
+      "deadline": 80.01999999999991,
+      "max_deadline": 82.02000000000058,
+      "task_id": 6,
+      "plan_epoch": 10,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 8,
+      "goal_location": "S6",
+      "ended_at": 83.20000000000114,
+      "duration": 3.2000000000010687,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 83.20000000000114,
+      "last_seen_at": 83.20000000000114,
+      "reason": "joint_slot_deadline",
+      "deadline": 83.2840000000006,
+      "max_deadline": 83.2840000000006,
+      "task_id": 1,
+      "plan_epoch": 11,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 11,
+      "goal_location": "S5",
+      "ended_at": 84.80000000000167,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 83.20000000000114,
+      "last_seen_at": 83.20000000000114,
+      "reason": "joint_slot_deadline",
+      "deadline": 83.2840000000006,
+      "max_deadline": 83.2840000000006,
+      "task_id": 3,
+      "plan_epoch": 11,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 10,
+      "goal_location": "S1",
+      "ended_at": 84.80000000000167,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 83.20000000000114,
+      "last_seen_at": 83.20000000000114,
+      "reason": "joint_slot_deadline",
+      "deadline": 83.2840000000006,
+      "max_deadline": 83.2840000000006,
+      "task_id": 5,
+      "plan_epoch": 11,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 9,
+      "goal_location": "S3",
+      "ended_at": 84.80000000000167,
+      "duration": 1.6000000000005343,
+      "outcome": "deadline_expired"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 83.20000000000114,
+      "last_seen_at": 84.80000000000167,
+      "reason": "controller_hold",
+      "deadline": 83.52400000000108,
+      "max_deadline": 85.02800000000158,
+      "task_id": 6,
+      "plan_epoch": 11,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 9,
+      "goal_location": "S6",
+      "ended_at": 86.40000000000221,
+      "duration": 3.2000000000010687,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 88.00000000000274,
+      "last_seen_at": 88.00000000000274,
+      "reason": "joint_slot_deadline",
+      "deadline": 88.6920000000016,
+      "max_deadline": 88.6920000000016,
+      "task_id": 2,
+      "plan_epoch": 12,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 11,
+      "goal_location": "S2",
+      "ended_at": 89.60000000000328,
+      "duration": 1.6000000000005343,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 86.40000000000221,
+      "last_seen_at": 88.00000000000274,
+      "reason": "controller_hold",
+      "deadline": 86.51600000000208,
+      "max_deadline": 88.02000000000258,
+      "task_id": 6,
+      "plan_epoch": 12,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 10,
+      "goal_location": "S6",
+      "ended_at": 89.60000000000328,
+      "duration": 3.2000000000010687,
+      "outcome": "superseded"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 89.60000000000328,
+      "last_seen_at": 89.60000000000328,
+      "reason": "joint_slot_deadline",
+      "deadline": 89.78000000000277,
+      "max_deadline": 89.78000000000277,
+      "task_id": 1,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 13,
+      "goal_location": "S5",
+      "ended_at": null,
+      "duration": 0.4000000000001336,
+      "outcome": "active"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 89.60000000000328,
+      "last_seen_at": 89.60000000000328,
+      "reason": "joint_slot_deadline",
+      "deadline": 89.78000000000277,
+      "max_deadline": 89.78000000000277,
+      "task_id": 2,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 12,
+      "goal_location": "S2",
+      "ended_at": null,
+      "duration": 0.4000000000001336,
+      "outcome": "active"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 89.60000000000328,
+      "last_seen_at": 89.60000000000328,
+      "reason": "joint_slot_deadline",
+      "deadline": 89.78000000000277,
+      "max_deadline": 89.78000000000277,
+      "task_id": 3,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 12,
+      "goal_location": "S1",
+      "ended_at": null,
+      "duration": 0.4000000000001336,
+      "outcome": "active"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 89.60000000000328,
+      "last_seen_at": 89.60000000000328,
+      "reason": "controller_hold",
+      "deadline": 90.02000000000325,
+      "max_deadline": 90.02000000000325,
+      "task_id": 6,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 11,
+      "goal_location": "S6",
+      "ended_at": null,
+      "duration": 0.4000000000001336,
+      "outcome": "active"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 89.60000000000328,
+      "last_seen_at": 89.60000000000328,
+      "reason": "joint_slot_deadline",
+      "deadline": 89.78000000000277,
+      "max_deadline": 89.78000000000277,
+      "task_id": 7,
+      "plan_epoch": 13,
+      "plan_source": "joint_grid_transaction",
+      "path_version": 11,
+      "goal_location": "WS5",
+      "ended_at": null,
+      "duration": 0.4000000000001336,
+      "outcome": "active"
+    }
+  ],
+  "deadlock_events": [],
+  "safety_events": [],
+  "time_series": [
+    {
+      "sim_time": 1.6000000000000012,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 62.31241917010452,
+      "min_pair_distance": 1.921002816592449,
+      "robot_positions": {
+        "1": [
+          -4.062228692238238,
+          2.9585459214581915
+        ],
+        "2": [
+          -4.000046632831397,
+          -2.999999999890388
+        ],
+        "3": [
+          4.000046632831398,
+          2.999999999766643
+        ],
+        "4": [
+          4.000046632831397,
+          -3.0000000002333564
+        ],
+        "5": [
+          -6.999999999938324,
+          -4.6632831400536534e-05
+        ],
+        "6": [
+          7.000000000280906,
+          4.663283139968999e-05
+        ],
+        "7": [
+          -8.500046632831395,
+          1.2000000001096105
+        ],
+        "8": [
+          8.500046632831397,
+          -1.200000000233355
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 3.2000000000000024,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.95349324493608,
+      "min_pair_distance": 1.9210028165924047,
+      "robot_positions": {
+        "1": [
+          -4.124838198010766,
+          2.975415224476513
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.999999999938329,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280911,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 4.800000000000003,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.942382133824985,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.218912562021232,
+          2.996566225039023
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 6.400000000000005,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.93127102271389,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.313362625780172,
+          2.9868569794641866
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 8.000000000000005,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.920159911602795,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.367366632817408,
+          2.9840711701096843
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 9.600000000000007,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 61.909048800491696,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.4997123110480945,
+          2.982289823167403
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 11.200000000000008,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 62.01717674941273,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.596073688493773,
+          2.9801616546296916
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 12.80000000000001,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 62.006065638301635,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.659065835579888,
+          2.9810716110897797
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 14.400000000000011,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.99495452719054,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.839272424751654,
+          2.9869742858446977
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 16.00000000000001,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.983843416079445,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.009491985110858,
+          2.9985969288426584
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 17.599999999999834,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.972732304968346,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.113011182632975,
+          3.0058793677793054
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 19.19999999999966,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.961621193857255,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.2472323146342665,
+          3.016161132611089
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": null
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 20.799999999999482,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.95028786052393,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.311892536677419,
+          3.0200935272246556
+        ],
+        "2": [
+          -4.010737774225721,
+          -2.997391462568075
+        ],
+        "3": [
+          3.964210487261048,
+          3.000000024950452
+        ],
+        "4": [
+          4.010737915515512,
+          -2.997391422508386
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 22.399999999999306,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 61.905843416079456,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.36673754706327,
+          3.0209043495926586
+        ],
+        "2": [
+          -4.05530066675656,
+          -2.9008421309844614
+        ],
+        "3": [
+          3.798368296373514,
+          3.0000000395758377
+        ],
+        "4": [
+          4.0552996104760854,
+          -2.900841777055752
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 23.99999999999913,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 5,
+      "robots_idle": 2,
+      "robots_active": 6,
+      "conflicts_total": 0,
+      "avg_battery": 55.46621122929407,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.514397949529381,
+          3.0155637916426032
+        ],
+        "2": [
+          -4.029362890013452,
+          -2.810527287619523
+        ],
+        "3": [
+          3.6336184055609415,
+          3.0000000227847115
+        ],
+        "4": [
+          4.029362240578605,
+          -2.810527101778284
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 25.599999999998953,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 5,
+      "robots_idle": 2,
+      "robots_active": 6,
+      "conflicts_total": 0,
+      "avg_battery": 55.4217667848496,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.627421507225806,
+          3.009560930898663
+        ],
+        "2": [
+          -4.006023129425845,
+          -2.6576691067582128
+        ],
+        "3": [
+          3.4358644750808995,
+          3.0000000070080888
+        ],
+        "4": [
+          4.00602331369749,
+          -2.657672729213777
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": null
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 27.199999999998777,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.77892158465526,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.638680464743944,
+          3.098935409760387
+        ],
+        "2": [
+          -3.9926630333481077,
+          -2.5095611683002796
+        ],
+        "3": [
+          3.2584210441498773,
+          3.000000002763543
+        ],
+        "4": [
+          3.9926617184399458,
+          -2.5095664156379587
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136729923e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": null
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": null
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null
+        }
+      }
+    },
+    {
+      "sim_time": 28.7999999999986,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.69447714021069,
+      "min_pair_distance": 1.9502094001387547,
+      "robot_positions": {
+        "1": [
+          -5.673929326351513,
+          3.0406554737918317
+        ],
+        "2": [
+          -3.984988628610458,
+          -2.4149393614739347
+        ],
+        "3": [
+          3.109260430431785,
+          3.0000000008435324
+        ],
+        "4": [
+          3.9849871232701144,
+          -2.414943733286545
+        ],
+        "5": [
+          -6.926909538586563,
+          -0.06784204918726752
+        ],
+        "6": [
+          6.926909379071101,
+          0.06784213832512484
+        ],
+        "7": [
+          -8.394884856382225,
+          1.2160446945453278
+        ],
+        "8": [
+          8.394886035556878,
+          -1.2160443616963197
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 30.399999999998425,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.605588251321656,
+      "min_pair_distance": 1.8845717102448503,
+      "robot_positions": {
+        "1": [
+          -5.615614492116278,
+          2.9742615797462486
+        ],
+        "2": [
+          -3.9835143352138327,
+          -2.37174266953544
+        ],
+        "3": [
+          2.91088493370804,
+          3.000000000404459
+        ],
+        "4": [
+          3.9835127973580744,
+          -2.371747178442772
+        ],
+        "5": [
+          -6.831589948925562,
+          -0.03457671955856177
+        ],
+        "6": [
+          6.831589823744351,
+          0.03457681290087229
+        ],
+        "7": [
+          -8.2187842212107,
+          1.2410809860954688
+        ],
+        "8": [
+          8.21878491168496,
+          -1.2410805596488428
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 31.99999999999825,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.51669936243263,
+      "min_pair_distance": 1.9075667139583863,
+      "robot_positions": {
+        "1": [
+          -5.56987653782613,
+          2.877492811887108
+        ],
+        "2": [
+          -3.98068625031324,
+          -2.207424864242507
+        ],
+        "3": [
+          2.723649955869636,
+          2.9999999996924736
+        ],
+        "4": [
+          3.980684577016415,
+          -2.2074288022874944
+        ],
+        "5": [
+          -6.681910696765219,
+          -0.008140716168295106
+        ],
+        "6": [
+          6.681910603168071,
+          0.008140774134174834
+        ],
+        "7": [
+          -8.115821209532797,
+          1.2499183236332245
+        ],
+        "8": [
+          8.1158209311041,
+          -1.2499180240308343
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 33.599999999998076,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.4278104735436,
+      "min_pair_distance": 1.8902163847022737,
+      "robot_positions": {
+        "1": [
+          -5.537486848765799,
+          2.7528124490604977
+        ],
+        "2": [
+          -3.979200595111185,
+          -2.1403505585900264
+        ],
+        "3": [
+          2.5608920902433594,
+          2.9999999990224557
+        ],
+        "4": [
+          3.979202297257936,
+          -2.1403335205671326
+        ],
+        "5": [
+          -6.545561661232187,
+          0.004095596276961424
+        ],
+        "6": [
+          6.5455615450796785,
+          -0.00409555074243709
+        ],
+        "7": [
+          -7.9546239287509986,
+          1.264041046956008
+        ],
+        "8": [
+          7.954623617790636,
+          -1.264040809967787
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 35.1999999999979,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.33892158465458,
+      "min_pair_distance": 1.9272112264511725,
+      "robot_positions": {
+        "1": [
+          -5.513965375293155,
+          2.6096697894289007
+        ],
+        "2": [
+          -3.966340057417305,
+          -2.1497121352170407
+        ],
+        "3": [
+          2.3892275844349293,
+          2.9999999996564606
+        ],
+        "4": [
+          3.9960926975988555,
+          -2.1524948166014366
+        ],
+        "5": [
+          -6.428393043822364,
+          0.014203147261943999
+        ],
+        "6": [
+          6.428392955144033,
+          -0.014203105989541852
+        ],
+        "7": [
+          -7.892621377170061,
+          1.267271207757573
+        ],
+        "8": [
+          7.89262106591924,
+          -1.267271001586225
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 36.79999999999772,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.25003269576555,
+      "min_pair_distance": 1.9583176070771204,
+      "robot_positions": {
+        "1": [
+          -5.497370737542325,
+          2.4308862508649645
+        ],
+        "2": [
+          -3.865484009229913,
+          -2.086370211192691
+        ],
+        "3": [
+          2.1935414251957583,
+          2.9999999998773426
+        ],
+        "4": [
+          4.111694976430312,
+          -2.092083349540518
+        ],
+        "5": [
+          -6.378627007759449,
+          0.016379979369555406
+        ],
+        "6": [
+          6.378626932310272,
+          -0.01637994176935977
+        ],
+        "7": [
+          -7.892578484124527,
+          1.2585393571874235
+        ],
+        "8": [
+          7.892578141097591,
+          -1.2585391858277357
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 38.39999999999755,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.161143806876524,
+      "min_pair_distance": 1.9708896011906871,
+      "robot_positions": {
+        "1": [
+          -5.492157033535069,
+          2.3641830528163625
+        ],
+        "2": [
+          -3.7370052048675073,
+          -2.054209087111484
+        ],
+        "3": [
+          2.0190384554698775,
+          3.000000000942969
+        ],
+        "4": [
+          4.125436710777263,
+          -2.0052029030831053
+        ],
+        "5": [
+          -6.233545699940806,
+          0.01868575775828324
+        ],
+        "6": [
+          6.233545684157142,
+          -0.018685739061849668
+        ],
+        "7": [
+          -7.849405458669805,
+          1.1471377224727088
+        ],
+        "8": [
+          7.849405276605125,
+          -1.1471375978380325
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 39.99999999999737,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 57.07225491798749,
+      "min_pair_distance": 1.9489212075820388,
+      "robot_positions": {
+        "1": [
+          -5.480529462462468,
+          2.21289274479122
+        ],
+        "2": [
+          -3.6047934708749763,
+          -2.02214526533045
+        ],
+        "3": [
+          1.8704819674212685,
+          3.0000000002818936
+        ],
+        "4": [
+          4.197817004590639,
+          -1.8669120740599492
+        ],
+        "5": [
+          -6.150336988922323,
+          0.020744241607876503
+        ],
+        "6": [
+          6.150337049538656,
+          -0.02074424073050761
+        ],
+        "7": [
+          -7.811515495151585,
+          1.03995009271154
+        ],
+        "8": [
+          7.811515373683048,
+          -1.0399500338635053
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 41.599999999997195,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.98336602909847,
+      "min_pair_distance": 1.9091807801040643,
+      "robot_positions": {
+        "1": [
+          -5.4785558210405965,
+          2.1466907800974466
+        ],
+        "2": [
+          -3.50399049607241,
+          -2.003959621462002
+        ],
+        "3": [
+          1.6674842672209012,
+          3.0000000004097744
+        ],
+        "4": [
+          4.225968405973545,
+          -1.7424023214330673
+        ],
+        "5": [
+          -6.070393656125214,
+          0.0187711554769077
+        ],
+        "6": [
+          6.07039385728081,
+          -0.01877121852191209
+        ],
+        "7": [
+          -7.773579692894654,
+          0.881400622673188
+        ],
+        "8": [
+          7.773579640562572,
+          -0.881400593598866
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 43.19999999999702,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.89447714020944,
+      "min_pair_distance": 2.0018814262597493,
+      "robot_positions": {
+        "1": [
+          -5.482325991853133,
+          2.047086099379761
+        ],
+        "2": [
+          -3.3690585162251954,
+          -1.9912096695274868
+        ],
+        "3": [
+          1.4828183317468249,
+          2.9999999995469446
+        ],
+        "4": [
+          4.243042518774729,
+          -1.6000459638419253
+        ],
+        "5": [
+          -5.897088699161433,
+          0.011470895357370432
+        ],
+        "6": [
+          5.897089362723574,
+          -0.011471092186492837
+        ],
+        "7": [
+          -7.698203924707926,
+          0.8852649616094678
+        ],
+        "8": [
+          7.698203893776243,
+          -0.8852649413492648
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 44.79999999999684,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.805588251320415,
+      "min_pair_distance": 1.8991576811280195,
+      "robot_positions": {
+        "1": [
+          -5.49127600601331,
+          1.883177453333552
+        ],
+        "2": [
+          -3.249821142029465,
+          -1.9820202380912166
+        ],
+        "3": [
+          1.3236346500568286,
+          2.999999998899965
+        ],
+        "4": [
+          4.258456453231269,
+          -1.441789940976231
+        ],
+        "5": [
+          -5.722589245825252,
+          -0.0018408709474773337
+        ],
+        "6": [
+          5.722589381721514,
+          0.0018406974620631985
+        ],
+        "7": [
+          -7.616462585211254,
+          0.8015499387056884
+        ],
+        "8": [
+          7.616462570805545,
+          -0.8015499282078667
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 46.399999999996666,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.716699362431385,
+      "min_pair_distance": 1.7193536248830275,
+      "robot_positions": {
+        "1": [
+          -5.503648682174366,
+          1.7057231197321392
+        ],
+        "2": [
+          -3.160299378611974,
+          -1.975038683701462
+        ],
+        "3": [
+          1.1449345928958112,
+          2.999999999480729
+        ],
+        "4": [
+          4.262852866021457,
+          -1.3836698938281278
+        ],
+        "5": [
+          -5.636582399953479,
+          -0.008483843874014685
+        ],
+        "6": [
+          5.636582177091824,
+          0.008483698718869285
+        ],
+        "7": [
+          -7.577017557207586,
+          0.6681366420480273
+        ],
+        "8": [
+          7.577017549913497,
+          -0.6681366348461928
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 47.99999999999649,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.62781047354236,
+      "min_pair_distance": 1.6472606436561152,
+      "robot_positions": {
+        "1": [
+          -5.509033116843149,
+          1.629939525141775
+        ],
+        "2": [
+          -3.1167454977911424,
+          -1.971829250894013
+        ],
+        "3": [
+          0.9514738418111884,
+          2.9999999999188596
+        ],
+        "4": [
+          4.268159226844413,
+          -1.2587601449786063
+        ],
+        "5": [
+          -5.5166338095839125,
+          -0.017303583087310646
+        ],
+        "6": [
+          5.516633567224082,
+          0.017303455642019697
+        ],
+        "7": [
+          -7.513434029848046,
+          0.6521855379324667
+        ],
+        "8": [
+          7.513434025170754,
+          -0.6521855342543872
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 49.599999999996314,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.56647714020893,
+      "min_pair_distance": 1.5604636291404486,
+      "robot_positions": {
+        "1": [
+          -5.515345251987303,
+          1.5425189566677646
+        ],
+        "2": [
+          -3.04517408450114,
+          -1.9675944246786887
+        ],
+        "3": [
+          0.8697618197947516,
+          2.9999999996164624
+        ],
+        "4": [
+          4.271610724253974,
+          -1.1869013443783725
+        ],
+        "5": [
+          -5.476901793369826,
+          -0.017471055595040186
+        ],
+        "6": [
+          5.446532701205272,
+          0.021422809437453862
+        ],
+        "7": [
+          -7.41538198406776,
+          0.5907077483877182
+        ],
+        "8": [
+          7.415381981116177,
+          -0.5907077464099729
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 51.19999999999614,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.4775882513199,
+      "min_pair_distance": 1.355565260810855,
+      "robot_positions": {
+        "1": [
+          -5.521720313953613,
+          1.4351383199821015
+        ],
+        "2": [
+          -2.9634665304434877,
+          -1.9623894018574508
+        ],
+        "3": [
+          0.7541302945906204,
+          3.0000000007601577
+        ],
+        "4": [
+          4.271661952362328,
+          -1.1321630105738971
+        ],
+        "5": [
+          -5.536334530106109,
+          0.07965183867605415
+        ],
+        "6": [
+          5.387685921420168,
+          0.022064594297217854
+        ],
+        "7": [
+          -7.396562824125502,
+          0.5205298770306146
+        ],
+        "8": [
+          7.3965628225041264,
+          -0.5205298755853186
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 52.79999999999596,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.38869936243088,
+      "min_pair_distance": 1.2784809297750463,
+      "robot_positions": {
+        "1": [
+          -5.521674137272412,
+          1.3815623977504508
+        ],
+        "2": [
+          -2.9141349245324957,
+          -1.959257866912427
+        ],
+        "3": [
+          0.6034528150859341,
+          3.0000000011138384
+        ],
+        "4": [
+          4.265144902272029,
+          -0.9806473753329376
+        ],
+        "5": [
+          -5.539612260724933,
+          0.10320731737353582
+        ],
+        "6": [
+          5.252792878216691,
+          0.016089605827455836
+        ],
+        "7": [
+          -7.3160125329854395,
+          0.3814171520496957
+        ],
+        "8": [
+          7.3160125323575365,
+          -0.38141715134455284
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 54.399999999995785,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.299810473541854,
+      "min_pair_distance": 1.105571191224443,
+      "robot_positions": {
+        "1": [
+          -5.516477208977371,
+          1.2672399903296194
+        ],
+        "2": [
+          -2.876932909730519,
+          -1.9591073261865688
+        ],
+        "3": [
+          0.4082860804256375,
+          3.000000000723382
+        ],
+        "4": [
+          4.254988393523128,
+          -0.8251409111331972
+        ],
+        "5": [
+          -5.639568952336269,
+          0.16854254262970728
+        ],
+        "6": [
+          5.1205939287095825,
+          0.007485037961398959
+        ],
+        "7": [
+          -7.224193842421214,
+          0.3730244734360202
+        ],
+        "8": [
+          7.224193841971241,
+          -0.3730244731872939
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 55.99999999999561,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.21092158465282,
+      "min_pair_distance": 0.898703605477712,
+      "robot_positions": {
+        "1": [
+          -5.510227119380329,
+          1.1611591041229121
+        ],
+        "2": [
+          -2.76900892777753,
+          -1.9682023349234765
+        ],
+        "3": [
+          0.22006994250488787,
+          2.999999999907558
+        ],
+        "4": [
+          4.243906935112109,
+          -0.672644476908628
+        ],
+        "5": [
+          -5.651734420638014,
+          0.27366608770565276
+        ],
+        "6": [
+          5.147854792588081,
+          -0.045114497195286984
+        ],
+        "7": [
+          -7.111463950456162,
+          0.30074015085565453
+        ],
+        "8": [
+          7.111463950253775,
+          -0.30074015074831484
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 57.59999999999543,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.12203269576379,
+      "min_pair_distance": 0.7870872739824089,
+      "robot_positions": {
+        "1": [
+          -5.503229107749149,
+          1.133196340500904
+        ],
+        "2": [
+          -2.5995250868396176,
+          -1.9864879800136768
+        ],
+        "3": [
+          0.055930244201350135,
+          2.9999999986894443
+        ],
+        "4": [
+          4.240097084111525,
+          -0.61993768493588
+        ],
+        "5": [
+          -5.696957793298737,
+          0.37032310512015715
+        ],
+        "6": [
+          5.083645098936234,
+          -0.12715885226880458
+        ],
+        "7": [
+          -7.09305181263955,
+          0.17754267673761823
+        ],
+        "8": [
+          7.093051812284735,
+          -0.1775426766381156
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 59.199999999995256,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 56.038699362430314,
+      "min_pair_distance": 0.7505368969412389,
+      "robot_positions": {
+        "1": [
+          -5.402039460763808,
+          1.1065870433079545
+        ],
+        "2": [
+          -2.4600265691199867,
+          -2.000740200312932
+        ],
+        "3": [
+          -0.11299472565333812,
+          2.9999999992017345
+        ],
+        "4": [
+          4.229519529754669,
+          -0.46493045898872865
+        ],
+        "5": [
+          -5.70985383360953,
+          0.422075578437001
+        ],
+        "6": [
+          5.050560207859979,
+          -0.25069451181145297
+        ],
+        "7": [
+          -7.054205836139482,
+          0.10615201630273188
+        ],
+        "8": [
+          7.0542058359252025,
+          -0.10615201624899971
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 60.79999999999508,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.95358825131906,
+      "min_pair_distance": 0.7929875492298263,
+      "robot_positions": {
+        "1": [
+          -5.40137529961677,
+          1.0927416157527923
+        ],
+        "2": [
+          -2.3898831632496735,
+          -2.0073640889329543
+        ],
+        "3": [
+          -0.17423377025575254,
+          2.9999999995780384
+        ],
+        "4": [
+          4.227784672655947,
+          -0.3975176090484253
+        ],
+        "5": [
+          -5.787357982301063,
+          0.3868732940391163
+        ],
+        "6": [
+          5.020617378147076,
+          -0.38184743556047773
+        ],
+        "7": [
+          -6.9462225191989155,
+          0.10445724790766661
+        ],
+        "8": [
+          6.946222519053087,
+          -0.10445724767300324
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 62.399999999994904,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.86469936243003,
+      "min_pair_distance": 0.7491669412386136,
+      "robot_positions": {
+        "1": [
+          -5.391572049616342,
+          1.0254371856184707
+        ],
+        "2": [
+          -2.298314810189546,
+          -2.014666273797786
+        ],
+        "3": [
+          -0.354110908276968,
+          2.99999999965736
+        ],
+        "4": [
+          4.231695839789371,
+          -0.2999816539657713
+        ],
+        "5": [
+          -5.879231085552578,
+          0.4567195311408195
+        ],
+        "6": [
+          4.994256390411625,
+          -0.3385015305966332
+        ],
+        "7": [
+          -6.84512449424918,
+          0.05913070161056945
+        ],
+        "8": [
+          6.845124494199472,
+          -0.059130701463648704
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 63.99999999999473,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.77581047354101,
+      "min_pair_distance": 0.6703840785213011,
+      "robot_positions": {
+        "1": [
+          -5.312921817793659,
+          0.8840068494473243
+        ],
+        "2": [
+          -2.19492267691977,
+          -2.0214579862072504
+        ],
+        "3": [
+          -0.5469972131089487,
+          2.999999999807048
+        ],
+        "4": [
+          4.238476609518845,
+          -0.167686547314872
+        ],
+        "5": [
+          -5.911827343391404,
+          0.5827976461627258
+        ],
+        "6": [
+          4.872998774551,
+          -0.4202228988786414
+        ],
+        "7": [
+          -6.677276146392833,
+          0.020304203373792445
+        ],
+        "8": [
+          6.677276146440333,
+          -0.02030420330041196
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 65.59999999999526,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.69081047354089,
+      "min_pair_distance": 0.7287765782372121,
+      "robot_positions": {
+        "1": [
+          -5.225215613702779,
+          0.877311272747308
+        ],
+        "2": [
+          -2.138726579776989,
+          -2.0220622944088067
+        ],
+        "3": [
+          -0.6382615207833898,
+          3.0000000007472667
+        ],
+        "4": [
+          4.242733742630874,
+          -0.10508437723390168
+        ],
+        "5": [
+          -5.9360531189905865,
+          0.6608074576549238
+        ],
+        "6": [
+          4.8789253319281265,
+          -0.4605777846194338
+        ],
+        "7": [
+          -6.5733041815368205,
+          0.007450906507955158
+        ],
+        "8": [
+          6.573304181555795,
+          -0.007450906501370021
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 67.1999999999958,
+      "tasks_completed": 0,
+      "tasks_pending": 2,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.61236602909638,
+      "min_pair_distance": 0.7693797724070969,
+      "robot_positions": {
+        "1": [
+          -5.107979420372099,
+          0.8031435294246816
+        ],
+        "2": [
+          -2.00736802586227,
+          -2.015987631571505
+        ],
+        "3": [
+          -0.7669343047470244,
+          2.9999999994612776
+        ],
+        "4": [
+          4.249136841450957,
+          -0.020449955816138288
+        ],
+        "5": [
+          -5.854789361575799,
+          0.5791963171365947
+        ],
+        "6": [
+          4.879638455644466,
+          -0.4613727933836378
+        ],
+        "7": [
+          -6.475706495881104,
+          -0.002774645533083142
+        ],
+        "8": [
+          6.47570649592807,
+          0.0027746455150935195
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 68.79999999999633,
+      "tasks_completed": 0,
+      "tasks_pending": 3,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.53414380687409,
+      "min_pair_distance": 0.7518887460013199,
+      "robot_positions": {
+        "1": [
+          -5.102808739312289,
+          0.6972569049827139
+        ],
+        "2": [
+          -1.8691361483213993,
+          -2.007750337589256
+        ],
+        "3": [
+          -0.8938218832498301,
+          3.0000000001016995
+        ],
+        "4": [
+          4.256197139030081,
+          0.07296882734637378
+        ],
+        "5": [
+          -5.843641811954459,
+          0.5687927277074947
+        ],
+        "6": [
+          4.8672040500619,
+          -0.4483590831858312
+        ],
+        "7": [
+          -6.3939770754547585,
+          -0.010084745559665435
+        ],
+        "8": [
+          6.394134006071473,
+          0.010142434282362696
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 70.39999999999687,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.45358825131845,
+      "min_pair_distance": 0.7487732434617987,
+      "robot_positions": {
+        "1": [
+          -5.0750566899657095,
+          0.6485360104157625
+        ],
+        "2": [
+          -1.7855018818652348,
+          -2.0016831456112127
+        ],
+        "3": [
+          -0.9827355381317251,
+          2.999999999143057
+        ],
+        "4": [
+          4.259542493737873,
+          0.11667714528718288
+        ],
+        "5": [
+          -5.832880752515256,
+          0.5738170932522949
+        ],
+        "6": [
+          4.857827893443881,
+          -0.4396454214046197
+        ],
+        "7": [
+          -6.294486221773906,
+          -0.015743557465511697
+        ],
+        "8": [
+          6.296748212568921,
+          0.01587048347867535
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 71.9999999999974,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.37581047354061,
+      "min_pair_distance": 0.7417204436542388,
+      "robot_positions": {
+        "1": [
+          -5.000748568151246,
+          0.6419501646667662
+        ],
+        "2": [
+          -1.6450303346335415,
+          -1.991915880364651
+        ],
+        "3": [
+          -1.1303125859038325,
+          2.9999999993637476
+        ],
+        "4": [
+          4.264652079269122,
+          0.19620792202941273
+        ],
+        "5": [
+          -5.838523621077955,
+          0.6363313354672538
+        ],
+        "6": [
+          4.857827905910099,
+          -0.4396454509388921
+        ],
+        "7": [
+          -6.181042396526959,
+          -0.021566912744090224
+        ],
+        "8": [
+          6.1831943773409845,
+          0.021827691329496628
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 73.59999999999793,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.29481047354052,
+      "min_pair_distance": 0.7364299981907795,
+      "robot_positions": {
+        "1": [
+          -4.991754181153779,
+          0.631041485287049
+        ],
+        "2": [
+          -1.5954629160885483,
+          -1.988341246167445
+        ],
+        "3": [
+          -1.1936102113599056,
+          2.99999999932562
+        ],
+        "4": [
+          4.27059155779399,
+          0.2908144752513885
+        ],
+        "5": [
+          -5.810684382064416,
+          0.6426419953953196
+        ],
+        "6": [
+          4.835688529132174,
+          -0.4252044473725042
+        ],
+        "7": [
+          -6.129203174094656,
+          -0.021342131944233417
+        ],
+        "8": [
+          6.129821174891413,
+          0.02156177672994312
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 75.19999999999847,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.216921584651566,
+      "min_pair_distance": 0.7081485737227529,
+      "robot_positions": {
+        "1": [
+          -4.86511497159602,
+          0.5571258103447584
+        ],
+        "2": [
+          -1.4802913199008623,
+          -1.9798422557142068
+        ],
+        "3": [
+          -1.362789154986894,
+          2.999999999352285
+        ],
+        "4": [
+          4.272107388144529,
+          0.3424431931649226
+        ],
+        "5": [
+          -5.73681541812359,
+          0.652422564678561
+        ],
+        "6": [
+          4.833215324108751,
+          -0.4240462349136298
+        ],
+        "7": [
+          -5.973603314501249,
+          -0.014964800046463105
+        ],
+        "8": [
+          5.963541890106886,
+          0.013585997893584327
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 76.799999999999,
+      "tasks_completed": 0,
+      "tasks_pending": 4,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.136032695762594,
+      "min_pair_distance": 0.8134291251234024,
+      "robot_positions": {
+        "1": [
+          -4.891924631845486,
+          0.5258050882265878
+        ],
+        "2": [
+          -1.3982102849061817,
+          -1.9736640875032316
+        ],
+        "3": [
+          -1.4587425868001678,
+          3.0000000012086385
+        ],
+        "4": [
+          4.270966622327723,
+          0.3766194194378538
+        ],
+        "5": [
+          -5.691709752223194,
+          0.674165132785215
+        ],
+        "6": [
+          4.79285721130133,
+          -0.43926180043880486
+        ],
+        "7": [
+          -6.047096336120402,
+          -0.09270542216324598
+        ],
+        "8": [
+          5.804261333165004,
+          0.0032097104793729963
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 78.39999999999954,
+      "tasks_completed": 0,
+      "tasks_pending": 5,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 55.05814380687364,
+      "min_pair_distance": 0.8409103870383084,
+      "robot_positions": {
+        "1": [
+          -4.825549673523169,
+          0.39418058118086535
+        ],
+        "2": [
+          -1.3467717993443196,
+          -1.9703819680451726
+        ],
+        "3": [
+          -1.6195664587063012,
+          3.0000000004616205
+        ],
+        "4": [
+          4.265135976983286,
+          0.5234817564853962
+        ],
+        "5": [
+          -5.606614064322941,
+          0.7057390772189273
+        ],
+        "6": [
+          4.792077771329403,
+          -0.43972088020787636
+        ],
+        "7": [
+          -5.989639850289383,
+          -0.0906991420798259
+        ],
+        "8": [
+          5.664108235754559,
+          -0.006604274615688449
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 80.00000000000007,
+      "tasks_completed": 0,
+      "tasks_pending": 5,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.977366029095776,
+      "min_pair_distance": 0.7764940229801777,
+      "robot_positions": {
+        "1": [
+          -4.794901288084315,
+          0.37048821788309727
+        ],
+        "2": [
+          -1.2499742368300213,
+          -1.9645998003753529
+        ],
+        "3": [
+          -1.6261952840642642,
+          2.999131890242461
+        ],
+        "4": [
+          4.258409901756177,
+          0.6305271614251334
+        ],
+        "5": [
+          -5.480810917678918,
+          0.7344538038295375
+        ],
+        "6": [
+          4.74003782971193,
+          -0.4556403333968332
+        ],
+        "7": [
+          -5.912836439293638,
+          -0.0776874781032609
+        ],
+        "8": [
+          5.595095607777484,
+          -0.011427578908589479
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 81.6000000000006,
+      "tasks_completed": 0,
+      "tasks_pending": 6,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.89947714020682,
+      "min_pair_distance": 0.8398819883489894,
+      "robot_positions": {
+        "1": [
+          -4.667285553751486,
+          0.33645098330943923
+        ],
+        "2": [
+          -1.1844346568047832,
+          -1.9604151667738505
+        ],
+        "3": [
+          -1.630038095938522,
+          2.915882057835081
+        ],
+        "4": [
+          4.2470650564362495,
+          0.7855811693023294
+        ],
+        "5": [
+          -5.401416142268881,
+          0.7444387691022925
+        ],
+        "6": [
+          4.739230095357653,
+          -0.4559833852992281
+        ],
+        "7": [
+          -5.818063081671748,
+          -0.04713367211527432
+        ],
+        "8": [
+          5.484400644447969,
+          -0.017694494580075142
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 83.20000000000114,
+      "tasks_completed": 0,
+      "tasks_pending": 6,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.81858825131784,
+      "min_pair_distance": 0.8113785099448542,
+      "robot_positions": {
+        "1": [
+          -4.606488344522,
+          0.3038948865529876
+        ],
+        "2": [
+          -1.1446913901204883,
+          -1.9586520891231416
+        ],
+        "3": [
+          -1.6814183247376995,
+          2.8478429744203235
+        ],
+        "4": [
+          4.24183985969354,
+          0.8561077301943003
+        ],
+        "5": [
+          -5.369662586275117,
+          0.7477671656883454
+        ],
+        "6": [
+          4.694071258274182,
+          -0.4671315052313964
+        ],
+        "7": [
+          -5.647478561298954,
+          -0.014566993602635381
+        ],
+        "8": [
+          5.423193410608498,
+          -0.020633757517616553
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 84.80000000000167,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.740699362428884,
+      "min_pair_distance": 0.8214507047119215,
+      "robot_positions": {
+        "1": [
+          -4.602938204451669,
+          0.19306733131830453
+        ],
+        "2": [
+          -1.113034984820927,
+          -1.9620545822142728
+        ],
+        "3": [
+          -1.803506450807855,
+          2.837051036828292
+        ],
+        "4": [
+          4.23761291439471,
+          0.918007050777782
+        ],
+        "5": [
+          -5.214415849059784,
+          0.7632644804293319
+        ],
+        "6": [
+          4.693245017045201,
+          -0.4673810365135702
+        ],
+        "7": [
+          -5.514849251798649,
+          -0.0012752705257503784
+        ],
+        "8": [
+          5.391093679552769,
+          -0.02111551440623018
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 86.40000000000221,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.65992158465102,
+      "min_pair_distance": 0.8085947001754037,
+      "robot_positions": {
+        "1": [
+          -4.549953625251332,
+          0.11300155366165485
+        ],
+        "2": [
+          -1.1127804494775433,
+          -1.9621426692811668
+        ],
+        "3": [
+          -1.883305727959341,
+          2.7934071913151155
+        ],
+        "4": [
+          4.230063497488405,
+          1.0337967168119429
+        ],
+        "5": [
+          -5.148080105287032,
+          0.767122768393734
+        ],
+        "6": [
+          4.657343012515625,
+          -0.47488003680057655
+        ],
+        "7": [
+          -5.424014455288964,
+          0.007066439138617609
+        ],
+        "8": [
+          5.358936523607225,
+          -0.019719304778375073
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 88.00000000000274,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.58203269576207,
+      "min_pair_distance": 0.7305111180519752,
+      "robot_positions": {
+        "1": [
+          -4.42617393242905,
+          0.09235713178289057
+        ],
+        "2": [
+          -1.1125258937386413,
+          -1.962232227026557
+        ],
+        "3": [
+          -1.901541852974454,
+          2.6747228106722263
+        ],
+        "4": [
+          4.228163725404739,
+          1.0879773692175523
+        ],
+        "5": [
+          -5.069657415052074,
+          0.7673893945614675
+        ],
+        "6": [
+          4.656505301586747,
+          -0.4750670434607149
+        ],
+        "7": [
+          -5.382359535930789,
+          0.010507777058288717
+        ],
+        "8": [
+          5.224074633601297,
+          -0.015163198125513816
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    },
+    {
+      "sim_time": 89.60000000000328,
+      "tasks_completed": 0,
+      "tasks_pending": 7,
+      "tasks_active": 8,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 54.501032695761985,
+      "min_pair_distance": 0.6833997999135915,
+      "robot_positions": {
+        "1": [
+          -4.356154499288119,
+          0.054271257454496576
+        ],
+        "2": [
+          -1.1125258903875892,
+          -1.9622322250782973
+        ],
+        "3": [
+          -1.9425829322380792,
+          2.6045289806917915
+        ],
+        "4": [
+          4.228769401138865,
+          1.1220922938417934
+        ],
+        "5": [
+          -4.9132385989883085,
+          0.7656756650656776
+        ],
+        "6": [
+          4.625272076582041,
+          -0.480867001797944
+        ],
+        "7": [
+          -5.369381358486469,
+          0.011259752478530994
+        ],
+        "8": [
+          5.119392248550113,
+          -0.008764743620566284
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction"
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction"
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction"
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction"
+        },
+        "7": {
+          "state": "en_route_pickup",
+          "task_id": 7,
+          "goal_location": "WS5",
+          "plan_source": "joint_grid_transaction"
+        },
+        "8": {
+          "state": "en_route_pickup",
+          "task_id": 8,
+          "goal_location": "WS4",
+          "plan_source": "joint_grid_transaction"
+        }
+      }
+    }
+  ]
+}

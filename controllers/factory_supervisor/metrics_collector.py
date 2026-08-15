@@ -33,7 +33,9 @@ class StepRecord:
     robots_active: int
     conflicts_total: int
     avg_battery: float
-    min_pair_distance: float
+    min_pair_distance: Optional[float]
+    robot_positions: Optional[dict] = None
+    robot_task_states: Optional[dict] = None
 
 
 @dataclass
@@ -68,6 +70,32 @@ class MetricsCollector:
         
         # Conflict/deadlock events
         self.conflict_events: List[dict] = []
+        self.route_dispatch_events: List[dict] = []
+        self.route_override_events: List[dict] = []
+        self._active_conflicts: Dict[tuple, dict] = {}
+        self._next_conflict_id = 1
+        self._last_route_dispatch: Dict[int, dict] = {}
+        self.conflict_episode_count = 0
+        self.route_dispatch_count = 0
+        self.route_override_count = 0
+        self.unauthorized_route_write_count = 0
+        self.unauthorized_route_write_events: List[dict] = []
+        self.replan_events: List[dict] = []
+        self.escape_events: List[dict] = []
+        self.unplanned_stop_events: List[dict] = []
+        self.replan_count = 0
+        self.replan_request_count = 0
+        self.replan_request_events: List[dict] = []
+        self.escape_count = 0
+        self.unplanned_stop_count = 0
+        self._motion_watch: Dict[int, dict] = {}
+        self.planned_wait_events: List[dict] = []
+        self.planned_wait_count = 0
+        self.planned_wait_total_seconds = 0.0
+        self._active_planned_waits: Dict[int, dict] = {}
+        self.safety_event_count = 0
+        self.minimum_pair_distance_seen = float('inf')
+        self.pair_distance_violation_samples = 0
         self.deadlock_events: List[dict] = []
         self.safety_events: List[dict] = []
         self._last_safety_event: Dict[tuple, float] = {}
@@ -130,6 +158,17 @@ class MetricsCollector:
         self.commits_by_algorithm[name] = (
             self.commits_by_algorithm.get(name, 0) + 1)
 
+    def record_unauthorized_route_write(self, sim_time: float, robot_id: int,
+                                        source: str, path_version: int,
+                                        plan_epoch=None):
+        self.unauthorized_route_write_count += 1
+        self.unauthorized_route_write_events.append({
+            'sim_time': float(sim_time), 'robot_id': int(robot_id),
+            'source': str(source), 'path_version': int(path_version),
+            'plan_epoch': plan_epoch, 'decision': 'rejected',
+        })
+        self._cap_events(self.unauthorized_route_write_events)
+
     @staticmethod
     def _percentile(values: List[float], percentile: float) -> float:
         if not values:
@@ -143,6 +182,126 @@ class MetricsCollector:
                     task_stats: dict, coord_stats: dict):
         """Record metrics at a simulation step."""
         from config import RobotState
+
+        task_motion_states = {
+            RobotState.EN_ROUTE_PICKUP, RobotState.CARRYING,
+            RobotState.EN_ROUTE_DELIVERY,
+        }
+        for rid, state in robot_states.items():
+            position = state.get('position')
+            active = state.get('state') in task_motion_states
+            planned_wait = state.get('planned_wait') is True
+            wait_episode = self._active_planned_waits.get(rid)
+            wait_ended = False
+            if planned_wait:
+                wait_identity = (
+                    state.get('task_id'), state.get('plan_epoch'),
+                    state.get('plan_source'),
+                    int(state.get('path_version', 0)),
+                    state.get('wait_reason'))
+                if wait_episode is not None:
+                    episode_identity = (
+                        wait_episode.get('task_id'),
+                        wait_episode.get('plan_epoch'),
+                        wait_episode.get('plan_source'),
+                        wait_episode.get('path_version'),
+                        wait_episode.get('reason'))
+                    if episode_identity != wait_identity:
+                        wait_episode['ended_at'] = float(sim_time)
+                        wait_episode['duration'] = max(
+                            0.0, float(sim_time) -
+                            wait_episode['started_at'])
+                        wait_episode['outcome'] = 'superseded'
+                        self.planned_wait_total_seconds += (
+                            wait_episode['duration'])
+                        self.planned_wait_events.append(wait_episode)
+                        self._cap_events(self.planned_wait_events)
+                        self._active_planned_waits.pop(rid, None)
+                        wait_episode = None
+                deadline = state.get('wait_deadline')
+                if not isinstance(deadline, (int, float)) or not math.isfinite(
+                        deadline):
+                    deadline = None
+                if wait_episode is None:
+                    wait_episode = {
+                        'robot_id': rid,
+                        'started_at': float(sim_time),
+                        'last_seen_at': float(sim_time),
+                        'reason': state.get('wait_reason'),
+                        'deadline': deadline,
+                        'max_deadline': deadline,
+                        'task_id': state.get('task_id'),
+                        'plan_epoch': state.get('plan_epoch'),
+                        'plan_source': state.get('plan_source'),
+                        'path_version': int(state.get('path_version', 0)),
+                        'goal_location': state.get('goal_location'),
+                        'ended_at': None,
+                        'duration': None,
+                        'outcome': 'active',
+                    }
+                    self._active_planned_waits[rid] = wait_episode
+                    self.planned_wait_count += 1
+                else:
+                    wait_episode['last_seen_at'] = float(sim_time)
+                    if deadline is not None:
+                        previous = wait_episode.get('max_deadline')
+                        wait_episode['max_deadline'] = (
+                            deadline if previous is None else
+                            max(float(previous), deadline))
+            elif wait_episode is not None:
+                wait_episode = self._active_planned_waits.pop(rid)
+                wait_episode['ended_at'] = float(sim_time)
+                wait_episode['duration'] = max(
+                    0.0, float(sim_time) - wait_episode['started_at'])
+                max_deadline = wait_episode.get('max_deadline')
+                wait_episode['outcome'] = (
+                    'deadline_expired'
+                    if max_deadline is not None and sim_time >= max_deadline
+                    else 'resumed')
+                self.planned_wait_total_seconds += wait_episode['duration']
+                self.planned_wait_events.append(wait_episode)
+                self._cap_events(self.planned_wait_events)
+                wait_ended = True
+            watch = self._motion_watch.get(rid)
+            if not active or planned_wait or position is None:
+                self._motion_watch[rid] = {
+                    'position': position, 'progress_at': sim_time,
+                    'reported': False}
+                continue
+            if wait_ended:
+                self._motion_watch[rid] = {
+                    'position': tuple(position), 'progress_at': sim_time,
+                    'reported': False}
+                continue
+            if watch is None or watch.get('position') is None:
+                self._motion_watch[rid] = {
+                    'position': tuple(position), 'progress_at': sim_time,
+                    'reported': False}
+                continue
+            distance = math.hypot(
+                position[0] - watch['position'][0],
+                position[1] - watch['position'][1])
+            if distance >= 0.05:
+                watch.update(position=tuple(position), progress_at=sim_time,
+                             reported=False)
+            elif (not watch['reported'] and
+                  sim_time - watch['progress_at'] >= 10.0):
+                event = {
+                    'sim_time': sim_time, 'robot_id': rid,
+                    'state': str(state.get('state')),
+                    'stopped_seconds': sim_time - watch['progress_at'],
+                    'position': list(position),
+                    'path_version': int(state.get('path_version', 0)),
+                    'plan_epoch': state.get('plan_epoch'),
+                    'plan_source': state.get('plan_source'),
+                    'task_id': state.get('task_id'),
+                    'goal_location': state.get('goal_location'),
+                    'planned_wait': False,
+                }
+                self.unplanned_stop_events.append(event)
+                self.unplanned_stop_count += 1
+                self._cap_events(self.unplanned_stop_events)
+                watch['reported'] = True
         
         idle_count = sum(1 for rs in robot_states.values() 
                         if rs['state'] == RobotState.IDLE)
@@ -157,8 +316,27 @@ class MetricsCollector:
             for rid_b in robot_ids[index + 1:]:
                 pos_b = robot_states[rid_b].get('position')
                 if pos_b is not None:
-                    pair_distances.append(((pos_a[0] - pos_b[0]) ** 2 +
-                                           (pos_a[1] - pos_b[1]) ** 2) ** 0.5)
+                    distance = ((pos_a[0] - pos_b[0]) ** 2 +
+                                (pos_a[1] - pos_b[1]) ** 2) ** 0.5
+                    pair_distances.append((distance, rid_a, rid_b))
+
+        closest = min(pair_distances, default=(float('inf'), None, None))
+        self.minimum_pair_distance_seen = min(
+            self.minimum_pair_distance_seen, closest[0])
+        if closest[0] < 0.50:
+            self.pair_distance_violation_samples += 1
+        for distance, rid_a, rid_b in pair_distances:
+            if distance >= 0.50:
+                continue
+            self.record_safety_event(SafetyEvent(
+                event_id=f"distance-{rid_a}-{rid_b}-{sim_time:.3f}",
+                sim_time=sim_time,
+                event_type="pair_distance_violation",
+                robot_id=rid_a,
+                peer_id=rid_b,
+                decision="observed",
+                minimum_distance=distance,
+            ))
         
         record = StepRecord(
             sim_time=sim_time,
@@ -169,9 +347,70 @@ class MetricsCollector:
             robots_active=active_count,
             conflicts_total=coord_stats.get('conflicts_resolved', 0),
             avg_battery=avg_battery,
-            min_pair_distance=min(pair_distances) if pair_distances else float('inf'),
+            min_pair_distance=(closest[0]
+                               if math.isfinite(closest[0]) else None),
+            robot_positions={
+                str(rid): [float(rs['position'][0]), float(rs['position'][1])]
+                for rid, rs in robot_states.items()
+                if rs.get('position') is not None
+            },
+            robot_task_states={
+                str(rid): {
+                    'state': str(rs.get('state')),
+                    'task_id': rs.get('task_id'),
+                    'goal_location': rs.get('goal_location'),
+                    'plan_source': rs.get('plan_source'),
+                    'plan_epoch': rs.get('plan_epoch'),
+                    'path_version': int(rs.get('path_version', 0)),
+                    'controller_waypoint_index': int(rs.get(
+                        'controller_waypoint_index', 0)),
+                    'planned_wait': bool(rs.get('planned_wait', False)),
+                    'wait_reason': rs.get('wait_reason'),
+                    'emergency_braking': bool(rs.get(
+                        'emergency_braking', False)),
+                    'speed_scale': float(rs.get('speed_scale', 1.0)),
+                }
+                for rid, rs in robot_states.items()
+            },
         )
         self.step_records.append(record)
+
+    @staticmethod
+    def _cap_events(events: List[dict]):
+        if len(events) > 10000:
+            del events[:1000]
+
+    def record_replan(self, sim_time: float, robot_id: int, source: str,
+                      plan_epoch, result: str, dispatched: bool):
+        if dispatched and result == 'succeeded':
+            self.replan_count += 1
+        self.replan_events.append({
+            'sim_time': float(sim_time), 'robot_id': int(robot_id),
+            'source': str(source), 'plan_epoch': plan_epoch,
+            'result': str(result), 'dispatched': bool(dispatched),
+        })
+        self._cap_events(self.replan_events)
+
+    def record_replan_request(self, sim_time: float, robot_id: int,
+                              path_version: int, plan_epoch):
+        self.replan_request_count += 1
+        self.replan_request_events.append({
+            'sim_time': float(sim_time), 'robot_id': int(robot_id),
+            'path_version': int(path_version), 'plan_epoch': plan_epoch,
+        })
+        self._cap_events(self.replan_request_events)
+
+    def record_escape(self, sim_time: float, robot_id: int,
+                      source: str, target=None):
+        self.escape_count += 1
+        self.escape_events.append({
+            'sim_time': float(sim_time), 'robot_id': int(robot_id),
+            'source': str(source),
+            'target': list(target) if target is not None else None,
+        })
+        self._cap_events(self.escape_events)
+        if len(self.step_records) > 10000:
+            del self.step_records[:1000]
     
     def record_task_arrival(self, task: TransportTask, sim_time: float):
         """Record a new task arrival."""
@@ -199,12 +438,79 @@ class MetricsCollector:
             'delivery': task.delivery_location,
         })
     
-    def record_conflict(self, conflict_info: dict, sim_time: float):
-        """Record a coordination conflict event."""
-        self.conflict_events.append({
-            'sim_time': sim_time,
-            **conflict_info,
-        })
+    def record_conflict_scan(self, conflicts, sim_time: float) -> None:
+        """Track predicted conflicts as episodes from detection to resolve."""
+        observed = {}
+        for rid_a, rid_b, time_to_conflict, distance in conflicts:
+            key = tuple(sorted((int(rid_a), int(rid_b))))
+            observed[key] = (float(time_to_conflict), float(distance))
+            episode = self._active_conflicts.get(key)
+            if episode is None:
+                episode = {
+                    'conflict_id': self._next_conflict_id,
+                    'type': 'predicted_trajectory',
+                    'robots_involved': list(key),
+                    'detected_at': float(sim_time),
+                    'last_seen_at': float(sim_time),
+                    'status': 'active',
+                    'minimum_predicted_distance': float(distance),
+                    'minimum_time_to_conflict': float(time_to_conflict),
+                }
+                self._next_conflict_id += 1
+                self.conflict_episode_count += 1
+                self._active_conflicts[key] = episode
+                self.conflict_events.append(episode)
+            else:
+                episode['last_seen_at'] = float(sim_time)
+                episode['minimum_predicted_distance'] = min(
+                    episode['minimum_predicted_distance'], float(distance))
+                episode['minimum_time_to_conflict'] = min(
+                    episode['minimum_time_to_conflict'],
+                    float(time_to_conflict))
+        for key in set(self._active_conflicts) - set(observed):
+            episode = self._active_conflicts.pop(key)
+            episode['status'] = 'resolved'
+            episode['resolved_at'] = float(sim_time)
+        while len(self.conflict_events) > 10000:
+            resolved_index = next(
+                (i for i, item in enumerate(self.conflict_events)
+                 if item.get('status') == 'resolved'), None)
+            if resolved_index is None:
+                break
+            del self.conflict_events[resolved_index]
+
+    def record_route_dispatch(self, robot_id: int, path_version: int,
+                              plan_epoch: int, source: str, waypoint_count: int,
+                              sim_time: float) -> bool:
+        """Audit route ownership and rapid cross-source replacement."""
+        event = {
+            'sim_time': float(sim_time), 'robot_id': int(robot_id),
+            'path_version': int(path_version), 'source': str(source),
+            'plan_epoch': int(plan_epoch),
+            'waypoint_count': int(waypoint_count),
+        }
+        previous = self._last_route_dispatch.get(int(robot_id))
+        if (previous is not None and
+                sim_time - previous['sim_time'] < 1.0 and
+                previous['path_version'] != event['path_version']):
+            self.route_override_events.append({
+                'sim_time': float(sim_time), 'robot_id': int(robot_id),
+                'previous_source': previous['source'],
+                'new_source': event['source'],
+                'previous_path_version': previous['path_version'],
+                'new_path_version': int(path_version),
+                'previous_plan_epoch': previous['plan_epoch'],
+                'new_plan_epoch': int(plan_epoch),
+            })
+            self.route_override_count += 1
+        self._last_route_dispatch[int(robot_id)] = event
+        self.route_dispatch_events.append(event)
+        self.route_dispatch_count += 1
+        if len(self.route_dispatch_events) > 10000:
+            del self.route_dispatch_events[:1000]
+        if len(self.route_override_events) > 10000:
+            del self.route_override_events[:1000]
+        return True
     
     def record_deadlock(self, cycle: List[int], sim_time: float):
         """Record a deadlock detection event."""
@@ -222,6 +528,9 @@ class MetricsCollector:
             return False
         self._last_safety_event[key] = event.sim_time
         self.safety_events.append(asdict(event))
+        self.safety_event_count += 1
+        if len(self.safety_events) > 10000:
+            del self.safety_events[:1000]
         return True
     
     def compute_final_metrics(self, robots: dict, task_stats: dict,
@@ -266,6 +575,15 @@ class MetricsCollector:
             workload_cv = 0.0
         
         latency = self.scheduling_latencies_ms
+        completion_marks = sorted(
+            float(item['completion_time']) for item in self.task_completions
+            if item.get('completion_time') is not None)
+        progress_marks = [0.0] + completion_marks + [float(total_time)]
+        completion_gaps = [later - earlier for earlier, later in zip(
+            progress_marks, progress_marks[1:])]
+        active_wait_seconds = sum(
+            max(0.0, float(total_time) - episode['started_at'])
+            for episode in self._active_planned_waits.values())
         return {
             # Primary KPIs
             "throughput_per_minute": throughput,
@@ -276,13 +594,23 @@ class MetricsCollector:
             "avg_robot_idle_pct": avg_idle_pct,
             "total_distance_all_robots": total_distance,
             "total_conflicts_resolved": coord_stats.get('conflicts_resolved', 0),
+            "predicted_conflicts": self.conflict_episode_count,
+            "route_dispatches": self.route_dispatch_count,
+            "rapid_route_overrides": self.route_override_count,
+            "unauthorized_route_writes": self.unauthorized_route_write_count,
+            "audited_replans": self.replan_count,
+            "replan_requests": self.replan_request_count,
+            "physical_escapes": self.escape_count,
+            "unplanned_task_stops": self.unplanned_stop_count,
+            "planned_wait_episodes": self.planned_wait_count,
+            "planned_wait_total_seconds": (
+                self.planned_wait_total_seconds + active_wait_seconds),
             "total_deadlocks": coord_stats.get('deadlocks_detected', 0),
-            "min_pair_distance": min(
-                (record.min_pair_distance for record in self.step_records),
-                default=float('inf')),
-            "pair_distance_violations": sum(
-                1 for record in self.step_records
-                if record.min_pair_distance < 0.50),
+            "min_pair_distance": (
+                self.minimum_pair_distance_seen
+                if math.isfinite(self.minimum_pair_distance_seen) else None),
+            "pair_distance_violations": (
+                self.pair_distance_violation_samples),
             
             # Secondary metrics
             "max_completion_time": max(completion_times) if completion_times else 0,
@@ -291,6 +619,19 @@ class MetricsCollector:
             "tasks_per_robot": tasks_per_robot,
             "robot_idle_percentages": robot_idle_pcts,
             "total_replans": coord_stats.get('total_replans', 0),
+            "joint_plans_attempted": coord_stats.get(
+                'joint_plans_attempted', 0),
+            "joint_plans_accepted": coord_stats.get(
+                'joint_plans_accepted', 0),
+            "joint_plan_rollbacks": coord_stats.get(
+                'joint_plan_rollbacks', 0),
+            "longest_completion_plateau_seconds": max(
+                completion_gaps, default=float(total_time)),
+            "final_completion_plateau_seconds": (
+                float(total_time) - completion_marks[-1]
+                if completion_marks else float(total_time)),
+            "robots_without_completed_tasks": sum(
+                1 for count in tasks_per_robot if count == 0),
             "scheduling_latency_mean_ms": (
                 statistics.fmean(latency) if latency else 0.0),
             "scheduling_latency_p50_ms": self._percentile(latency, 0.50),
@@ -325,6 +666,13 @@ class MetricsCollector:
             robots, task_stats, coord_stats, total_time
         )
         
+        active_wait_events = []
+        for episode in self._active_planned_waits.values():
+            snapshot = dict(episode)
+            snapshot['duration'] = max(
+                0.0, float(total_time) - snapshot['started_at'])
+            active_wait_events.append(snapshot)
+
         results = {
             "experiment_info": {
                 "scenario": self.scenario_name,
@@ -337,13 +685,24 @@ class MetricsCollector:
             "task_stats": task_stats,
             "coordination_stats": coord_stats,
             "task_completions": self.task_completions,
+            "conflict_events": self.conflict_events,
+            "route_dispatch_events": self.route_dispatch_events,
+            "route_override_events": self.route_override_events,
+            "unauthorized_route_write_events": (
+                self.unauthorized_route_write_events),
+            "replan_events": self.replan_events,
+            "replan_request_events": self.replan_request_events,
+            "escape_events": self.escape_events,
+            "unplanned_stop_events": self.unplanned_stop_events,
+            "planned_wait_events": (
+                self.planned_wait_events + active_wait_events),
             "deadlock_events": self.deadlock_events,
             "safety_events": self.safety_events,
             "time_series": [asdict(sr) for sr in self.step_records[-100:]],  # last 100 steps
         }
         
         with open(self.output_path, 'w') as f:
-            json.dump(results, f, indent=2, default=str)
+            json.dump(results, f, indent=2, default=str, allow_nan=False)
         
         return self.output_path
     
