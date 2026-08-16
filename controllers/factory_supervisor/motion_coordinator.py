@@ -1602,7 +1602,9 @@ class MotionCoordinator:
     def plan_grid_lifelong(self,
                             robot_id: int,
                             current_position: Tuple[float, float],
-                            goal_location
+                            goal_location,
+                            hard_peer_prefix: float = 4.0,
+                            allow_unrestricted_fallback: bool = True
                             ) -> Optional[List[Tuple[float, float]]]:
         """
         Plan a path using the FREE-SPACE grid with multi-robot
@@ -1681,11 +1683,13 @@ class MotionCoordinator:
                 continue
             coordinates = self.coordinate_paths.get(rid)
             if coordinates and len(coordinates) >= 2:
-                # Only the immediate next 2 m is a hard spatial obstacle.
-                # Far-future sharing is serialized by absolute-time
-                # reservations; a longer hard prefix forced A* to detour
-                # around peers that would already be gone by arrival time.
-                prefix = self._polyline_prefix(coordinates, 2.0)
+                # Only the immediate next few metres are a hard spatial
+                # obstacle by default. Far-future sharing is serialized by
+                # absolute-time reservations; a longer hard prefix forced A*
+                # to detour around peers that would already be gone by
+                # arrival time. Priority-yield callers can extend this window.
+                prefix = self._polyline_prefix(
+                    coordinates, hard_peer_prefix)
                 centreline = self._rasterize_polyline(prefix)
                 for col, row in centreline:
                     for dc in range(-1, 2):
@@ -1785,7 +1789,11 @@ class MotionCoordinator:
 
         # If no separated route exists, use the unrestricted shortest route;
         # temporal dispatch delay and controller holds then serialize access.
+        # Priority-yield replans may disable this fallback so a low-priority
+        # robot cannot be steered straight back into the conflict corridor.
         if raw_path is None or len(raw_path) == 0:
+            if not allow_unrestricted_fallback:
+                return None
             raw_path = self.grid_planner.plan(current_position, goal_xy,
                                               smooth=True)
             if raw_path is None or len(raw_path) == 0:
@@ -1802,13 +1810,18 @@ class MotionCoordinator:
         # Compare suspiciously long candidates against the unrestricted
         # clean-grid path and discard the detour when it is materially worse.
         candidate_length = self._path_length(raw_path)
-        if peer_cost_detour or candidate_length > goal_distance * 1.45:
+        # Only reject an avoidance path when it is an extreme detour.
+        # Moderate separation is still valuable: throwing it away makes
+        # direct paths cross each other and shifts the problem to runtime
+        # escapes/stalls. Priority-yield callers keep the separated route.
+        if allow_unrestricted_fallback and (
+                peer_cost_detour or candidate_length > goal_distance * 2.2):
             unrestricted = self.grid_planner.plan(
                 current_position, goal_xy, smooth=True)
             if unrestricted:
                 unrestricted_length = self._path_length(unrestricted)
-                max_ratio = 1.25 if peer_cost_detour else 1.35
-                max_extra = 1.5 if peer_cost_detour else 3.0
+                max_ratio = 1.8 if peer_cost_detour else 2.0
+                max_extra = 4.0 if peer_cost_detour else 8.0
                 if (candidate_length > unrestricted_length * max_ratio and
                         candidate_length > unrestricted_length + max_extra):
                     raw_path = unrestricted

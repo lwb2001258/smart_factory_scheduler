@@ -61,6 +61,12 @@ YIELD_RESUME_MIN_CLEARANCE = 1.00
 YIELD_RESUME_HORIZON = 4.0
 YIELD_RESUME_TIMEOUT = 10.0
 YIELD_STANDOFF_SETTLE_SECONDS = 1.5
+# Supervisor cadence controls. The logic is unchanged; these only change how
+# often a few expensive bookkeeping scans run in wall-clock time.
+JOINT_WATCHDOG_INTERVAL = float(os.environ.get(
+    "SMART_FACTORY_JOINT_WATCHDOG_INTERVAL", "0.5"))
+RESERVATION_REFRESH_INTERVAL = float(os.environ.get(
+    "SMART_FACTORY_RESERVATION_REFRESH_INTERVAL", "1.0"))
 NUM_REPEATS = 5        # Number of runs per experiment with different seeds
 
 # ================================================================
@@ -506,7 +512,7 @@ ASSIGNMENT_FAILURE_TTL = 5.0  # seconds before retrying a failed robot/task pair
 # robots are relocated as one group so their new positions are checked
 # against each other before any Webots node is moved.
 STALL_RELOCATION_TIMEOUT = 6.0  # reserve physical escape for sustained stalls
-JOINT_STALL_RELOCATION_TIMEOUT = 6.0  # joint-mode route-proximate recovery deadline
+JOINT_STALL_RELOCATION_TIMEOUT = 8.0  # joint-mode route-proximate recovery deadline
 JOINT_STALL_RECOVERY_COOLDOWN = 2.0   # retry interval when recovery routing fails
 STALL_PROGRESS_DISTANCE = 0.10   # normal turning/slowdown still counts as progress
 MIN_NAV_DISPLACEMENT = 0.15  # metres - reject routes that do not move the robot
