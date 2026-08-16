@@ -9,8 +9,6 @@ SCENARIO C: 8 robots, high task arrival rate (1 task per 8 seconds)
 Scheduler              Throughput    Avg Compl     Avg Wait     Idle %  Conflicts
                       (tasks/min)    (seconds)    (seconds)                      
 --------------------------------------------------------------------------------
-FCFS                         0.00         0.00         0.00       23.1        0.0
-  valid seeds=1/1; throughput std=0.000, median=0.000, min=0.000, max=0.000
-  scheduling latency across runs: P95 mean=6.2635 ms, P99 mean=6.2635 ms
+FCFS                          N/A          N/A          N/A        N/A        N/A
 
 ================================================================================

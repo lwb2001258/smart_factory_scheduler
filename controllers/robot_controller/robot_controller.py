@@ -185,10 +185,21 @@ class WaypointNavigator:
         self.waypoint_not_before = list(waypoint_not_before or ())
         self.plan_is_partial = bool(partial)
         self.joint_coordinated = False
+        self._reset_reactive_state()
         if not partial:
             self.joint_release_index = 10 ** 9
             self.waypoint_threshold = GOAL_THRESHOLD
             self.joint_epoch_wait_deadline = 0.0
+
+    def _reset_reactive_state(self):
+        """Clear all local obstacle-avoidance state after a route replacement."""
+        self.sidestep_active = False
+        self.sidestep_direction = 0
+        self.sidestep_start_t = 0.0
+        self.sidestep_lateral_x = 0.0
+        self.sidestep_lateral_y = 0.0
+        self._emergency_stopped = False
+        self._replan_requested = False
     
     def get_current_target(self) -> Optional[Tuple[float, float]]:
         """Get the current target waypoint."""
@@ -433,6 +444,7 @@ class WaypointNavigator:
             # ── 2. Head-on detection → enter / continue sidestep ─
             elif (front_in_narrow_cone < SIDESTEP_TRIGGER_DIST
                   and not self.sidestep_active):
+                self._replan_requested = True
                 # Pick the side with more clearance
                 left_clear, right_clear = side_clear
                 if left_clear > right_clear and left_clear > 0.6:
@@ -452,6 +464,9 @@ class WaypointNavigator:
                 if (front_in_narrow_cone > SIDESTEP_RECOVER_DIST
                         or elapsed > SIDESTEP_TIMEOUT):
                     self._exit_sidestep()
+                    self._emergency_stopped = True
+                    self._replan_requested = True
+                    return (0.0, 0.0)
                 else:
                     # Stay in sidestep — let DWA with lateral bias steer
                     ss_l, ss_r = self._dwa_control(robot_x, robot_y, robot_heading,

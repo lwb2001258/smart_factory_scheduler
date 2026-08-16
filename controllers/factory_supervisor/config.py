@@ -48,6 +48,18 @@ ENABLE_LEGACY_INTERLOCK_RECOVERY = os.environ.get(
 ENABLE_NONPHYSICAL_RECOVERY = os.environ.get(
     "SMART_FACTORY_ENABLE_NONPHYSICAL_RECOVERY", "0"
 ).strip().lower() in {"1", "true", "yes"}
+# Deterministic priority-yield state machine used by joint runtime.  The
+# legacy path is preserved when disabled so controlled A/B experiments can
+# compare the new yield -> wait-for-clear -> resume loop against the existing
+# head-on yield heuristic.
+ENABLE_PRIORITY_YIELD_RESUME = os.environ.get(
+    "SMART_FACTORY_ENABLE_PRIORITY_YIELD_RESUME", "0"
+).strip().lower() in {"1", "true", "yes"}
+YIELD_PREDICTION_HORIZON = 10.0
+YIELD_PREDICTION_DT = 0.5
+YIELD_RESUME_MIN_CLEARANCE = 0.80
+YIELD_RESUME_HORIZON = 3.0
+YIELD_RESUME_TIMEOUT = 8.0
 NUM_REPEATS = 5        # Number of runs per experiment with different seeds
 
 # ================================================================
@@ -492,7 +504,7 @@ ASSIGNMENT_FAILURE_TTL = 5.0  # seconds before retrying a failed robot/task pair
 # distance for this long is considered physically stuck.  Nearby stuck
 # robots are relocated as one group so their new positions are checked
 # against each other before any Webots node is moved.
-STALL_RELOCATION_TIMEOUT = 10.0  # reserve physical escape for sustained stalls
+STALL_RELOCATION_TIMEOUT = 6.0  # reserve physical escape for sustained stalls
 STALL_PROGRESS_DISTANCE = 0.10   # normal turning/slowdown still counts as progress
 STALL_GROUP_DISTANCE = 1.8       # metres joining stuck robots into one group
 RELOCATION_PEER_CLEARANCE = 0.7  # minimum landing-point centre separation

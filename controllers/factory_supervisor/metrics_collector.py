@@ -93,6 +93,18 @@ class MetricsCollector:
         self.planned_wait_count = 0
         self.planned_wait_total_seconds = 0.0
         self._active_planned_waits: Dict[int, dict] = {}
+        self.yield_resume_events: List[dict] = []
+        self.yield_start_count = 0
+        self.yield_standoff_selected_count = 0
+        self.yield_wait_start_count = 0
+        self.yield_wait_cleared_count = 0
+        self.yield_wait_timeout_count = 0
+        self.yield_resume_proposed_count = 0
+        self.yield_resume_rejected_count = 0
+        self.yield_resume_committed_count = 0
+        self.yield_resume_rollback_count = 0
+        self.nonphysical_recoveries = 0
+        self.nonphysical_recovery_events: List[dict] = []
         self.safety_event_count = 0
         self.minimum_pair_distance_seen = float('inf')
         self.pair_distance_violation_samples = 0
@@ -391,6 +403,39 @@ class MetricsCollector:
         })
         self._cap_events(self.replan_events)
 
+    def record_yield_event(self, event_type: str, sim_time: float,
+                           robot_id: int, winner=None, target=None):
+        """Record one deterministic yield/resume state-machine transition."""
+        counter_attr = {
+            'yield_start': 'yield_start_count',
+            'yield_standoff_selected': 'yield_standoff_selected_count',
+            'yield_wait_start': 'yield_wait_start_count',
+            'yield_wait_cleared': 'yield_wait_cleared_count',
+            'yield_wait_timeout': 'yield_wait_timeout_count',
+            'yield_resume_proposed': 'yield_resume_proposed_count',
+            'yield_resume_rejected': 'yield_resume_rejected_count',
+            'yield_resume_committed': 'yield_resume_committed_count',
+            'yield_resume_rollback': 'yield_resume_rollback_count',
+        }.get(event_type)
+        if counter_attr is not None:
+            setattr(self, counter_attr, getattr(self, counter_attr, 0) + 1)
+        self.yield_resume_events.append({
+            'sim_time': float(sim_time), 'event_type': str(event_type),
+            'robot_id': int(robot_id), 'winner': winner,
+            'target': list(target) if target is not None else None,
+        })
+        self._cap_events(self.yield_resume_events)
+
+    def record_nonphysical_recovery(self, sim_time: float, robot_id: int,
+                                    target=None):
+        """Audit teleport-style recoveries separately from physical escapes."""
+        self.nonphysical_recoveries += 1
+        self.nonphysical_recovery_events.append({
+            'sim_time': float(sim_time), 'robot_id': int(robot_id),
+            'target': list(target) if target is not None else None,
+        })
+        self._cap_events(self.nonphysical_recovery_events)
+
     def record_replan_request(self, sim_time: float, robot_id: int,
                               path_version: int, plan_epoch):
         self.replan_request_count += 1
@@ -601,6 +646,17 @@ class MetricsCollector:
             "audited_replans": self.replan_count,
             "replan_requests": self.replan_request_count,
             "physical_escapes": self.escape_count,
+            "nonphysical_recoveries": self.nonphysical_recoveries,
+            "yield_start": self.yield_start_count,
+            "yield_standoff_selected": self.yield_standoff_selected_count,
+            "yield_wait_start": self.yield_wait_start_count,
+            "yield_wait_cleared": self.yield_wait_cleared_count,
+            "yield_wait_timeout": self.yield_wait_timeout_count,
+            "yield_resume_proposed": self.yield_resume_proposed_count,
+            "yield_resume_rejected": self.yield_resume_rejected_count,
+            "yield_resume_committed": self.yield_resume_committed_count,
+            "yield_resume_rollback": self.yield_resume_rollback_count,
+            "safety_event_count": self.safety_event_count,
             "unplanned_task_stops": self.unplanned_stop_count,
             "planned_wait_episodes": self.planned_wait_count,
             "planned_wait_total_seconds": (
@@ -693,6 +749,8 @@ class MetricsCollector:
             "replan_events": self.replan_events,
             "replan_request_events": self.replan_request_events,
             "escape_events": self.escape_events,
+            "yield_resume_events": self.yield_resume_events,
+            "nonphysical_recovery_events": self.nonphysical_recovery_events,
             "unplanned_stop_events": self.unplanned_stop_events,
             "planned_wait_events": (
                 self.planned_wait_events + active_wait_events),
