@@ -372,6 +372,13 @@ class GridAStar:
         """Internal A* search — called by plan() within a try/finally
         block that handles cell-relaxation cleanup."""
         if start == goal:
+            # Same grid cell normally means the robot is already effectively
+            # at its destination. Returning a [start, goal] pair can be
+            # dispatched as a movement plan even when the two world points
+            # coincide; controllers then report arrival without moving.
+            if (math.hypot(start_xy[0] - goal_xy[0],
+                           start_xy[1] - goal_xy[1]) < 0.05):
+                return None
             return [start_xy, goal_xy]
         
         # A* with octile heuristic

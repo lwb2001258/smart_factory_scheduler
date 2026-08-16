@@ -141,7 +141,7 @@ class SupervisorPredictionTests(unittest.TestCase):
             time_slot_seconds=3.0)
         supervisor.motion_coordinator = SimpleNamespace(
             grid=Grid(),
-            plan_joint_grid_candidate=lambda agents, max_seconds: candidate)
+            plan_joint_grid_candidate=lambda agents, max_seconds, **kwargs: candidate)
         captured = []
         supervisor._begin_joint_plan_transaction = (
             lambda plans, **kwargs: captured.append((plans, kwargs)) or True)
@@ -405,7 +405,7 @@ class SupervisorPredictionTests(unittest.TestCase):
         supervisor._has_active_navigation = lambda robot: True
         supervisor._navigation_goal = lambda robot: (4.0, robot.robot_id)
         supervisor.motion_coordinator.plan_joint_grid_candidate = (
-            lambda agents, max_seconds: None)
+            lambda agents, max_seconds, **kwargs: None)
         supervisor._refresh_joint_grid_candidate()
         self.assertIsNone(supervisor._joint_plan_transaction)
         commands = [json.loads(payload.decode('utf-8'))['command']['type']
@@ -702,7 +702,7 @@ class SupervisorPredictionTests(unittest.TestCase):
         self.assertFalse(robot.recovery_active)
         self.assertEqual([(1, [(1.0, 0.0), (2.0, 0.0)])], installed)
 
-    def test_close_emergency_pair_assigns_only_higher_id_as_yielder(self):
+    def test_close_emergency_pair_uses_priority_yield_key(self):
         supervisor = FactorySupervisor.__new__(FactorySupervisor)
         supervisor.sim_time = 10.0
         supervisor.robots = {
@@ -718,11 +718,13 @@ class SupervisorPredictionTests(unittest.TestCase):
         supervisor._command_reverse = (
             lambda rid, distance: escaped.append(rid) or True)
         self.assertTrue(supervisor._coordinate_emergency_pair())
-        self.assertEqual([2], escaped)
+        # Equal task priority falls back to higher robot ID as right-of-way,
+        # so the lower-ID robot is the yielder.
+        self.assertEqual([1], escaped)
         self.assertEqual('winner',
-                         supervisor.robots[1].recovery_session_role)
-        self.assertEqual('yielder',
                          supervisor.robots[2].recovery_session_role)
+        self.assertEqual('yielder',
+                         supervisor.robots[1].recovery_session_role)
         self.assertFalse(supervisor.robots[1]._replan_requested)
         self.assertFalse(supervisor.robots[2]._replan_requested)
 

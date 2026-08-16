@@ -1,0 +1,1 @@
+sim_time,robot_id,state,pos_x,pos_y,goal_x,goal_y,active_plan_source,active_plan_epoch,controller_epoch,controller_waypoint_idx,waypoints,current_task,hold_until,speed_scale,heading,emergency_braking,joint_wait_reason,joint_wait_until,replan_requested

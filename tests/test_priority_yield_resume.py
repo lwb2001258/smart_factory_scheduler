@@ -42,7 +42,7 @@ class PriorityYieldResumeTests(unittest.TestCase):
         self.assertFalse(sup._priority_yield_is_exempt(sup.robots[1]))
         self.assertTrue(sup._priority_yield_is_exempt(sup.robots[2]))
 
-    def test_priority_key_uses_task_then_goal_then_id(self):
+    def test_priority_key_uses_task_then_id(self):
         sup = self._supervisor()
         sup.robots = {
             1: self._robot(1, (0.0, 0.0), task_priority=1.0, goal=(5.0, 0.0)),
@@ -50,8 +50,10 @@ class PriorityYieldResumeTests(unittest.TestCase):
         }
         self.assertGreater(sup._priority_yield_key(2), sup._priority_yield_key(1))
         sup.robots[2].current_task.priority = 1.0
+        # Goal distance must not override task priority or the final ID
+        # tie-break; equal task priorities fall through to robot ID.
         sup.robots[1].goal_location = (1.0, 0.0)
-        self.assertGreater(sup._priority_yield_key(1), sup._priority_yield_key(2))
+        self.assertGreater(sup._priority_yield_key(2), sup._priority_yield_key(1))
 
     def test_priority_key_uses_higher_robot_id_on_final_tie(self):
         sup = self._supervisor()

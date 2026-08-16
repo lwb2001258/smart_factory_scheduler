@@ -57,9 +57,10 @@ ENABLE_PRIORITY_YIELD_RESUME = os.environ.get(
 ).strip().lower() in {"1", "true", "yes"}
 YIELD_PREDICTION_HORIZON = 10.0
 YIELD_PREDICTION_DT = 0.5
-YIELD_RESUME_MIN_CLEARANCE = 0.80
-YIELD_RESUME_HORIZON = 3.0
-YIELD_RESUME_TIMEOUT = 8.0
+YIELD_RESUME_MIN_CLEARANCE = 1.00
+YIELD_RESUME_HORIZON = 4.0
+YIELD_RESUME_TIMEOUT = 10.0
+YIELD_STANDOFF_SETTLE_SECONDS = 1.5
 NUM_REPEATS = 5        # Number of runs per experiment with different seeds
 
 # ================================================================
@@ -505,9 +506,12 @@ ASSIGNMENT_FAILURE_TTL = 5.0  # seconds before retrying a failed robot/task pair
 # robots are relocated as one group so their new positions are checked
 # against each other before any Webots node is moved.
 STALL_RELOCATION_TIMEOUT = 6.0  # reserve physical escape for sustained stalls
+JOINT_STALL_RELOCATION_TIMEOUT = 8.0  # joint-mode route-proximate recovery deadline
+JOINT_STALL_RECOVERY_COOLDOWN = 2.0   # retry interval when recovery routing fails
 STALL_PROGRESS_DISTANCE = 0.10   # normal turning/slowdown still counts as progress
+MIN_NAV_DISPLACEMENT = 0.15  # metres - reject routes that do not move the robot
 STALL_GROUP_DISTANCE = 1.8       # metres joining stuck robots into one group
-RELOCATION_PEER_CLEARANCE = 0.7  # minimum landing-point centre separation
+RELOCATION_PEER_CLEARANCE = 0.85  # minimum landing-point centre separation
 
 # Planning runs inside Webots' synchronous controller step. These limits
 # prevent a dense search from freezing simulation time.

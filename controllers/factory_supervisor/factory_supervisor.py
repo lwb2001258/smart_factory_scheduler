@@ -46,6 +46,7 @@ from config import (
     ENABLE_PRIORITY_YIELD_RESUME,
     YIELD_PREDICTION_HORIZON, YIELD_PREDICTION_DT,
     YIELD_RESUME_MIN_CLEARANCE, YIELD_RESUME_HORIZON, YIELD_RESUME_TIMEOUT,
+    YIELD_STANDOFF_SETTLE_SECONDS,
     ENABLE_LEGACY_INTERLOCK_RECOVERY, SCENARIOS, MAX_ROBOTS, STARTUP_CONFIG,
     RobotState, TaskStatus, WORKSTATIONS, STORAGE_AREAS,
     CHARGING_STATIONS, ALL_LOCATIONS, GOAL_TOLERANCE, PARKING_SPOTS,
@@ -53,7 +54,8 @@ from config import (
     LOW_BATTERY_THRESHOLD, TASK_ABORT_BATTERY_THRESHOLD,
     MIN_TASK_BATTERY, FULL_BATTERY_THRESHOLD,
     ASSIGNMENT_FAILURE_TTL,
-    STALL_RELOCATION_TIMEOUT, STALL_PROGRESS_DISTANCE,
+    STALL_RELOCATION_TIMEOUT, STALL_PROGRESS_DISTANCE, MIN_NAV_DISPLACEMENT,
+    JOINT_STALL_RELOCATION_TIMEOUT, JOINT_STALL_RECOVERY_COOLDOWN,
     STALL_GROUP_DISTANCE, RELOCATION_PEER_CLEARANCE,
     PROACTIVE_SCAN_BUDGET_SECONDS, PROACTIVE_SCAN_MAX_REPLANS,
     ENABLE_NONPHYSICAL_RECOVERY,
@@ -129,6 +131,8 @@ class RobotInfo:
         self.priority_yield_wait_started_at = 0.0
         self.priority_yield_wait_deadline = 0.0
         self.priority_yield_original_goal = None
+        self.priority_yield_cooldown_until = 0.0
+        self._joint_stall_recovery_until = 0.0
         self.speed_scale = 1.0
         self.joint_speed_until = 0.0
         self.joint_speed_started = 0.0
@@ -199,6 +203,8 @@ class FactorySupervisor:
 
     def _log_replan(self, *args, **kwargs):
         """Print replan diagnostics with the current simulation timestamp."""
+        if getattr(self, '_supervisor_quiet', False):
+            return
         timestamp = float(getattr(self, 'sim_time', 0.0))
         message = " ".join(str(item) for item in args)
         kwargs.setdefault('flush', True)
@@ -242,6 +248,16 @@ class FactorySupervisor:
         if goal in WAYPOINTS:
             return WAYPOINTS[goal]
         return None
+
+    def _waypoints_are_stationary(self, robot, waypoints) -> bool:
+        """Return True when a candidate route makes no meaningful progress."""
+        points = [tuple(point) for point in waypoints]
+        if not points:
+            return True
+        final = points[-1]
+        return (math.hypot(final[0] - robot.position[0],
+                           final[1] - robot.position[1]) <
+                MIN_NAV_DISPLACEMENT)
 
     def _robot_completed_joint_txn(self, robot, active_txn) -> bool:
         """Return True once the robot has consumed the committed prefix."""
@@ -347,7 +363,9 @@ class FactorySupervisor:
                 handle.write('call,rid,event\n')
         with open(fallback_log, 'a', encoding='utf-8') as handle:
             handle.write(f'{self.sim_time:.3f},all,start\n')
-        for rid in sorted(planning_agents):
+        for rid in sorted(planning_agents,
+                           key=self._priority_yield_key,
+                           reverse=True):
             start, goal_xy = planning_agents[rid]
             with open(fallback_log, 'a', encoding='utf-8') as handle:
                 handle.write(f'{self.sim_time:.3f},{rid},plan_start '
@@ -361,6 +379,10 @@ class FactorySupervisor:
                 continue
             points = [tuple(point) for point in path]
             if not points:
+                continue
+            if (math.hypot(points[-1][0] - start[0],
+                           points[-1][1] - start[1]) <
+                    MIN_NAV_DISPLACEMENT):
                 continue
             if math.hypot(points[0][0] - start[0],
                           points[0][1] - start[1]) > 0.18:
@@ -471,16 +493,11 @@ class FactorySupervisor:
             grouped_goals.setdefault(goal_xy, []).append(rid)
         planning_agents = {}
         for goal_xy, robot_ids in grouped_goals.items():
-            primary = min(
-                robot_ids,
-                key=lambda rid: math.hypot(
-                    self.robots[rid].position[0] - goal_xy[0],
-                    self.robots[rid].position[1] - goal_xy[1]))
+            primary = max(robot_ids, key=self._priority_yield_key)
             followers = sorted(
                 (rid for rid in robot_ids if rid != primary),
-                key=lambda rid: math.hypot(
-                    self.robots[rid].position[0] - goal_xy[0],
-                    self.robots[rid].position[1] - goal_xy[1]))
+                key=self._priority_yield_key,
+                reverse=True)
             assigned_staging = []
             for rid in [primary] + followers:
                 start = agents[rid][0]
@@ -496,8 +513,11 @@ class FactorySupervisor:
                 planning_agents[rid] = (start, staging)
         failures = int(getattr(self, '_joint_candidate_failures', 0))
         budget = min(1.00, 0.25 + failures * 0.05)
+        priority_order = tuple(sorted(
+            planning_agents, key=self._priority_yield_key, reverse=True))
         candidate = self.motion_coordinator.plan_joint_grid_candidate(
-            planning_agents, max_seconds=budget)
+            planning_agents, max_seconds=budget,
+            priority_order=priority_order)
         self._joint_grid_candidate = candidate
         if candidate is not None:
             self._joint_candidate_failures = 0
@@ -612,6 +632,25 @@ class FactorySupervisor:
             return False
         return self._navigation_is_activated(robot)
 
+
+    def _update_joint_stall_clock(self, robot):
+        """Track continuous no-progress time for joint-mode stall recovery."""
+        if not self._robot_requires_recovery_monitoring(robot):
+            robot._deadlock_stuck_since = None
+            robot._deadlock_watch_pos = robot.position
+            return None
+        watch_pos = getattr(robot, '_deadlock_watch_pos', robot.position)
+        moved = math.hypot(robot.position[0] - watch_pos[0],
+                           robot.position[1] - watch_pos[1])
+        threshold = STALL_PROGRESS_DISTANCE * max(0.5, robot.speed_scale)
+        if moved >= threshold:
+            robot._deadlock_watch_pos = robot.position
+            robot._deadlock_stuck_since = None
+            return None
+        if getattr(robot, '_deadlock_stuck_since', None) is None:
+            robot._deadlock_stuck_since = self.sim_time
+        return self.sim_time - robot._deadlock_stuck_since
+
     def _coordinate_emergency_pair(self) -> bool:
         """Assign one deterministic yielder for a close emergency pair."""
         candidates = []
@@ -629,10 +668,17 @@ class FactorySupervisor:
                     first.position[0] - second.position[0],
                     first.position[1] - second.position[1])
                 if distance < 0.80:
-                    candidates.append((distance, rid_a, rid_b))
+                    if self._priority_yield_key(rid_a) >= self._priority_yield_key(rid_b):
+                        winner, yielder = rid_a, rid_b
+                    else:
+                        winner, yielder = rid_b, rid_a
+                    candidates.append(
+                        (self._priority_yield_key(yielder), distance,
+                         winner, yielder))
         if not candidates:
             return False
-        _, winner, yielder = min(candidates)
+        candidates.sort(key=lambda item: (item[0], item[1]))
+        _priority, _distance, winner, yielder = candidates[0]
         first = self.robots[winner]
         second = self.robots[yielder]
         if (self.sim_time < first.recovery_session_until or
@@ -691,7 +737,7 @@ class FactorySupervisor:
             self._hold_robot(rid, duration)
 
     def _find_joint_safety_profile(self, component, base_trajectories,
-                                   minimum_distance=0.65):
+                                   minimum_distance=0.75):
         """Find a non-stopping speed profile that preserves joint clearance."""
         component = tuple(sorted(component))
         levels = (1.0, 0.85, 0.70, 0.55, 0.40)
@@ -738,11 +784,15 @@ class FactorySupervisor:
             changes = sum(
                 abs(profile[rid] - self.robots[rid].speed_scale)
                 for rid in component)
-            safe.append((efficiency, minimum_speed, -changes, profile))
+            priority_score = sum(
+                float(scale) * self._priority_yield_numeric_key(rid)
+                for rid, scale in profile.items())
+            safe.append((priority_score, efficiency, minimum_speed,
+                         -changes, profile))
         if not safe:
             return None
-        safe.sort(key=lambda item: item[:3], reverse=True)
-        return safe[0][3]
+        safe.sort(key=lambda item: item[:4], reverse=True)
+        return safe[0][4]
 
     def _joint_predictive_speed_shield(self, active_robots) -> bool:
         """Coordinate dense traffic with low-intervention joint shaping.
@@ -764,7 +814,7 @@ class FactorySupervisor:
                     handle.write('sim_time,trajectories,conflicts,components,actions\n')
         horizon = 6.0
         sample_dt = 0.25
-        minimum_distance = 0.72
+        minimum_distance = 0.85
         trajectories = {}
         for rid, robot in active_robots.items():
             if not robot.waypoints:
@@ -808,7 +858,11 @@ class FactorySupervisor:
                     for b in component[index + 1:]
                 ]
                 closest = min(component_distances) if component_distances else 0.0
-                yielder = component[-1]
+                yielder = sorted(component, key=self._priority_yield_key)[0]
+                selection = self._priority_yield_select(
+                    component, actual_conflicts)
+                if selection is not None:
+                    _, yielder = selection
                 if closest < 0.70:
                     if self._joint_try_escape_component(component):
                         continue
@@ -837,7 +891,8 @@ class FactorySupervisor:
                 handle.write(
                     f'{now:.3f},{sorted(trajectories)},{conflicts},,,\n')
         if not conflicts:
-            if getattr(self, '_next_shield_log', 0.0) <= now:
+            if (not getattr(self, '_supervisor_quiet', False) and
+                    getattr(self, '_next_shield_log', 0.0) <= now):
                 print(f"[JointShield] T={now:.1f}s no predicted conflicts "
                       f"active={sorted(trajectories)}", file=sys.stderr)
                 self._next_shield_log = now + 5.0
@@ -852,7 +907,8 @@ class FactorySupervisor:
 
         components = self._conflict_components(conflicts)
         acted = False
-        if getattr(self, '_next_shield_log', 0.0) <= now:
+        if (not getattr(self, '_supervisor_quiet', False) and
+                getattr(self, '_next_shield_log', 0.0) <= now):
             print(f"[JointShield] T={now:.1f}s conflicts={len(conflicts)} "
                   f"components={components}", file=sys.stderr)
             self._next_shield_log = now + 2.0
@@ -864,14 +920,16 @@ class FactorySupervisor:
                 default=10.0)
             profile = self._find_joint_safety_profile(
                 component, trajectories, minimum_distance)
-            print(f"[JointShield] T={now:.1f}s component={component} "
-                  f"earliest={earliest:.2f}s profile={profile}", file=sys.stderr)
+            if not getattr(self, '_supervisor_quiet', False):
+                print(f"[JointShield] T={now:.1f}s component={component} "
+                      f"earliest={earliest:.2f}s profile={profile}",
+                      file=sys.stderr)
             if profile is None:
-                ordered = sorted(component)
+                ordered = sorted(component, key=self._priority_yield_key)
                 profile = {rid: 1.0 for rid in component}
-                profile[ordered[-1]] = 0.55
+                profile[ordered[0]] = 0.55
                 if len(component) > 2:
-                    profile[ordered[-2]] = 0.70
+                    profile[ordered[1]] = 0.70
             if not self._apply_joint_speed_profile(profile):
                 continue
             for rid, scale in profile.items():
@@ -890,19 +948,49 @@ class FactorySupervisor:
         )
 
     def _priority_yield_key(self, robot_id: int):
-        """Deterministic right-of-way key; higher values keep the route."""
+        """Deterministic right-of-way key; higher values keep the route.
+
+        Task priority is the only conflict-domain signal.  Exempt robots are
+        never selected as the yielder, and robot ID is used only as a final
+        deterministic tie-break for identical task priorities.  Goal distance
+        is intentionally absent so a closer-but-lower-priority robot cannot
+        influence the winner/yielder selection.
+        """
         robot = self.robots[robot_id]
         exempt = 1 if self._priority_yield_is_exempt(robot) else 0
         task_priority = float(
             getattr(getattr(robot, 'current_task', None), 'priority', 0.0)
             or 0.0)
-        goal_xy = self._goal_coordinates(self._navigation_goal(robot))
-        goal_distance = 0.0
-        if goal_xy is not None:
-            goal_distance = math.hypot(
-                robot.position[0] - goal_xy[0],
-                robot.position[1] - goal_xy[1])
-        return (exempt, task_priority, -goal_distance, float(robot_id))
+        return (exempt, task_priority, float(robot_id))
+
+    def _priority_yield_numeric_key(self, robot_id: int) -> float:
+        """Scalar version of ``_priority_yield_key`` for profile scoring."""
+        exempt, task_priority, rid = self._priority_yield_key(robot_id)
+        return (
+            float(exempt) * 1e18 +
+            float(task_priority) * 1e12 +
+            float(rid))
+
+    def _priority_yield_pair(self, robot_a: int, robot_b: int):
+        """Return (winner, yielder) for one conflicting pair.
+
+        The higher priority robot normally keeps the right-of-way.  If the
+        preferred yielder is exempt, the other robot must yield as a safety
+        fallback.  ``None`` means both robots are exempt and no safe yield
+        role can be assigned from priority alone.
+        """
+        if robot_a not in self.robots or robot_b not in self.robots:
+            return None
+        key_a = self._priority_yield_key(robot_a)
+        key_b = self._priority_yield_key(robot_b)
+        winner, yielder = (
+            (robot_a, robot_b) if key_a >= key_b else (robot_b, robot_a))
+        if not self._priority_yield_is_exempt(self.robots[yielder]):
+            return winner, yielder
+        winner, yielder = yielder, winner
+        if self._priority_yield_is_exempt(self.robots[yielder]):
+            return None
+        return winner, yielder
 
     def _priority_yield_select(self, component, conflicts=None):
         """Choose (winner, yielder) without priority oscillation."""
@@ -921,32 +1009,82 @@ class FactorySupervisor:
             pairs = set(itertools.combinations(component, 2))
         ranked = []
         for a, b in pairs:
-            key_a = self._priority_yield_key(a)
-            key_b = self._priority_yield_key(b)
-            if key_a >= key_b:
-                winner, yielder = a, b
-                winner_key, yielder_key = key_a, key_b
-            else:
-                winner, yielder = b, a
-                winner_key, yielder_key = key_b, key_a
-            if self._priority_yield_is_exempt(self.robots[yielder]):
+            pair = self._priority_yield_pair(a, b)
+            if pair is None:
                 continue
+            winner, yielder = pair
             distance = math.hypot(
                 self.robots[a].position[0] - self.robots[b].position[0],
                 self.robots[a].position[1] - self.robots[b].position[1])
-            ranked.append((yielder_key, distance, winner, yielder))
+            ranked.append(
+                (self._priority_yield_key(yielder), distance, winner, yielder))
         if not ranked:
             return None
-        ranked.sort(key=lambda item: item[:3])
+        ranked.sort(key=lambda item: (item[0], item[1]))
         return ranked[0][2], ranked[0][3]
+
+    @staticmethod
+    def _point_segment_distance(point, seg_a, seg_b):
+        """Return the shortest distance from point to segment ab."""
+        px, py = float(point[0]), float(point[1])
+        ax, ay = float(seg_a[0]), float(seg_a[1])
+        bx, by = float(seg_b[0]), float(seg_b[1])
+        dx, dy = bx - ax, by - ay
+        length_sq = dx * dx + dy * dy
+        if length_sq <= 1e-12:
+            return math.hypot(px - ax, py - ay)
+        t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / length_sq))
+        proj_x = ax + t * dx
+        proj_y = ay + t * dy
+        return math.hypot(px - proj_x, py - proj_y)
+
+    def _priority_yield_segment_peer_clear(self, yielder: int, target) -> bool:
+        """Reject standoff paths that cut through current peer positions."""
+        robot = self.robots[yielder]
+        for peer_id, peer in self.robots.items():
+            if peer_id == yielder:
+                continue
+            if self._point_segment_distance(
+                    peer.position, robot.position, target) < 0.75:
+                return False
+        return True
+
+    def _priority_yield_standoff_dynamic_clear(self, yielder: int,
+                                              winner: int, target) -> bool:
+        """Reject standoff targets that the winner's future path still visits."""
+        robot = self.robots[yielder]
+        winner_robot = self.robots.get(winner)
+        if winner_robot is None:
+            return True
+        try:
+            winner_traj = self._trajectory_for_scale(
+                winner, max(0.4, winner_robot.speed_scale),
+                YIELD_PREDICTION_HORIZON, YIELD_PREDICTION_DT)
+        except Exception:
+            return True
+        travel_seconds = (
+            math.hypot(target[0] - robot.position[0],
+                       target[1] - robot.position[1]) /
+            max(0.10, 0.22 * 0.55))
+        lookahead = min(YIELD_PREDICTION_HORIZON, travel_seconds + 1.5)
+        for sample in winner_traj:
+            if sample[2] > lookahead:
+                break
+            if math.hypot(sample[0] - target[0],
+                          sample[1] - target[1]) < YIELD_RESUME_MIN_CLEARANCE:
+                return False
+            if self._point_segment_distance(
+                    (sample[0], sample[1]), robot.position, target
+            ) < YIELD_RESUME_MIN_CLEARANCE:
+                return False
+        return True
 
     def _priority_yield_standoff_candidates(self, winner: int, yielder: int):
         """Return validated 90-degree lateral standoff candidates."""
         robot = self.robots[yielder]
         winner_robot = self.robots.get(winner)
         original_goal = self._navigation_goal(robot)
-        goal_xy = (ALL_LOCATIONS.get(original_goal)
-                   if isinstance(original_goal, str) else original_goal)
+        goal_xy = self._goal_coordinates(original_goal)
         peers = [peer.position for peer_id, peer in self.robots.items()
                  if peer_id != yielder]
         directions = []
@@ -978,6 +1116,52 @@ class FactorySupervisor:
                     col, row = grid.world_to_grid(*target)
                     if not grid.in_bounds(col, row) or not grid.is_free(col, row):
                         continue
+                if not self._priority_yield_segment_peer_clear(yielder, target):
+                    continue
+                if not self._priority_yield_standoff_dynamic_clear(
+                        yielder, winner, target):
+                    continue
+                goal_progress = 0.0
+                if goal_xy is not None:
+                    goal_progress = (
+                        math.hypot(robot.position[0] - goal_xy[0],
+                                   robot.position[1] - goal_xy[1]) -
+                        math.hypot(target[0] - goal_xy[0],
+                                   target[1] - goal_xy[1]))
+                score = (min(clearance, 1.6) + 0.55 * goal_progress -
+                         0.05 * distance)
+                candidates.append((score, clearance, target))
+        if candidates:
+            candidates.sort(key=lambda item: item[0], reverse=True)
+            return candidates
+
+        # Fall back to the full 360-degree passable ring when a pure 90-degree
+        # lateral standoff is blocked.  This mirrors the existing full-ring
+        # escape search and lets the planner use every reachable free cell.
+        for distance in (0.80, 1.20, 1.60, 2.00, 2.40):
+            for step in range(32):
+                angle = 2.0 * math.pi * step / 32.0
+                target = (robot.position[0] + distance * math.cos(angle),
+                          robot.position[1] + distance * math.sin(angle))
+                clearance = min(
+                    (math.hypot(target[0] - px, target[1] - py)
+                     for px, py in peers),
+                    default=math.inf)
+                if clearance < YIELD_RESUME_MIN_CLEARANCE:
+                    continue
+                if not self.motion_coordinator._segment_clear(
+                        robot.position, target):
+                    continue
+                grid = getattr(self.motion_coordinator, 'grid', None)
+                if grid is not None:
+                    col, row = grid.world_to_grid(*target)
+                    if not grid.in_bounds(col, row) or not grid.is_free(col, row):
+                        continue
+                if not self._priority_yield_segment_peer_clear(yielder, target):
+                    continue
+                if not self._priority_yield_standoff_dynamic_clear(
+                        yielder, winner, target):
+                    continue
                 goal_progress = 0.0
                 if goal_xy is not None:
                     goal_progress = (
@@ -1016,10 +1200,10 @@ class FactorySupervisor:
             robot.priority_yield_started_at = self.sim_time
             robot.priority_yield_original_goal = original_goal
             self._set_robot_speed_scale(yielder, 0.55)
-            self._set_robot_speed_scale(winner, 0.45)
+            self._set_robot_speed_scale(winner, 1.0)
             for peer_id in component:
                 if peer_id not in (winner, yielder):
-                    self._set_robot_speed_scale(peer_id, 0.45)
+                    self._set_robot_speed_scale(peer_id, 0.50)
             if getattr(self, 'metrics', None) is not None:
                 self.metrics.record_yield_event(
                     'yield_start', self.sim_time, yielder, winner)
@@ -1030,7 +1214,18 @@ class FactorySupervisor:
                   f"yielder={yielder} standoff=({target[0]:.2f},"
                   f"{target[1]:.2f}) clearance={clearance:.2f}m")
             return True
-        return False
+        # The preferred 90-degree lateral standoff may be blocked by shelves,
+        # docks, or another peer. Fall back to the full free-space ring so the
+        # selected low-priority robot still moves and clears the conflict.
+        escaped = self._joint_escape_robot(
+            yielder, min_peer_clearance=1.00,
+            source='_priority_yield_resume', priority_yield_winner=winner)
+        if escaped:
+            self._set_robot_speed_scale(winner, 1.0)
+            for peer_id in component:
+                if peer_id not in (winner, yielder):
+                    self._set_robot_speed_scale(peer_id, 0.50)
+        return escaped
 
     def _priority_yield_resolve_component(self, component,
                                           conflicts=None) -> bool:
@@ -1041,6 +1236,9 @@ class FactorySupervisor:
         if any(getattr(self.robots[rid], 'priority_yield_state', None)
                is not None for rid in component):
             return False
+        if any(getattr(self.robots[rid], 'priority_yield_cooldown_until', 0.0)
+               > self.sim_time for rid in component):
+            return False
         selection = self._priority_yield_select(component, conflicts)
         if selection is None:
             return False
@@ -1049,6 +1247,9 @@ class FactorySupervisor:
 
     def _priority_yield_clear_state(self, robot) -> None:
         """Clear yield state and its matching route-writer lease."""
+        original_goal = (robot.priority_yield_original_goal or
+                         robot.recovery_resume_goal)
+        robot.priority_yield_cooldown_until = self.sim_time + 2.0
         robot.priority_yield_state = None
         robot.priority_yield_winner = None
         robot.priority_yield_standoff = None
@@ -1061,6 +1262,17 @@ class FactorySupervisor:
         if robot.route_write_owner == '_priority_yield_resume':
             robot.route_write_owner = None
             robot.route_write_until = 0.0
+            robot.active_plan_source = 'joint_grid_transaction'
+            robot.waypoints = []
+            robot.current_waypoint_idx = 0
+            if original_goal is not None:
+                robot.goal_location = original_goal
+        # A yield/resume leg ends at full speed and with no residual hold,
+        # otherwise a cleared robot can remain parked even after the winner
+        # has left the conflict area.
+        robot.hold_until = 0.0
+        robot.wait_started = 0.0
+        self._set_robot_speed_scale(robot.robot_id, 1.0)
 
     def _priority_yield_handle_arrival(self, robot_id: int,
                                        force: bool = False) -> None:
@@ -1217,7 +1429,9 @@ class FactorySupervisor:
                   "wait timeout; fresh joint plan requested")
             return True
         if robot.hold_until < now + 0.50:
-            self._hold_robot(robot_id, YIELD_RESUME_TIMEOUT)
+            self._hold_robot(
+                robot_id,
+                max(0.10, robot.priority_yield_wait_deadline - now))
         return self._priority_yield_commit_resume(
             robot_id) if self._priority_yield_resume_is_safe(robot_id) else False
 
@@ -1234,7 +1448,15 @@ class FactorySupervisor:
                     acted = True
             elif state == 'standoff_enroute':
                 started = getattr(robot, 'priority_yield_started_at', now)
-                if now - started > YIELD_RESUME_TIMEOUT:
+                if (now - started >= YIELD_STANDOFF_SETTLE_SECONDS):
+                    # The exact standoff point is a target, not a gate. Once
+                    # the yielder has had a short direct-control window to turn
+                    # away from the winner, start the wait-for-clear timer from
+                    # its measured position. Waiting for exact grid arrival was
+                    # producing repeated 10s standoff timeouts.
+                    self._priority_yield_handle_arrival(rid, force=True)
+                    acted = True
+                elif now - started > YIELD_RESUME_TIMEOUT:
                     if getattr(self, 'metrics', None) is not None:
                         self.metrics.record_yield_event(
                             'yield_wait_timeout', now, rid,
@@ -1260,7 +1482,7 @@ class FactorySupervisor:
                 trajectories[rid] = traj
         if len(trajectories) < 2:
             return acted
-        conflicts = self._trajectory_conflicts(trajectories, 0.72)
+        conflicts = self._trajectory_conflicts(trajectories, 0.85)
         if getattr(self, 'metrics', None) is not None:
             self.metrics.record_conflict_scan(conflicts, now)
         if not conflicts:
@@ -1286,7 +1508,7 @@ class FactorySupervisor:
             for index, a in enumerate(component)
             for b in component[index + 1:]
         ]
-        if pair_distances and min(pair_distances) < 0.70:
+        if pair_distances and min(pair_distances) < 0.85:
             return True
         earliest = min(
             (float(conflict[2])
@@ -1339,6 +1561,32 @@ class FactorySupervisor:
             return
 
         self._joint_collision_scan(active)
+        relocate_due = []
+        for rid, robot in active.items():
+            elapsed = self._update_joint_stall_clock(robot)
+            if (elapsed is not None and
+                    elapsed >= JOINT_STALL_RELOCATION_TIMEOUT):
+                relocate_due.append((rid, elapsed))
+        # Recover the robot that has been stationary the longest.  This is a
+        # liveness backstop, not a right-of-way decision: low-priority
+        # recovery should not be able to starve an equally stuck high-
+        # priority robot, which would otherwise sit for tens of seconds.
+        relocate_due.sort(
+            key=lambda item: (-float(item[1]),
+                              self._priority_yield_key(item[0])))
+        for rid, _elapsed in relocate_due:
+            robot = self.robots[rid]
+            if getattr(robot, '_joint_stall_recovery_until', 0.0) > now:
+                continue
+            recovered = self._joint_stall_recovery(rid)
+            if recovered:
+                robot._deadlock_stuck_since = None
+                robot._deadlock_watch_pos = robot.position
+                robot._joint_watch_pos = robot.position
+                robot._joint_watch_since = now
+                robot._joint_any_wait_started = None
+                robot._joint_wait_started = None
+                break
         emergency = []
         stale_wait = []
         stalled = []
@@ -1357,9 +1605,13 @@ class FactorySupervisor:
                 ))
             if getattr(robot, '_replan_requested', False) or robot.emergency_braking:
                 emergency.append(rid)
+                if getattr(robot, '_joint_emergency_since', None) is None:
+                    robot._joint_emergency_since = now
                 robot._joint_watch_pos = robot.position
                 robot._joint_watch_since = now
                 continue
+            if getattr(robot, '_joint_emergency_since', None) is not None:
+                robot._joint_emergency_since = None
             if legal_wait:
                 if robot.controller_joint_wait_reason in (
                         'joint_window_endpoint', 'joint_epoch_barrier'):
@@ -1372,6 +1624,11 @@ class FactorySupervisor:
                         stale_wait.append(rid)
                 else:
                     robot._joint_wait_started = None
+                any_wait_started = getattr(robot, '_joint_any_wait_started', None)
+                if any_wait_started is None:
+                    robot._joint_any_wait_started = now
+                elif now - any_wait_started > 8.0:
+                    stale_wait.append(rid)
                 robot._joint_watch_pos = robot.position
                 robot._joint_watch_since = now
                 continue
@@ -1381,6 +1638,7 @@ class FactorySupervisor:
                 robot.position[0] - last_pos[0],
                 robot.position[1] - last_pos[1])
             if moved >= STALL_PROGRESS_DISTANCE:
+                robot._joint_any_wait_started = None
                 robot._joint_watch_pos = robot.position
                 robot._joint_watch_since = now
                 robot._joint_stall_count = 0
@@ -1388,6 +1646,7 @@ class FactorySupervisor:
             if getattr(robot, '_joint_watch_since', None) is None:
                 robot._joint_watch_since = now
                 robot._joint_watch_pos = robot.position
+                robot._joint_any_wait_started = None
                 continue
             if now - robot._joint_watch_since >= 3.0:
                 stalled.append(rid)
@@ -1404,17 +1663,52 @@ class FactorySupervisor:
             # controllers have acknowledged the next safe window, so holding
             # here only converts a temporary slowdown into a full stop.
             self._joint_request_fresh_plan(ids, 'joint_runtime_watchdog')
+            # A replan request is a one-shot controller signal. Once the
+            # rolling joint planner has been asked for a replacement route,
+            # clear the flag so the same request cannot keep the robot in the
+            # emergency set indefinitely. Physical emergency braking remains
+            # latched until the controller itself reports it has cleared.
+            for rid in emergency:
+                robot = self.robots[rid]
+                if not robot.emergency_braking:
+                    robot._replan_requested = False
+                    robot._joint_emergency_since = None
             hard_stalled = [
                 rid for rid in stalled
                 if now - self.robots[rid]._joint_watch_since >= 5.0
             ]
+            emergency_hard = [
+                rid for rid in emergency
+                if self.robots[rid].emergency_braking and
+                (getattr(self.robots[rid], '_joint_emergency_since',
+                         None) is not None and
+                 now - self.robots[rid]._joint_emergency_since >= 3.0)
+            ]
+            hard_stalled.extend(emergency_hard)
+            for rid in stale_wait:
+                robot = self.robots[rid]
+                wait_started = getattr(robot, '_joint_any_wait_started', None)
+                priority_yield_leg = (
+                    getattr(robot, 'priority_yield_state', None) in
+                    ('standoff_enroute', 'waiting_clear'))
+                if (wait_started is not None and
+                        now - wait_started >= 8.0 and
+                        not priority_yield_leg):
+                    hard_stalled.append(rid)
+            hard_stalled = list(dict.fromkeys(hard_stalled))
             if hard_stalled:
                 self._joint_escalate_stalled_robots(hard_stalled)
             for rid in ids:
                 robot = self.robots[rid]
+                robot._joint_wait_started = None
+                robot._joint_any_wait_started = None
+                if rid in stalled:
+                    # Keep the continuous no-progress clock running until the
+                    # robot physically moves. Resetting it after every fresh
+                    # joint plan made the 5s hard-escalation unreachable.
+                    continue
                 robot._joint_watch_pos = robot.position
                 robot._joint_watch_since = now
-                robot._joint_wait_started = None
             return
 
     def __init__(self, scenario: str = "C", scheduler_type: str = "FCFS",
@@ -1432,6 +1726,8 @@ class FactorySupervisor:
         # Initialize Webots supervisor
         self.supervisor = Supervisor()
         self.timestep = int(self.supervisor.getBasicTimeStep())
+        self._supervisor_quiet = os.environ.get(
+            'SMART_FACTORY_SUPERVISOR_QUIET', '0') == '1'
         # Freeze the route-writer policy for this run. Tests and explicitly
         # configured legacy scenarios can exercise the old stack separately.
         self.joint_runtime_enforced = ENABLE_JOINT_RUNTIME
@@ -1507,7 +1803,9 @@ class FactorySupervisor:
                 handle.write('sim_time,robot_id,state,pos_x,pos_y,goal_x,goal_y,'
                              'active_plan_source,active_plan_epoch,'
                              'controller_epoch,controller_waypoint_idx,'
-                             'waypoints,current_task,hold_until,speed_scale\n')
+                             'waypoints,current_task,hold_until,speed_scale,'
+                             'heading,emergency_braking,joint_wait_reason,'
+                             'joint_wait_until,replan_requested\n')
         
         print(f"[Supervisor] Initialized: Scenario {scenario} "
               f"({self.scenario_config['description']})")
@@ -1666,12 +1964,26 @@ class FactorySupervisor:
             return False
         epoch = self._next_plan_epoch
         self._next_plan_epoch += 1
-        normalized = {
-            rid: [tuple(point) for point in path]
-            for rid, path in plans.items() if path
-        }
-        if set(normalized) != set(plans) or not normalized:
+        normalized = {}
+        omitted_stationary = []
+        for rid, path in plans.items():
+            points = [tuple(point) for point in path]
+            if not points:
+                omitted_stationary.append(rid)
+                continue
+            robot = self.robots[rid]
+            if self._waypoints_are_stationary(robot, points):
+                omitted_stationary.append(rid)
+                continue
+            normalized[rid] = points
+        if not normalized:
             return False
+        # A wait-only/zero-displacement member must not keep the whole fleet
+        # from receiving a usable rolling prefix. Keep that robot briefly
+        # held; the progress watchdog will escalate it to a physical escape
+        # if the joint planner repeatedly fails to give it a moving route.
+        for rid in omitted_stationary:
+            self._hold_robot(rid, 0.5)
         if any(not self._route_write_allowed(
                 self.robots[rid], 'joint_grid_transaction')
                 for rid in normalized):
@@ -1818,6 +2130,8 @@ class FactorySupervisor:
     def _route_writer_priority(source: str) -> int:
         if source == '_command_reverse':
             return 100
+        if source == '_joint_stall_recovery':
+            return 98
         if source == '_priority_yield_resume':
             return 96
         if source in ('_joint_group_recovery', '_resume_after_escape'):
@@ -1856,7 +2170,7 @@ class FactorySupervisor:
         recovery_sources = {
             '_command_reverse', '_joint_group_recovery',
             '_resume_after_escape', '_teleport_stalled_group',
-            '_priority_yield_resume',
+            '_priority_yield_resume', '_joint_stall_recovery',
         }
         txn = getattr(self, '_joint_plan_transaction', None)
         if (txn is not None and robot_id in txn.members and
@@ -1897,6 +2211,18 @@ class FactorySupervisor:
                 self.sim_time)
             return True
         robot = self.robots[robot_id]
+        if self._waypoints_are_stationary(robot, waypoints):
+            if hasattr(self.motion_coordinator, 'rollback_robot_plan'):
+                self.motion_coordinator.rollback_robot_plan(robot_id)
+            robot.pending_waypoints = None
+            robot.pending_plan_source = None
+            robot.pending_plan_epoch = None
+            robot.pending_route_generation = None
+            robot.pending_is_runtime_replan = False
+            robot.pending_previous_waypoints = None
+            robot.pending_previous_index = 0
+            robot.dispatch_not_before = 0.0
+            return False
         if (getattr(self, 'joint_runtime_enforced', False) and
                 source != 'joint_grid_transaction' and
                 source not in recovery_sources):
@@ -1981,6 +2307,7 @@ class FactorySupervisor:
             'target': list(plan[0]),
             'all_waypoints': [list(wp) for wp in plan],
             'path_version': robot.path_version,
+            'direct_navigation': source in recovery_sources,
         })
         if self._last_command_send_ok:
             self._last_plan_dispatch_performed = True
@@ -1989,6 +2316,8 @@ class FactorySupervisor:
             robot.route_write_owner = source
             route_lease = 1.0
             if source == '_command_reverse':
+                route_lease = 3.0
+            elif source == '_joint_stall_recovery':
                 route_lease = 3.0
             elif source == '_priority_yield_resume':
                 route_lease = YIELD_RESUME_TIMEOUT + 2.0
@@ -2056,6 +2385,9 @@ class FactorySupervisor:
             self.motion_coordinator.rollback_robot_plan(robot_id)
             return False
         robot = self.robots[robot_id]
+        if self._waypoints_are_stationary(robot, waypoints):
+            self.motion_coordinator.rollback_robot_plan(robot_id)
+            return False
         if source is None:
             frame = inspect.currentframe()
             source = (frame.f_back.f_code.co_name
@@ -2290,7 +2622,8 @@ class FactorySupervisor:
                             self.metrics.record_replan_request(
                                 self.sim_time, robot_id, robot.path_version,
                                 robot.active_plan_epoch)
-                        print(f"[Supervisor] Replan request received from Robot {robot_id}")
+                        if not getattr(self, '_supervisor_quiet', False):
+                            print(f"[Supervisor] Replan request received from Robot {robot_id}")
                 
                 self.receiver.nextPacket()
             except Exception as e:
@@ -2416,11 +2749,12 @@ class FactorySupervisor:
         self.startup_failed = True
 
     @staticmethod
-    def _trajectory_conflicts(trajectories, minimum_distance=0.75,
+    def _trajectory_conflicts(trajectories, minimum_distance=0.85,
                               only_robot_ids=None):
         """Return the first predicted conflict for every relevant pair."""
         ids = sorted(trajectories)
         selected = set(only_robot_ids) if only_robot_ids is not None else None
+        minimum_distance_sq = minimum_distance * minimum_distance
         conflicts = []
         for index, rid_a in enumerate(ids):
             for rid_b in ids[index + 1:]:
@@ -2428,10 +2762,11 @@ class FactorySupervisor:
                     continue
                 for sample_a, sample_b in zip(
                         trajectories[rid_a], trajectories[rid_b]):
-                    distance = math.hypot(
-                        sample_a[0] - sample_b[0],
-                        sample_a[1] - sample_b[1])
-                    if distance < minimum_distance:
+                    dx = sample_a[0] - sample_b[0]
+                    dy = sample_a[1] - sample_b[1]
+                    distance_sq = dx * dx + dy * dy
+                    if distance_sq < minimum_distance_sq:
+                        distance = math.sqrt(distance_sq)
                         conflicts.append(
                             (rid_a, rid_b, sample_a[2], distance))
                         break
@@ -2477,7 +2812,7 @@ class FactorySupervisor:
             0.22 * scale, horizon, dt, start_delay=start_delay)
 
     def _find_joint_speed_profile(self, component, base_trajectories,
-                                  minimum_distance=0.75):
+                                  minimum_distance=0.85):
         """Find a safe, efficient group profile and recheck external peers."""
         component = tuple(sorted(component))
         # Preventive shaping must not approximate a stop. More severe
@@ -2520,11 +2855,16 @@ class FactorySupervisor:
                 changes = sum(
                     abs(profile[rid] - self.robots[rid].speed_scale)
                     for rid in component)
-                safe.append((efficiency, -changes, profile))
+                priority_score = sum(
+                    float(scale) * self._priority_yield_numeric_key(rid)
+                    for rid, scale in profile.items())
+                safe.append((priority_score, efficiency, -changes,
+                             profile))
         if not safe:
             return None
-        safe.sort(key=lambda item: (item[0], item[1]), reverse=True)
-        return safe[0][2]
+        safe.sort(key=lambda item: (item[0], item[1], item[2]),
+                  reverse=True)
+        return safe[0][3]
 
     def _apply_joint_speed_profile(self, profile) -> bool:
         """Send a speed group as one rollback-capable transaction."""
@@ -2616,10 +2956,13 @@ class FactorySupervisor:
             trajectories, COLLISION_RADIUS)
         if getattr(self, 'metrics', None) is not None:
             self.metrics.record_conflict_scan(raw_conflicts, self.sim_time)
-        conflicts = [
-            (max(rid_a, rid_b), min(rid_a, rid_b), conflict_time)
-            for rid_a, rid_b, conflict_time, _ in raw_conflicts
-        ]
+        conflicts = []
+        for rid_a, rid_b, conflict_time, _ in raw_conflicts:
+            if self._priority_yield_key(rid_a) >= self._priority_yield_key(rid_b):
+                winner, yielder = rid_a, rid_b
+            else:
+                winner, yielder = rid_b, rid_a
+            conflicts.append((yielder, winner, conflict_time))
 
         # Jointly shape every connected conflict group. A candidate is
         # accepted only after rebuilding the changed trajectories and checking
@@ -3149,7 +3492,13 @@ class FactorySupervisor:
         self._record_long_stall_event(group)
 
         if not ENABLE_NONPHYSICAL_RECOVERY:
-            yielder = max(group)
+            yielder = None
+            for candidate in sorted(group, key=self._priority_yield_key):
+                if not self._priority_yield_is_exempt(self.robots[candidate]):
+                    yielder = candidate
+                    break
+            if yielder is None:
+                yielder = sorted(group, key=self._priority_yield_key)[0]
             recovered = self._command_reverse(yielder, 0.3)
             if recovered:
                 rb = self.robots[yielder]
@@ -3317,7 +3666,9 @@ class FactorySupervisor:
             return  # 不构成互�?
         
         # 检测到互锁�?
-        stalled_robots.sort(key=lambda x: x[0])  # 按ID升序
+        stalled_robots.sort(
+            key=lambda item: self._priority_yield_key(item[0]),
+            reverse=True)
         stall_info = ", ".join(f"Robot {r} (stalled {t:.1f} s)" for r, t in stalled_robots)
         print(f"[Deadlock] Interlock detected among {len(stalled_robots)} robots: {stall_info}")
         
@@ -3382,6 +3733,348 @@ class FactorySupervisor:
         first_rid = stalled_robots[0][0]
         self._resolve_robot_deadlock(first_rid, [r for r, _ in stalled_robots[1:]])
 
+
+    def _route_polyline_for_robot(self, robot):
+        """Return the remaining business route as a polyline for stall recovery."""
+        remaining = [tuple(point) for point in
+                     robot.waypoints[robot.current_waypoint_idx:]]
+        points = [tuple(robot.position)]
+        for point in remaining:
+            point = tuple(point)
+            if math.hypot(point[0] - points[-1][0],
+                          point[1] - points[-1][1]) > 0.02:
+                points.append(point)
+        if len(points) < 2:
+            goal_xy = self._goal_coordinates(self._navigation_goal(robot))
+            if goal_xy is not None:
+                points.append(goal_xy)
+        return points
+
+    @staticmethod
+    def _point_along_polyline(points, target_distance):
+        """Return a point at target_distance along a world-coordinate polyline."""
+        if not points:
+            return None
+        cumulative = [0.0]
+        for first, second in zip(points, points[1:]):
+            cumulative.append(cumulative[-1] + math.hypot(
+                second[0] - first[0], second[1] - first[1]))
+        total = cumulative[-1]
+        if total <= 1e-9:
+            return points[0]
+        target_distance = max(0.0, min(total, float(target_distance)))
+        for index in range(1, len(cumulative)):
+            if target_distance <= cumulative[index] or index == len(cumulative) - 1:
+                segment_length = cumulative[index] - cumulative[index - 1]
+                ratio = (0.0 if segment_length <= 1e-9 else
+                         (target_distance - cumulative[index - 1]) / segment_length)
+                ratio = max(0.0, min(1.0, ratio))
+                first = points[index - 1]
+                second = points[index]
+                return (first[0] + ratio * (second[0] - first[0]),
+                        first[1] + ratio * (second[1] - first[1]))
+        return points[-1]
+
+    def _distance_to_route_polyline(self, point, route_points):
+        """Return the shortest distance from point to a route polyline."""
+        if not route_points:
+            return math.inf
+        distance = math.inf
+        for first, second in zip(route_points, route_points[1:]):
+            distance = min(distance, self._point_segment_distance(
+                point, first, second))
+        if len(route_points) == 1:
+            distance = math.hypot(point[0] - route_points[0][0],
+                                  point[1] - route_points[0][1])
+        return distance
+
+    @staticmethod
+    def _route_polyline_length(route_points):
+        if len(route_points) < 2:
+            return 0.0
+        return sum(math.hypot(second[0] - first[0], second[1] - first[1])
+                   for first, second in zip(route_points, route_points[1:]))
+
+    def _static_turning_path(self, start_xy, goal_xy):
+        """Build an obstacle-only turning path between two world points."""
+        raw_path = self.motion_coordinator.grid_planner.plan(
+            start_xy, goal_xy, smooth=False)
+        if not raw_path:
+            return None
+        cells = []
+        for waypoint in raw_path:
+            cell = self.motion_coordinator.grid.world_to_grid(*waypoint)
+            if not cells or cells[-1] != cell:
+                cells.append(cell)
+        path = self.motion_coordinator._cells_to_turning_waypoints(cells)
+        if (path and math.hypot(path[0][0] - start_xy[0],
+                                path[0][1] - start_xy[1]) < 0.05):
+            path = path[1:]
+        return path or None
+
+    def _joint_stall_recovery_candidates(self, robot):
+        """Return route-proximate, peer-clear landing points for one robot.
+
+        Candidate targets are sampled along the robot's remaining planned
+        route (with small lateral grid offsets) and must be free cells, keep
+        the configured peer clearance, and still admit a static path back to
+        the business goal.  They are sorted by distance to the predetermined
+        route, then peer clearance/path length, so the recovery moves the
+        robot to the closest unblocked point on its intended route.
+        """
+        rid = robot.robot_id
+        goal_xy = self._goal_coordinates(self._navigation_goal(robot))
+        if goal_xy is None:
+            return []
+        route_points = self._route_polyline_for_robot(robot)
+        if len(route_points) < 2:
+            return []
+        grid = self.motion_coordinator.grid
+        origin = tuple(robot.position)
+        peers = [peer.position for peer_id, peer in self.robots.items()
+                 if peer_id != rid]
+        sample_distances = [0.4, 0.8, 1.2, 1.6, 2.0, 2.5, 3.0, 3.5, 4.0]
+        route_length = self._route_polyline_length(route_points)
+        raw_samples = []
+        for distance in sample_distances:
+            if distance > route_length:
+                continue
+            point = self._point_along_polyline(route_points, distance)
+            if point is not None:
+                raw_samples.append(point)
+        for point in route_points[1:]:
+            if math.hypot(point[0] - origin[0], point[1] - origin[1]) <= 4.0:
+                raw_samples.append(point)
+
+        candidates = []
+        seen_cells = set()
+        for sample in raw_samples:
+            sample_cell = grid.world_to_grid(*sample)
+            # Use the local route direction for lateral offsets.  For the
+            # last route point there is no next segment, so keep only axial
+            # offsets around the sampled cell.
+            if math.hypot(sample[0] - origin[0], sample[1] - origin[1]) < 0.02:
+                tangent = (1.0, 0.0)
+            else:
+                tangent = ((sample[0] - origin[0]) / max(1e-6,
+                             math.hypot(sample[0] - origin[0], sample[1] - origin[1])),
+                           (sample[1] - origin[1]) / max(1e-6,
+                             math.hypot(sample[0] - origin[0], sample[1] - origin[1])))
+            normal = (-tangent[1], tangent[0])
+            for lateral_cells in (0, 1, -1, 2, -2):
+                cell = (sample_cell[0] + int(round(normal[0])) * lateral_cells,
+                        sample_cell[1] + int(round(normal[1])) * lateral_cells)
+                if cell in seen_cells:
+                    continue
+                seen_cells.add(cell)
+                if not grid.in_bounds(*cell) or not grid.is_free(*cell):
+                    continue
+                target = grid.grid_to_world(*cell)
+                origin_distance = math.hypot(target[0] - origin[0],
+                                            target[1] - origin[1])
+                if origin_distance < MIN_NAV_DISPLACEMENT:
+                    continue
+                peer_clearance = min(
+                    (math.hypot(target[0] - px, target[1] - py)
+                     for px, py in peers),
+                    default=math.inf)
+                if peer_clearance < RELOCATION_PEER_CLEARANCE:
+                    continue
+                route_distance = self._distance_to_route_polyline(
+                    target, route_points)
+                if route_distance > 1.0:
+                    continue
+                static_path = self.motion_coordinator.grid_planner.plan(
+                    target, goal_xy, smooth=False)
+                if not static_path:
+                    continue
+                static_path_length = self._route_polyline_length(static_path)
+                score = (route_distance,
+                         -min(peer_clearance, 2.0),
+                         static_path_length,
+                         origin_distance)
+                candidates.append((score, route_distance, peer_clearance,
+                                   target, static_path))
+        candidates.sort(key=lambda item: item[0])
+        return candidates
+
+    def _recovery_path_peer_clear(self, rid, path, clearance=0.70) -> bool:
+        """Reject recovery legs that cut too close to a current peer pose.
+
+        Both waypoint clearance and the continuous segment between
+        consecutive waypoints are checked.  The controller still applies a
+        hard radial stop for coordinated/direct navigation, so the first
+        departing waypoint must also point away from every peer inside the
+        hard-stop radius; otherwise the robot can receive a valid route and
+        still be parked immediately by the controller.
+        """
+        robot = self.robots.get(rid)
+        if robot is None:
+            return False
+        start = tuple(robot.position)
+        peers = [peer.position for peer_id, peer in self.robots.items()
+                 if peer_id != rid]
+        if not peers:
+            return True
+        if not path:
+            return False
+
+        departure = None
+        for point in path:
+            if math.hypot(point[0] - start[0], point[1] - start[1]) > 0.05:
+                departure = tuple(point)
+                break
+        if departure is None:
+            return False
+        move_x = departure[0] - start[0]
+        move_y = departure[1] - start[1]
+        move_length = math.hypot(move_x, move_y)
+        if move_length <= 1e-9:
+            return False
+        move_x /= move_length
+        move_y /= move_length
+        for peer in peers:
+            peer_distance = math.hypot(peer[0] - start[0], peer[1] - start[1])
+            if peer_distance < 0.60:
+                relative_x = peer[0] - start[0]
+                relative_y = peer[1] - start[1]
+                if move_x * relative_x + move_y * relative_y >= 0.0:
+                    return False
+            for index, point in enumerate(path):
+                if math.hypot(point[0] - peer[0], point[1] - peer[1]) < clearance:
+                    return False
+                if index > 0:
+                    segment_distance = self._point_segment_distance(
+                        peer, path[index - 1], point)
+                    if segment_distance < clearance:
+                        return False
+        return True
+
+    def _clear_joint_stall_state(self, robot):
+        """Clear all logical wait/emergency state after a recovery dispatch."""
+        now = self.sim_time
+        robot.emergency_braking = False
+        robot.emergency_braking_since = None
+        robot.emergency_recovery_until = 0.0
+        robot._replan_requested = False
+        robot._joint_emergency_since = None
+        robot.hold_until = 0.0
+        robot.wait_started = 0.0
+        robot.dispatch_not_before = 0.0
+        robot.controller_paused_until = 0.0
+        robot.controller_joint_wait_until = 0.0
+        robot.controller_joint_wait_reason = None
+        if robot.priority_yield_state is not None:
+            self._priority_yield_clear_state(robot)
+        robot.recovery_session_role = None
+        robot.recovery_session_until = 0.0
+        robot._deadlock_stuck_since = None
+        robot._deadlock_watch_pos = robot.position
+        robot._joint_watch_pos = robot.position
+        robot._joint_watch_since = now
+        robot._joint_any_wait_started = None
+        robot._joint_wait_started = None
+
+    def _joint_stall_recovery(self, rid) -> bool:
+        """Move one long-stalled joint-mode robot to its nearest safe route point.
+
+        The preferred recovery is a physical route to a free point on (or
+        immediately adjacent to) the robot's remaining planned route, followed
+        by a route back to the original business goal.  This avoids repeated
+        replans that keep the robot stationary while preserving the
+        non-physical recovery opt-in only as a diagnostic fallback.
+        """
+        robot = self.robots.get(rid)
+        if robot is None:
+            return False
+        now = self.sim_time
+        if getattr(robot, '_joint_stall_recovery_until', 0.0) > now:
+            return False
+        robot._joint_stall_recovery_until = now + JOINT_STALL_RECOVERY_COOLDOWN
+        goal = self._navigation_goal(robot)
+        goal_xy = self._goal_coordinates(goal)
+        if goal_xy is None:
+            return False
+        candidates = self._joint_stall_recovery_candidates(robot)
+        if not candidates:
+            return False
+
+        for _score, route_distance, peer_clearance, target, static_suffix in candidates:
+            target_goal_distance = math.hypot(
+                target[0] - goal_xy[0], target[1] - goal_xy[1])
+            path_to_target = self._static_turning_path(
+                robot.position, target)
+            if not path_to_target or not self._recovery_path_peer_clear(
+                    rid, path_to_target):
+                path_to_target = self.motion_coordinator.plan_grid_lifelong(
+                    rid, robot.position, target)
+                if not path_to_target or not self._recovery_path_peer_clear(
+                        rid, path_to_target):
+                    continue
+            if not path_to_target:
+                continue
+
+            suffix = None
+            if target_goal_distance > GOAL_TOLERANCE * 1.5:
+                suffix = self._static_turning_path(target, goal_xy)
+                if not suffix:
+                    suffix = self.motion_coordinator.plan_grid_lifelong(
+                        rid, target, goal)
+            if suffix:
+                if (path_to_target and
+                        math.hypot(path_to_target[-1][0] - suffix[0][0],
+                                   path_to_target[-1][1] - suffix[0][1]) < 0.05):
+                    suffix = suffix[1:]
+                full_path = list(path_to_target) + list(suffix)
+            else:
+                full_path = list(path_to_target)
+
+            if not full_path:
+                continue
+            if self._waypoints_are_stationary(robot, full_path):
+                continue
+            final = full_path[-1]
+            final_goal_distance = math.hypot(
+                final[0] - goal_xy[0], final[1] - goal_xy[1])
+            if self._install_runtime_plan(
+                    rid, full_path, delay=0.0,
+                    source='_joint_stall_recovery'):
+                self._clear_joint_stall_state(robot)
+                if final_goal_distance > GOAL_TOLERANCE * 1.5:
+                    robot.recovery_active = True
+                    robot.recovery_resume_goal = goal
+                else:
+                    robot.recovery_active = False
+                    robot.recovery_resume_goal = None
+                self._set_robot_speed_scale(rid, 1.0)
+                if getattr(self, 'metrics', None) is not None:
+                    self.metrics.record_escape(
+                        now, rid, '_joint_stall_recovery', target)
+                print(f"[JointStallRecovery] T={now:.1f}s robot={rid} "
+                      f"stuck; routed to ({target[0]:.2f},{target[1]:.2f}) "
+                      f"route_dist={route_distance:.2f} "
+                      f"peer_clear={peer_clearance:.2f} "
+                      f"final_goal_dist={final_goal_distance:.2f}")
+                return True
+
+        # Route-proximate recovery is preferred, but if every nearby route
+        # point is currently blocked a liveness fallback still has to move
+        # the robot.  First try a validated nearby free-space standoff, then
+        # the legacy reverse escape, before the optional diagnostic teleport.
+        if self._joint_escape_robot(
+                rid, min_peer_clearance=0.90,
+                source='_joint_stall_recovery'):
+            self._clear_joint_stall_state(robot)
+            self._set_robot_speed_scale(rid, 1.0)
+            return True
+        if self._command_reverse(rid, 0.3):
+            self._clear_joint_stall_state(robot)
+            return True
+        if ENABLE_NONPHYSICAL_RECOVERY and self._teleport_stalled_group([rid]):
+            self._clear_joint_stall_state(robot)
+            return True
+        return False
+
     def _teleport_stalled_group(self, robot_ids) -> bool:
         """Relocate stalled robots nearby, then replan from there.
 
@@ -3395,7 +4088,8 @@ class FactorySupervisor:
             robot.position for rid, robot in self.robots.items()
             if rid not in robot_ids
         ]
-        for rid in sorted(robot_ids):
+        for rid in sorted(robot_ids, key=self._priority_yield_key,
+                           reverse=True):
             robot = self.robots[rid]
             goal = self._navigation_goal(robot) or robot._get_current_goal()
             if not goal:
@@ -3423,6 +4117,11 @@ class FactorySupervisor:
             self.motion_coordinator.release_robot_grid(rid)
             candidates = []
             seen_cells = set()
+            # Prefer a free landing point on/near the robot's remaining
+            # planned route before falling back to a generic radial search.
+            for _score, _route_distance, _peer_clearance, route_point, _path in (
+                    self._joint_stall_recovery_candidates(robot)):
+                candidates.append(route_point)
             # A robot can stop inside the grid's obstacle-inflation band
             # (for example while turning away from a dock).  That band is
             # wider than 1.5 m around some shelf corners, so the old search
@@ -3583,6 +4282,25 @@ class FactorySupervisor:
                 self._handle_goal_reached(rid, force=True)
                 continue
 
+            if (ENABLE_JOINT_RUNTIME and
+                    getattr(self, 'joint_runtime_enforced', False)):
+                # In joint mode the rolling space-time planner owns the route.
+                # Re-latching ``emergency_braking`` here only keeps an already
+                # stalled robot in the exempt set, so physical escape can never
+                # be selected. Try a route-proximate recovery leg first; only
+                # fall back to a fresh all-active joint plan if no safe point
+                # is currently reachable.
+                if self._joint_stall_recovery(rid):
+                    print(f"[EmergencyRecovery] Robot {rid} blocked for "
+                          "10 s; route-proximate recovery dispatched")
+                    continue
+                robot._replan_requested = True
+                self._joint_liveness_needed = True
+                self._next_joint_grid_tick = min(
+                    getattr(self, '_next_joint_grid_tick', self.sim_time + 1.0),
+                    self.sim_time)
+                continue
+
             if (ENABLE_NONPHYSICAL_RECOVERY and
                     self._teleport_stalled_group([rid])):
                 print(f"[EmergencyRecovery] Robot {rid} blocked for 10 s; "
@@ -3617,16 +4335,12 @@ class FactorySupervisor:
         from config import ALL_LOCATIONS
         
         def _resolve_goal(g):
-            """将goal_location转为坐标tuple (可能是str或tuple)"""
-            if g is None:
-                return None
-            if isinstance(g, (list, tuple)) and len(g) >= 2:
-                return (float(g[0]), float(g[1]))
-            if isinstance(g, str):
-                pos = ALL_LOCATIONS.get(g)
-                return pos if pos else None
-            return None
-        
+            """?goal_location????tuple (???str?tuple)"""
+            return self._goal_coordinates(g)
+
+        best_pair = None
+        best_yielder_key = None
+        best_distance = None
         for i in range(len(stalled_robots)):
             rid_a = stalled_robots[i][0]
             ra = self.robots[rid_a]
@@ -3639,32 +4353,43 @@ class FactorySupervisor:
                 goal_b = _resolve_goal(getattr(rb, 'goal_location', None))
                 if not goal_b:
                     continue
-                
+
                 dx_pos = abs(ra.position[0] - rb.position[0])
                 dy_pos = abs(ra.position[1] - rb.position[1])
-                
+
                 head_on_detected = False
-                
-                # 情况1: 垂直走廊(x接近, y方向相反)
+
+                # ??1: ????(x??, y????)
                 if dx_pos < 0.8:
                     dir_a_y = goal_a[1] - ra.position[1]
                     dir_b_y = goal_b[1] - rb.position[1]
                     if dir_a_y * dir_b_y < 0:
                         head_on_detected = True
-                
-                # 情况2: 水平走廊(y接近, x方向相反)
+
+                # ??2: ????(y??, x????)
                 if not head_on_detected and dy_pos < 0.8:
                     dir_a_x = goal_a[0] - ra.position[0]
                     dir_b_x = goal_b[0] - rb.position[0]
                     if dir_a_x * dir_b_x < 0:
                         head_on_detected = True
-                
-                if head_on_detected:
-                    if rid_a < rid_b:
-                        return (rid_a, rid_b)
-                    else:
-                        return (rid_b, rid_a)
-        return None
+
+                if not head_on_detected:
+                    continue
+                pair = self._priority_yield_pair(rid_a, rid_b)
+                if pair is None:
+                    continue
+                winner, yielder = pair
+                yielder_key = self._priority_yield_key(yielder)
+                distance = math.hypot(ra.position[0] - rb.position[0],
+                                      ra.position[1] - rb.position[1])
+                if (best_pair is None or
+                        yielder_key < best_yielder_key or
+                        (yielder_key == best_yielder_key and
+                         distance < best_distance)):
+                    best_pair = pair
+                    best_yielder_key = yielder_key
+                    best_distance = distance
+        return best_pair
 
     def _resolve_robot_deadlock(self, rid, obstacle_rids):
         """
@@ -3702,7 +4427,9 @@ class FactorySupervisor:
             self._deadlock_state = 'WAIT_MOVE'
             self._deadlock_wait_start = self.sim_time
     
-    def _joint_escape_robot(self, rid, min_peer_clearance=0.85):
+    def _joint_escape_robot(self, rid, min_peer_clearance=0.85,
+                            source='_command_reverse',
+                            priority_yield_winner=None):
         """Move one robot to a validated nearby standoff point.
 
         Unlike the legacy reverse command, this searches the full 360-degree
@@ -3715,8 +4442,7 @@ class FactorySupervisor:
         if not robot:
             return False
         original_goal = self._navigation_goal(robot)
-        goal_xy = (ALL_LOCATIONS.get(original_goal)
-                   if isinstance(original_goal, str) else original_goal)
+        goal_xy = self._goal_coordinates(original_goal)
         peers = [peer.position for peer_id, peer in self.robots.items()
                  if peer_id != rid]
         candidates = []
@@ -3751,17 +4477,38 @@ class FactorySupervisor:
                 rid, robot.position, target)
             if not path:
                 continue
+            if not self._recovery_path_peer_clear(rid, path):
+                continue
             if not self._install_runtime_plan(
-                    rid, path, delay=0.0, source='_command_reverse'):
+                    rid, path, delay=0.0, source=source):
                 continue
             robot.recovery_active = True
             robot.recovery_resume_goal = original_goal
-            if getattr(self, 'metrics', None) is not None:
-                self.metrics.record_escape(
-                    self.sim_time, rid, '_joint_escape_robot', target)
-            print(f"[JointEscape] T={self.sim_time:.1f}s robot={rid} "\
-                  f"standoff=({target[0]:.2f},{target[1]:.2f}) "\
-                  f"clearance={clearance:.2f}m")
+            if priority_yield_winner is not None:
+                robot.priority_yield_state = 'standoff_enroute'
+                robot.priority_yield_winner = priority_yield_winner
+                robot.priority_yield_standoff = target
+                robot.priority_yield_started_at = self.sim_time
+                robot.priority_yield_original_goal = original_goal
+                self._set_robot_speed_scale(rid, 0.55)
+                if getattr(self, 'metrics', None) is not None:
+                    self.metrics.record_yield_event(
+                        'yield_start', self.sim_time, rid,
+                        priority_yield_winner)
+                    self.metrics.record_yield_event(
+                        'yield_standoff_selected', self.sim_time, rid,
+                        priority_yield_winner, target)
+                print(f"[PriorityYield] T={self.sim_time:.1f}s "
+                      f"winner={priority_yield_winner} yielder={rid} "
+                      f"standoff=({target[0]:.2f},{target[1]:.2f}) "
+                      f"clearance={clearance:.2f}m")
+            else:
+                if getattr(self, 'metrics', None) is not None:
+                    self.metrics.record_escape(
+                        self.sim_time, rid, '_joint_escape_robot', target)
+                print(f"[JointEscape] T={self.sim_time:.1f}s robot={rid} "\
+                      f"standoff=({target[0]:.2f},{target[1]:.2f}) "\
+                      f"clearance={clearance:.2f}m")
             return True
         return False
 
@@ -3788,8 +4535,7 @@ class FactorySupervisor:
         if winner_robot is None:
             return False
         original_goal = self._navigation_goal(robot)
-        goal_xy = (ALL_LOCATIONS.get(original_goal)
-                   if isinstance(original_goal, str) else original_goal)
+        goal_xy = self._goal_coordinates(original_goal)
         peers = [peer.position for peer_id, peer in self.robots.items()
                  if peer_id != yielder]
 
@@ -3812,7 +4558,7 @@ class FactorySupervisor:
                     (math.hypot(target[0] - px, target[1] - py)
                      for px, py in peers),
                     default=math.inf)
-                if clearance < 0.80:
+                if clearance < 0.90:
                     continue
                 if not self.motion_coordinator._segment_clear(
                         robot.position, target):
@@ -3872,31 +4618,21 @@ class FactorySupervisor:
         if self._joint_head_on_yield(component):
             return True
 
-        def yield_score(rid):
-            robot = self.robots[rid]
-            goal = self._goal_coordinates(self._navigation_goal(robot))
-            goal_distance = 0.0
-            if goal is not None:
-                goal_distance = math.hypot(
-                    robot.position[0] - goal[0], robot.position[1] - goal[1])
-            peer_distance = min(
-                (math.hypot(robot.position[0] - self.robots[peer].position[0],
-                            robot.position[1] - self.robots[peer].position[1])
-                 for peer in component if peer != rid),
-                default=0.0)
-            # Prefer escaping the robot with the longest remaining trip and
-            # the least local clearance.  This mirrors normal right-of-way
-            # reasoning: a robot already near its dock should stay on task.
-            return (goal_distance, -peer_distance, -rid)
-
-        ordered = sorted(component, key=yield_score, reverse=True)
+        # Try the lowest-priority non-exempt robot first, not merely the one
+        # with the longest remaining route.  This keeps the right-of-way rule
+        # consistent for non-head-on close conflicts: the higher-priority
+        # robot continues on its original route while the lower-priority one
+        # turns into a validated standoff.
+        ordered = sorted(component, key=self._priority_yield_key)
         for rid in ordered:
             robot = self.robots[rid]
+            if self._priority_yield_is_exempt(robot):
+                continue
             if getattr(robot, '_joint_escape_until', 0.0) > now:
                 continue
             if getattr(robot, 'recovery_active', False):
                 continue
-            if self._joint_escape_robot(rid, min_peer_clearance=0.80):
+            if self._joint_escape_robot(rid, min_peer_clearance=0.90):
                 robot._joint_escape_until = now + 3.0
                 self._joint_liveness_needed = True
                 self._next_joint_grid_tick = min(
@@ -3948,14 +4684,25 @@ class FactorySupervisor:
         now = self.sim_time
         if self._joint_head_on_yield(tuple(sorted(robot_ids))):
             return True
-        for rid in sorted(robot_ids, reverse=True):
+        for rid in sorted(robot_ids, key=self._priority_yield_key):
             robot = self.robots.get(rid)
             if robot is None:
+                continue
+            if self._priority_yield_is_exempt(robot):
                 continue
             if getattr(robot, '_joint_escape_until', 0.0) > now:
                 continue
             if getattr(robot, 'recovery_active', False):
                 continue
+            # A physical escape is the final liveness backstop. Clear all
+            # supervisory hold state first so the new navigate command cannot
+            # remain logically paused after the controller accepts it.
+            robot.hold_until = 0.0
+            robot.wait_started = 0.0
+            robot.dispatch_not_before = 0.0
+            robot.controller_paused_until = 0.0
+            robot.controller_joint_wait_until = 0.0
+            robot.controller_joint_wait_reason = None
             if self._joint_escape_robot(rid):
                 robot._joint_escape_until = now + 2.0
                 self._joint_liveness_needed = True
@@ -3972,8 +4719,7 @@ class FactorySupervisor:
             return False
         heading = getattr(robot, 'heading', 0.0)
         original_goal = self._navigation_goal(robot)
-        goal_xy = (ALL_LOCATIONS.get(original_goal)
-                   if isinstance(original_goal, str) else original_goal)
+        goal_xy = self._goal_coordinates(original_goal)
         peers = [peer.position for peer_id, peer in self.robots.items()
                  if peer_id != rid]
         candidates = []
@@ -4299,6 +5045,9 @@ class FactorySupervisor:
                 # grid reservation before using the legacy fallback planner;
                 # otherwise peers would avoid a path the robot has left.
                 self.motion_coordinator.release_robot_grid(robot_id)
+                if robot.current_task is not None:
+                    self.motion_coordinator.robot_priorities[robot_id] = -float(
+                        getattr(robot.current_task, 'priority', 0.0) or 0.0)
                 delivery_path = self.motion_coordinator.plan_path_for_robot(
                     robot_id, robot.position,
                     robot.current_task.delivery_location)
@@ -4585,6 +5334,7 @@ class FactorySupervisor:
             path = self.motion_coordinator.plan_grid_lifelong(
                 robot_id, robot.position, station)
             if path is None:
+                self.motion_coordinator.robot_priorities[robot_id] = -1000.0
                 path = self.motion_coordinator.plan_path_for_robot(
                     robot_id, robot.position, station)
             if path:
@@ -4599,6 +5349,7 @@ class FactorySupervisor:
                 path = self.motion_coordinator.plan_grid_lifelong(
                     robot_id, robot.position, station)
                 if path is None:
+                    self.motion_coordinator.robot_priorities[robot_id] = -1000.0
                     path = self.motion_coordinator.plan_path_for_robot(
                         robot_id, robot.position, station)
                 if path:
@@ -4839,6 +5590,8 @@ class FactorySupervisor:
             pickup_path = self.motion_coordinator.plan_grid_lifelong(
                 robot_id, robot.position, task.pickup_location)
             if pickup_path is None:
+                self.motion_coordinator.robot_priorities[robot_id] = -float(
+                    getattr(task, 'priority', 0.0) or 0.0)
                 pickup_path = self.motion_coordinator.plan_path_for_robot(
                     robot_id, robot.position, task.pickup_location)
             
@@ -4900,8 +5653,11 @@ class FactorySupervisor:
         """Periodically check for and resolve deadlocks."""
         robot_positions = {}
         robot_goals = {}
+        robot_states = {}
         
         for rid, robot in self.robots.items():
+            task_priority = float(getattr(getattr(robot, "current_task", None), "priority", 0.0) or 0.0)
+            robot_states[rid] = {"task_priority": task_priority, "position": robot.position}
             nearest_node = self.motion_coordinator.graph.get_nearest_node(robot.position)
             robot_positions[rid] = nearest_node
             
@@ -4913,17 +5669,14 @@ class FactorySupervisor:
                     robot_goals[rid] = self.motion_coordinator.graph.get_nearest_node(
                         ALL_LOCATIONS.get(goal, CHARGING_STATIONS.get(goal, (0, 0)))
                     )
-        
         deadlocks = self.motion_coordinator.detect_deadlock(robot_positions, robot_goals)
         
         for cycle in deadlocks:
             print(f"[T={self.sim_time:.1f}] DEADLOCK detected: robots {cycle}")
-            self.motion_coordinator.resolve_deadlock(cycle)
+            self.motion_coordinator.resolve_deadlock(cycle, robot_states)
             self.metrics.record_deadlock(cycle, self.sim_time)
-
     def run(self):
         """Main simulation loop."""
-        # Reset lifelong planner state for a fresh run.
         self.motion_coordinator.lifelong_reset()
         # Register each robot's initial position as its home spot in CBS
         # so peers don't try to route through these nodes from t=0.
@@ -5000,7 +5753,7 @@ class FactorySupervisor:
                             goal = self._navigation_goal(robot)
                             goal_xy = self._goal_coordinates(goal)
                             handle.write(
-                                f'{self.sim_time:.3f},{rid},{robot.state.name},'
+                                f'{self.sim_time:.3f},{rid},{robot.state},'
                                 f'{robot.position[0]:.3f},{robot.position[1]:.3f},'
                                 f'{goal_xy[0] if goal_xy else 0:.3f},'
                                 f'{goal_xy[1] if goal_xy else 0:.3f},'
@@ -5010,7 +5763,12 @@ class FactorySupervisor:
                                 f'{robot.controller_waypoint_index},'
                                 f'{len(robot.waypoints)},'
                                 f'{robot.current_task.task_id if robot.current_task else None},'
-                                f'{robot.hold_until:.3f},{robot.speed_scale:.2f}\n')
+                                f'{robot.hold_until:.3f},{robot.speed_scale:.2f},'
+                                f'{robot.heading:.3f},'
+                                f'{robot.emergency_braking},'
+                                f'{robot.controller_joint_wait_reason},'
+                                f'{robot.controller_joint_wait_until:.3f},'
+                                f'{getattr(robot, "_replan_requested", False)}\n')
                 except Exception as debug_error:
                     print(f'[DEBUG_STATES] write failed: {debug_error}')
 
@@ -5109,8 +5867,15 @@ class FactorySupervisor:
                     "position": r.position,
                     "state": (r.state if self._robot_should_be_moving(r)
                               else RobotState.WAITING),
-                    "goal_location": getattr(r, 'goal_location', None),
+                    "goal_location": getattr(r, "goal_location", None),
                     "speed_scale": r.speed_scale,
+                    "task_priority": float(
+                        getattr(getattr(r, "current_task", None),
+                                "priority", 0.0) or 0.0),
+                    "entered_zone": bool(getattr(r, "entered_zone", False)),
+                    "wait_age": float(getattr(r, "wait_age", 0.0)),
+                    "conflict_distance": float(
+                        getattr(r, "conflict_distance", 0.0)),
                 } for rid, r in self.robots.items()}
                 stuck = self.motion_coordinator.update_deadlock_monitor(rs_dict)
                 if stuck:
@@ -5118,7 +5883,7 @@ class FactorySupervisor:
                         stuck, rs_dict)
                     for rid in broken:
                         rb = self.robots[rid]
-                        if rb.current_task and getattr(rb, 'goal_location', None):
+                        if rb.current_task and getattr(rb, "goal_location", None):
                             new_p = self.motion_coordinator.plan_grid_lifelong(
                                 rid, rb.position, rb.goal_location)
                             if new_p:
@@ -5200,6 +5965,8 @@ class FactorySupervisor:
               f"Pending: {task_stats['pending']} | "
               f"Robots idle/active: {idle_count}/{active_count} | "
               f"Conflicts: {coord_stats['conflicts_resolved']}")
+        if getattr(self, '_supervisor_quiet', False):
+            return
         for rid, robot in self.robots.items():
             if robot.state in (RobotState.RETURNING_TO_CHARGE,
                                RobotState.CHARGING,

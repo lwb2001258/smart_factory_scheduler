@@ -14,6 +14,7 @@ import sys
 import json
 import math
 import random
+import os
 from typing import List, Tuple, Optional
 
 try:
@@ -45,8 +46,8 @@ INITIAL_BATTERY_MIN = 25.0
 GOAL_THRESHOLD = 0.35     # m - distance to consider waypoint reached
 HEADING_THRESHOLD = 0.15  # rad - heading alignment threshold
 
-OBSTACLE_THRESHOLD = 0.7  # m - increased from 0.5: react earlier to avoid scraping
-CRITICAL_DISTANCE = 0.35  # m - increased from 0.25: avoid bumping shelves
+OBSTACLE_THRESHOLD = 0.8  # m - increased for earlier steering clearance
+CRITICAL_DISTANCE = 0.40  # m - increased from 0.25: avoid bumping shelves
 
 # DWA parameters
 DWA_V_RESOLUTION = 0.01   # m/s
@@ -61,16 +62,16 @@ W_VELOCITY = 0.5   # Weight for forward velocity
 W_LATERAL = 2.0    # Weight for lateral bias when in sidestep mode
 
 # Sidestep / lateral avoidance parameters
-SIDESTEP_TRIGGER_DIST = 1.0   # m  — head-on detected when LiDAR < this
-SIDESTEP_RECOVER_DIST = 1.8   # m  — exit sidestep once front clear beyond this
-SIDESTEP_LATERAL_OFFSET = 0.75  # increased to match OBSTACLE_THRESHOLD=0.7  # m — how far to deviate from path centreline
-SIDESTEP_TIMEOUT = 4.0        # seconds — max time to spend in sidestep
+SIDESTEP_TRIGGER_DIST = 1.2   # m  �?head-on detected when LiDAR < this
+SIDESTEP_RECOVER_DIST = 2.0   # m  �?exit sidestep once front clear beyond this
+SIDESTEP_LATERAL_OFFSET = 0.85  # m �?wider lateral deviation for easier turns
+SIDESTEP_TIMEOUT = 4.0        # seconds �?max time to spend in sidestep
 SIDESTEP_FRONT_CONE_DEG = 30  # ±15° front cone for head-on detection
 SIDESTEP_SIDE_CONE_DEG = 80   # ±40° each side for "where's the room?"
 
 # ── Dock Zone (Shelf-Adjacent Band) ───────────────────────────────────
 # Storage docks at y=±1.5 are only 0.32m from shelf faces (shelf top at y=±1.0).
-# Anywhere in this band, LiDAR detects shelves at close range → DWA panics.
+# Anywhere in this band, LiDAR detects shelves at close range �?DWA panics.
 # Solution: define "dock zones" as horizontal bands adjacent to shelves.
 # ANY robot in a dock zone uses pure pursuit (no obstacle avoidance).
 # Safe because: paths are pre-verified by the grid planner, and the first
@@ -83,36 +84,36 @@ DOCK_ZONE_Y_BANDS = [(1.0, 2.0), (-2.0, -1.0)]  # (y_min, y_max) bands
 DOCK_ZONE_X_RANGE = (-3.7, 3.7)  # shelves span x∈[-3.5, 3.5] + margin
 
 # ══════════════════════════════════════════════════════════════════════
-# 物理参数 — 所有避障距离的计算基础
+# 物理参数 �?所有避障距离的计算基础
 # ══════════════════════════════════════════════════════════════════════
-ROBOT_RADIUS = 0.18             # m — 机器人碰撞半径
-ROBOT_DIAMETER = 2 * ROBOT_RADIUS  # 0.36m — 两机器人碰撞时的中心距
-MAX_LINEAR_SPEED = 0.22         # m/s — 最大线速度
-BRAKING_DECEL = 0.5             # m/s² — 制动减速度(保守估计)
-BRAKING_DISTANCE = MAX_LINEAR_SPEED**2 / (2 * BRAKING_DECEL)  # ≈0.048m
-BRAKING_TIME = MAX_LINEAR_SPEED / BRAKING_DECEL                # ≈0.44s
-SAFETY_MARGIN = 0.10            # m — 额外安全裕度
+ROBOT_RADIUS = 0.18             # m �?机器人碰撞半�?
+ROBOT_DIAMETER = 2 * ROBOT_RADIUS  # 0.36m �?两机器人碰撞时的中心�?
+MAX_LINEAR_SPEED = 0.22         # m/s �?最大线速度
+BRAKING_DECEL = 0.5             # m/s² �?制动减速度(保守估计)
+BRAKING_DISTANCE = MAX_LINEAR_SPEED**2 / (2 * BRAKING_DECEL)  # �?.048m
+BRAKING_TIME = MAX_LINEAR_SPEED / BRAKING_DECEL                # �?.44s
+SAFETY_MARGIN = 0.12            # m �?额外安全裕度
 
 # ══════════════════════════════════════════════════════════════════════
-# LAYER 0: 前瞻性路径冲突检测 + 紧急制动（保险）
+# LAYER 0: 前瞻性路径冲突检�?+ 紧急制动（保险�?
 # ══════════════════════════════════════════════════════════════════════
-# 设计理念：提前预判路径冲突 → 请求重规划绕开 → 机器人始终在运动
+# 设计理念：提前预判路径冲�?�?请求重规划绕开 �?机器人始终在运动
 # 紧急制动只作为最后保险（正常情况下不应触发）
 #
-# 前瞻检测距离:
-PATH_CONFLICT_DIST = 1.2         # m — 前方路径上peer距离小于此值则"冲突"
-PATH_CONFLICT_CHECK_INTERVAL = 5 # 每5帧检测一次(160ms)
-# 紧急制动(最后保险):
-EMERGENCY_STOP_DIST = 0.45       # m — 中心距小于此值才紧急制动(仅保命)
+# 前瞻检测距�?
+PATH_CONFLICT_DIST = 1.4         # m �?前方路径上peer距离小于此值则"冲突"
+PATH_CONFLICT_CHECK_INTERVAL = 5 # �?帧检测一�?160ms)
+# 紧急制�?最后保�?:
+EMERGENCY_STOP_DIST = 0.55       # m �?中心距小于此值才紧急制�?仅保�?
 
 # ══════════════════════════════════════════════════════════════════════
-# LAYER 1: 平滑减速 — 接近peer时减速（配合前瞻重规划）
+# LAYER 1: 平滑减�?�?接近peer时减速（配合前瞻重规划）
 # ══════════════════════════════════════════════════════════════════════
-# 正常情况下，前瞻检测会提前重规划，机器人不会靠近peer。
-# 此层仅在重规划延迟期间提供平滑减速保护。
-PEER_SLOW_DIST = 1.0              # m — 开始减速
-PEER_STOP_DIST = 0.55             # m — 停止(保留0.50m硬冲突边界外的余量)
-PEER_RADIAL_STOP_DIST = 0.65      # m — 独立欧氏距离保护，覆盖侧向接近和制动惯性
+# 正常情况下，前瞻检测会提前重规划，机器人不会靠近peer�?
+# 此层仅在重规划延迟期间提供平滑减速保护�?
+PEER_SLOW_DIST = 1.2              # m �?开始减�?
+PEER_STOP_DIST = 0.70             # m �?停止(保留0.50m硬冲突边界外的余�?
+PEER_RADIAL_STOP_DIST = 0.80      # m �?独立欧氏距离保护，覆盖侧向接近和制动惯�?
 # Legacy aliases for compatibility:
 PEER_LOOKAHEAD_DIST = 2.0
 PEER_REPLAN_DIST = 1.5
@@ -130,17 +131,18 @@ class WaypointNavigator:
     """
     
     def __init__(self):
+        self.quiet = os.environ.get('SMART_FACTORY_ROBOT_QUIET', '0') == '1'
         self.waypoints: List[Tuple[float, float]] = []
         self.current_waypoint_idx = 0
         self.navigation_active = False
         self.goal_reached = False
         
-        # ── LAYER 0: 前瞻路径冲突检测 + 紧急制动(保险) ──
+        # ── LAYER 0: 前瞻路径冲突检�?+ 紧急制�?保险) ──
         self._replan_requested = False
         self._conflict_check_counter = 0  # 帧计数器
-        self._nav_step_count = 0          # 总帧数(用于冷却计时)
+        self._nav_step_count = 0          # 总帧�?用于冷却计时)
         self._replan_cooldown_until = 0.0 # 冷却结束时间
-        self._emergency_stopped = False   # 紧急制动状态
+        self._emergency_stopped = False   # 紧急制动状�?
         self.robot_id = 0  # Set by RobotController
         
         # ── Sidestep state (lateral avoidance for head-on robots) ──
@@ -155,7 +157,7 @@ class WaypointNavigator:
         self.sidestep_lateral_y = 0.0  # offset waypoint y
         
         # ── Peer robot positions (updated by supervisor broadcasts) ──
-        self.peer_positions = {}  # {robot_id: (x, y)} — all other robots
+        self.peer_positions = {}  # {robot_id: (x, y)} �?all other robots
         self.peer_samples = {}
         self.paused_until = 0.0
         self.path_version = 0
@@ -169,11 +171,19 @@ class WaypointNavigator:
         self.planned_wait_reason = None
         self.joint_epoch_wait_deadline = 0.0
         self.joint_coordinated = False
+        self.direct_navigation = False
         # Preserve the legacy sample order so DWA tie-breaking is unchanged.
         self._dwa_v_samples = tuple(self._frange(
             0.0, MAX_LINEAR_SPEED, DWA_V_RESOLUTION * 5))
         self._dwa_w_samples = tuple(self._frange(
             -MAX_ANGULAR_SPEED, MAX_ANGULAR_SPEED, DWA_W_RESOLUTION * 5))
+        # Precompute one DWA integration delta per angular sample. The
+        # controller uses the same algebra as the previous sin/cos calls,
+        # but avoids two trig calls for every prediction substep.
+        self._dwa_prediction_steps = int(DWA_PREDICTION_TIME / DWA_DT)
+        self._dwa_w_deltas = tuple(
+            (math.cos(w * DWA_DT), math.sin(w * DWA_DT))
+            for w in self._dwa_w_samples)
     
     def set_waypoints(self, waypoints: List[Tuple[float, float]],
                       waypoint_not_before=None, partial=False):
@@ -185,6 +195,7 @@ class WaypointNavigator:
         self.waypoint_not_before = list(waypoint_not_before or ())
         self.plan_is_partial = bool(partial)
         self.joint_coordinated = False
+        self.direct_navigation = False
         self._reset_reactive_state()
         if not partial:
             self.joint_release_index = 10 ** 9
@@ -213,11 +224,13 @@ class WaypointNavigator:
         if self.current_waypoint_idx >= len(self.waypoints):
             self.navigation_active = False
             self.goal_reached = True
-            print(f"[Nav {self.robot_id}] ★ Final goal reached ({len(self.waypoints)} waypoints)")
+            if not self.quiet:
+                print(f"[Nav {self.robot_id}] \u2605 Final goal reached ({len(self.waypoints)} waypoints)")
             return True
         wp = self.waypoints[self.current_waypoint_idx]
-        print(f"[Nav {self.robot_id}] → Waypoint {self.current_waypoint_idx}/{len(self.waypoints)-1} "
-              f"({wp[0]:.2f},{wp[1]:.2f})")
+        if not self.quiet:
+            print(f"[Nav {self.robot_id}] \u2192 Waypoint {self.current_waypoint_idx}/{len(self.waypoints)-1} "
+                  f"({wp[0]:.2f},{wp[1]:.2f})")
         return False
     
     def compute_control(self, robot_x: float, robot_y: float,
@@ -254,7 +267,7 @@ class WaypointNavigator:
         tx, ty = target
         
         # ══════════════════════════════════════════════════════════════
-        # LAYER 0+1: 前瞻冲突检测 + 紧急制动 + 平滑减速
+        # LAYER 0+1: 前瞻冲突检�?+ 紧急制�?+ 平滑减�?
         # ══════════════════════════════════════════════════════════════
         conflict_result = self._check_path_conflict_and_emergency(
             robot_x, robot_y, robot_heading, lidar_ranges)
@@ -331,7 +344,8 @@ class WaypointNavigator:
         # When in the shelf-adjacent band (y∈[1.0,2.0] or y∈[-2.0,-1.0]
         # AND x∈[-3.7, 3.7]), bypass DWA entirely. The shelves are too
         # close for reactive avoidance. Use pure pursuit instead.
-        if getattr(self, 'joint_coordinated', False):
+        if (getattr(self, 'joint_coordinated', False) or
+                getattr(self, 'direct_navigation', False)):
             # A joint plan has already reserved conflict-free space-time
             # slots. Follow that centreline with pure pursuit instead of
             # running DWA/peer heuristics that deviate from the reservation
@@ -380,7 +394,7 @@ class WaypointNavigator:
                     dock_emergency = True
             
             if dock_emergency:
-                # Something very close — stop and rotate toward target
+                # Something very close �?stop and rotate toward target
                 heading_to_target = math.atan2(ty - robot_y, tx - robot_x)
                 turn_err = heading_to_target - robot_heading
                 while turn_err > math.pi: turn_err -= 2 * math.pi
@@ -388,7 +402,7 @@ class WaypointNavigator:
                 rot_sign = 1.0 if turn_err > 0 else -1.0
                 return (-MAX_SPEED * 0.2 * rot_sign, MAX_SPEED * 0.2 * rot_sign)
             
-            # Pure pursuit (safe — no imminent obstacle)
+            # Pure pursuit (safe �?no imminent obstacle)
             if abs(heading_error) > 0.3:
                 # Rotate toward waypoint
                 angular_speed = max(min(heading_error * 2.5, MAX_ANGULAR_SPEED * 0.7),
@@ -406,7 +420,7 @@ class WaypointNavigator:
         # ── Predictive Obstacle Avoidance (LiDAR-based) ─────────────
         # Strategy: detect obstacles EARLY via LiDAR and progressively
         # reduce speed BEFORE reaching the obstacle. The robot should
-        # never actually hit anything — it slows, steers, or replans.
+        # never actually hit anything �?it slows, steers, or replans.
         #
         # Priority layers:
         #   1. CRITICAL (< 0.25m): Emergency rotation (shouldn't happen)
@@ -429,11 +443,11 @@ class WaypointNavigator:
             LIDAR_LOOKAHEAD = 1.5
             LIDAR_DWA_DIST = 0.8  # DWA takes over below this
             if front_min < LIDAR_LOOKAHEAD and front_min >= LIDAR_DWA_DIST:
-                # Linear: 100% at 1.5m → 60% at 0.8m
+                # Linear: 100% at 1.5m �?60% at 0.8m
                 t = (front_min - LIDAR_DWA_DIST) / (LIDAR_LOOKAHEAD - LIDAR_DWA_DIST)
                 lidar_speed_factor = 0.6 + t * 0.4
             elif front_min < LIDAR_DWA_DIST and front_min >= CRITICAL_DISTANCE:
-                # Further reduction: 60% at 0.8m → 30% at 0.25m
+                # Further reduction: 60% at 0.8m �?30% at 0.25m
                 t = (front_min - CRITICAL_DISTANCE) / (LIDAR_DWA_DIST - CRITICAL_DISTANCE)
                 lidar_speed_factor = 0.3 + t * 0.3
 
@@ -441,7 +455,7 @@ class WaypointNavigator:
             if front_min < CRITICAL_DISTANCE:
                 obstacle_too_close = True
 
-            # ── 2. Head-on detection → enter / continue sidestep ─
+            # ── 2. Head-on detection �?enter / continue sidestep ─
             elif (front_in_narrow_cone < SIDESTEP_TRIGGER_DIST
                   and not self.sidestep_active):
                 self._replan_requested = True
@@ -457,7 +471,7 @@ class WaypointNavigator:
                                           robot_heading=robot_heading)
                 # If both sides too tight, fall through to DWA / emergency
 
-            # ── 3. Already in sidestep → check for exit ──────────
+            # ── 3. Already in sidestep �?check for exit ──────────
             if self.sidestep_active:
                 # Auto-exit when front is clear OR timeout expires
                 elapsed = self._sim_time() - self.sidestep_start_t
@@ -468,7 +482,7 @@ class WaypointNavigator:
                     self._replan_requested = True
                     return (0.0, 0.0)
                 else:
-                    # Stay in sidestep — let DWA with lateral bias steer
+                    # Stay in sidestep �?let DWA with lateral bias steer
                     ss_l, ss_r = self._dwa_control(robot_x, robot_y, robot_heading,
                                                      tx, ty, lidar_ranges)
                     return (ss_l * peer_speed_factor, ss_r * peer_speed_factor)
@@ -557,66 +571,53 @@ class WaypointNavigator:
         return factor
     
     # ══════════════════════════════════════════════════════════════
-    #  LAYER 0: 前瞻路径冲突检测 + 紧急制动(最后保险)
+    #  LAYER 0: 前瞻路径冲突检�?+ 紧急制�?最后保�?
     # ══════════════════════════════════════════════════════════════
     
     def _check_path_conflict_and_emergency(self, robot_x, robot_y, 
                                              robot_heading, lidar_ranges):
         """
-        基于"路径线段投影"的制动判断 + 前瞻检测。
+        基于"路径线段投影"的制动判�?+ 前瞻检测�?
         
         核心逻辑:
-          仅当 peer 在"我→当前waypoint"路径线段上才制动。
-          判定方法: peer到路径线段的垂直距离 < 机器人宽度(0.4m)
-                   且 peer在线段正前方（投影距离>0）
-          侧面经过的peer → 完全忽略，不制动。
+          仅当 peer �?我→当前waypoint"路径线段上才制动�?
+          判定方法: peer到路径线段的垂直距离 < 机器人宽�?0.4m)
+                   �?peer在线段正前方（投影距�?0�?
+          侧面经过的peer �?完全忽略，不制动�?
         
         返回:
-          None — 无危险，正常导航
-          (0,0) — 紧急停止
-          (speed_factor,) — 减速因子(0~1)
+          None �?无危险，正常导航
+          (0,0) �?紧急停�?
+          (speed_factor,) �?减速因�?0~1)
         """
-        # 注: 不在这里重置 _replan_requested!
-        # 该标志只在以下时机清除:
+        # �? 不在这里重置 _replan_requested!
+        # 该标志只在以下时机清�?
         #  - Supervisor读取并处理后(standalone模式)
-        #  - 发送status消息后(Webots物理模式)
-        #  - 收到新的navigate命令时(表示已经重规划完成)
+        #  - 发送status消息�?Webots物理模式)
+        #  - 收到新的navigate命令�?表示已经重规划完�?
         
-        # ── 前瞻路径冲突检测: 已禁用 ──
-        # 原因: 该检测用peer当前位置判断未来路径段冲突，但不考虑peer也在移动。
-        # 导致: 远距离peer被误判为"在路径上" → 无效重规划 → 卡死循环。
-        # 替代: Supervisor层的轨迹预测(_proactive_path_conflict_scan)会预测
-        #       双方未来位置，正确判断是否有时空碰撞。
-        # 安全: 实时制动层(d_perp<0.30m)仍每帧运行，保障近距离安全。
+        # ── 前瞻路径冲突检�? 已禁�?──
+        # 原因: 该检测用peer当前位置判断未来路径段冲突，但不考虑peer也在移动�?
+        # 导致: 远距离peer被误判为"在路径上" �?无效重规�?�?卡死循环�?
+        # 替代: Supervisor层的轨迹预测(_proactive_path_conflict_scan)会预�?
+        #       双方未来位置，正确判断是否有时空碰撞�?
+        # 安全: 实时制动�?d_perp<0.30m)仍每帧运行，保障近距离安全�?
         # self._conflict_check_counter += 1
         # if self._conflict_check_counter >= PATH_CONFLICT_CHECK_INTERVAL:
         #     self._conflict_check_counter = 0
         #     self._check_path_for_conflicts(robot_x, robot_y)
         
-        # ── LiDAR紧急制动（物理障碍物，非peer） ──
+        # ── LiDAR紧急制动（物理障碍物，非peer�?──
         if lidar_ranges:
             front_min = self._get_front_min(lidar_ranges, robot_heading)
             if front_min < 0.25:
                 if not self._emergency_stopped:
-                    print(f"[Nav {self.robot_id}] ? LiDAR emergency braking! "
-                          f"Obstacle ahead at {front_min:.2f} m")
+                    if not self.quiet:
+                        print(f"[Nav {self.robot_id}] ? LiDAR emergency braking! "
+                              f"Obstacle ahead at {front_min:.2f} m")
                     self._replan_requested = True  # ?????????
                 self._emergency_stopped = True
                 return (0.0, 0.0)
-
-        if getattr(self, 'joint_coordinated', False):
-            # A joint plan already reserves conflict-free space-time slots.
-            # Peer-projection and predictive braking below otherwise fight the
-            # centralized schedule in wide corridors and create standstills.
-            if self._emergency_stopped:
-                self._emergency_stopped = False
-            return None
-
-        # ?? Peer????: ?"???????"?peer??? ??
-        if not self.peer_positions:
-            if self._emergency_stopped:
-                self._emergency_stopped = False
-            return None
 
         target = self.get_current_target()
         if target is None:
@@ -630,8 +631,11 @@ class WaypointNavigator:
         # boundary. Stop early enough to cover controller/physics latency and
         # request a replacement route exactly once on entry.
         move_x, move_y = target[0] - robot_x, target[1] - robot_y
+        coordinated = (getattr(self, 'joint_coordinated', False) or
+                       getattr(self, 'direct_navigation', False))
+        radial_stop = (EMERGENCY_STOP_DIST if coordinated else PEER_RADIAL_STOP_DIST)
         dangerous_radial = any(
-            math.hypot(px - robot_x, py - robot_y) < PEER_RADIAL_STOP_DIST
+            math.hypot(px - robot_x, py - robot_y) < radial_stop
             and move_x * (px - robot_x) + move_y * (py - robot_y) >= 0.0
             for px, py in self.peer_positions.values())
         if dangerous_radial:
@@ -639,9 +643,24 @@ class WaypointNavigator:
                 self._replan_requested = True
                 self._emergency_stopped = True
             return (0.0, 0.0)
+
+        if (getattr(self, 'joint_coordinated', False) or
+                getattr(self, 'direct_navigation', False)):
+            # A joint plan reserves conflict-free space-time slots. Keep the
+            # hard radial peer stop above as a physical safety net, but do not
+            # apply path-projection/predictive braking in coordinated mode.
+            if self._emergency_stopped:
+                self._emergency_stopped = False
+            return None
+
+        # ?? Peer????: ?"???????"?peer??? ??
+        if not self.peer_positions:
+            if self._emergency_stopped:
+                self._emergency_stopped = False
+            return None
         
         tx, ty = target
-        # 路径向量: robot → target
+        # 路径向量: robot �?target
         path_dx = tx - robot_x
         path_dy = ty - robot_y
         path_len = math.sqrt(path_dx*path_dx + path_dy*path_dy)
@@ -657,87 +676,88 @@ class WaypointNavigator:
         blocking_peer = False
         
         for peer_id, (px, py) in self.peer_positions.items():
-            # peer相对于robot的向量
+            # peer相对于robot的向�?
             rel_x, rel_y = px - robot_x, py - robot_y
             
-            # 投影到路径方向
-            d_along = rel_x * ux + rel_y * uy   # 沿路径方向距离
-            d_perp = abs(rel_x * (-uy) + rel_y * ux)  # 垂直于路径距离
+            # 投影到路径方�?
+            d_along = rel_x * ux + rel_y * uy   # 沿路径方向距�?
+            d_perp = abs(rel_x * (-uy) + rel_y * ux)  # 垂直于路径距�?
             
-            # 只关心: 在前方(d_along>0) 且 在路径上(d_perp<0.4m=机器人宽度)
+            # 只关�? 在前�?d_along>0) �?在路径上(d_perp<0.4m=机器人宽�?
             if d_along <= 0:
                 continue   # peer在后方，不管
             if d_perp > 0.40:
                 continue   # peer在侧面，不管（不会碰撞）
             
-            # peer在路径正前方！
+            # peer在路径正前方�?
             blocking_peer = True
             min_along_dist = min(min_along_dist, d_along)
         
         if not blocking_peer:
-            # 没有peer在路径上 → 解除紧急状态
+            # 没有peer在路径上 �?解除紧急状�?
             if self._emergency_stopped:
                 self._emergency_stopped = False
             return None
         
-        # ── peer在路径正前方 → 根据距离决定制动力度 ──
+        # ── peer在路径正前方 �?根据距离决定制动力度 ──
         if min_along_dist < EMERGENCY_STOP_DIST:
-            # 极近(<0.45m) → 紧急停止
+            # 极近(<0.45m) �?紧急停�?
             if not self._emergency_stopped:
-                print(f"[Nav {self.robot_id}] ⚠ Emergency braking! peer directly ahead "
-                      f"d_along={min_along_dist:.2f} m")
-                self._replan_requested = True  # ★ 只在首次进入时请求一次
+                if not self.quiet:
+                    print(f"[Nav {self.robot_id}] �?Emergency braking! peer directly ahead "
+                          f"d_along={min_along_dist:.2f} m")
+                self._replan_requested = True  # �?只在首次进入时请求一�?
             self._emergency_stopped = True
             return (0.0, 0.0)
         elif min_along_dist < PEER_STOP_DIST:
-            # <0.6m → 停止
+            # <0.6m �?停止
             if not self._emergency_stopped:
-                self._replan_requested = True  # ★ 只在首次进入时请求一次
+                self._replan_requested = True  # �?只在首次进入时请求一�?
             self._emergency_stopped = True
             return (0.0, 0.0)
         elif min_along_dist < PEER_SLOW_DIST:
-            # 0.6~1.2m → 线性减速 (不请求重规划,正常减速通过)
+            # 0.6~1.2m �?线性减�?(不请求重规划,正常减速通过)
             factor = (min_along_dist - PEER_STOP_DIST) / (PEER_SLOW_DIST - PEER_STOP_DIST)
             factor = max(0.1, min(1.0, factor))
             return (factor,)
         
-        # >1.2m但在路径上 → 不制动，supervisor轨迹预测会处理
+        # >1.2m但在路径�?�?不制动，supervisor轨迹预测会处�?
         return None
     
     def _check_path_for_conflicts(self, robot_x, robot_y):
         """
-        前瞻路径冲突检测：检查前方N个waypoint线段上是否有peer。
+        前瞻路径冲突检测：检查前方N个waypoint线段上是否有peer�?
         
-        只检测"未来段"(段1~4)，段0由实时制动层(_check_path_conflict_and_emergency)
-        处理——避免两层重复触发导致无限重规划循环。
+        只检�?未来�?(�?~4)，段0由实时制动层(_check_path_conflict_and_emergency)
+        处理——避免两层重复触发导致无限重规划循环�?
         
-        阈值: d_perp < 0.32m (两个robot半径0.18×2=0.36m，0.32m意味着必定碰撞)
+        阈�? d_perp < 0.32m (两个robot半径0.18×2=0.36m�?.32m意味着必定碰撞)
         冷却: 请求重规划后5秒内不再触发
         """
         if not self.peer_positions or not self.waypoints:
             return
         
-        # 冷却期检查: 避免反复重规划导致卡死
+        # 冷却期检�? 避免反复重规划导致卡�?
         if not hasattr(self, '_replan_cooldown_until'):
             self._replan_cooldown_until = 0.0
         if hasattr(self, '_nav_step_count'):
-            # 用帧数估算时间 (32ms/帧)
+            # 用帧数估算时�?(32ms/�?
             current_time_est = self._nav_step_count * 0.032
             if current_time_est < self._replan_cooldown_until:
                 return
         
-        # 收集前方路径段
+        # 收集前方路径�?
         idx = self.current_waypoint_idx
         upcoming = self.waypoints[idx:idx + 5]
         if not upcoming:
             return
         
-        # 构建路径点序列: [当前位置, wp1, wp2, ...]
+        # 构建路径点序�? [当前位置, wp1, wp2, ...]
         points = [(robot_x, robot_y)] + [(w[0], w[1]) for w in upcoming]
         
-        LOOKAHEAD_COLLISION_RADIUS = 0.32  # 只在必碰时触发(< 2×robot_radius)
+        LOOKAHEAD_COLLISION_RADIUS = 0.32  # 只在必碰时触�?< 2×robot_radius)
         
-        # 跳过段0! 段0=当前位置→当前目标waypoint, 由实时制动层处理
+        # 跳过�?! �?=当前位置→当前目标waypoint, 由实时制动层处理
         for i in range(1, len(points) - 1):
             ax, ay = points[i]
             bx, by = points[i + 1]
@@ -752,14 +772,15 @@ class WaypointNavigator:
                 d_along = rel_x * sux + rel_y * suy
                 d_perp = abs(rel_x * (-suy) + rel_y * sux)
                 
-                # peer在未来路径段上(投影在段内, 距离<碰撞半径)
+                # peer在未来路径段�?投影在段�? 距离<碰撞半径)
                 if 0 <= d_along <= seg_len and d_perp < LOOKAHEAD_COLLISION_RADIUS:
                     self._replan_requested = True
-                    # 设置5秒冷却(约156帧)
+                    # 设置5秒冷�?�?56�?
                     if hasattr(self, '_nav_step_count'):
                         self._replan_cooldown_until = self._nav_step_count * 0.032 + 5.0
-                    print(f"[Nav {self.robot_id}] Look-ahead check: peer {peer_id} "
-                          f"occupies path segment {i} (d_perp={d_perp:.2f} m < 0.32 m); requesting replan")
+                    if not self.quiet:
+                        print(f"[Nav {self.robot_id}] Look-ahead check: peer {peer_id} "
+                              f"occupies path segment {i} (d_perp={d_perp:.2f} m < 0.32 m); requesting replan")
                     return
     
     def _get_front_min(self, lidar_ranges, robot_heading):
@@ -785,18 +806,18 @@ class WaypointNavigator:
         front_in_narrow_cone).
         
         Zones (assuming LiDAR is 360° starting at front, CCW):
-          • narrow front cone   ±SIDESTEP_FRONT_CONE_DEG/2 (e.g. ±15°)
-                                — used for head-on detection
-          • full front          ±45° — used for general DWA trigger
-          • left side           +(15°…SIDESTEP_SIDE_CONE_DEG)
-          • right side          -(15°…SIDESTEP_SIDE_CONE_DEG)
+          �?narrow front cone   ±SIDESTEP_FRONT_CONE_DEG/2 (e.g. ±15°)
+                                �?used for head-on detection
+          �?full front          ±45° �?used for general DWA trigger
+          �?left side           +(15°…SIDESTEP_SIDE_CONE_DEG)
+          �?right side          -(15°…SIDESTEP_SIDE_CONE_DEG)
         Returns the MIN distance in each zone (smaller = obstacle closer).
         """
         n = len(lidar_ranges)
         if n == 0:
             return (float('inf'), (float('inf'), float('inf')), float('inf'))
         
-        # Helper: angle (deg) → ray index (assuming ray 0 = front, CCW)
+        # Helper: angle (deg) �?ray index (assuming ray 0 = front, CCW)
         def deg_to_idx(deg):
             # Webots LiDAR convention: ray 0 is front of sensor;
             # subsequent rays sweep CCW (left side first).
@@ -887,9 +908,9 @@ class WaypointNavigator:
         Dynamic Window Approach for reactive collision avoidance.
 
         Evaluates candidate (v, w) pairs and selects the best based on:
-          • heading alignment with the goal
-          • distance to the nearest obstacle
-          • forward velocity preference
+          �?heading alignment with the goal
+          �?distance to the nearest obstacle
+          �?forward velocity preference
 
         All angles use math convention: 0 = facing +x, +π/2 = facing +y.
         Trajectory simulation uses (cos h, sin h) accordingly.
@@ -904,29 +925,43 @@ class WaypointNavigator:
             rx, ry, obstacle_points)
 
         for v in self._dwa_v_samples:
-            for w in self._dwa_w_samples:
+            for w_index, w in enumerate(self._dwa_w_samples):
                 # Simulate trajectory in math convention
                 px, py, ph = rx, ry, rh
-                min_dist = float('inf')
+                min_dist_sq = float('inf')
+                cos_ph = math.cos(rh)
+                sin_ph = math.sin(rh)
+                cos_delta, sin_delta = self._dwa_w_deltas[w_index]
 
-                for _t_step in range(int(DWA_PREDICTION_TIME / DWA_DT)):
-                    px += v * math.cos(ph) * DWA_DT  # x = forward * cos
-                    py += v * math.sin(ph) * DWA_DT  # y = forward * sin
+                for _t_step in range(self._dwa_prediction_steps):
+                    px += v * cos_ph * DWA_DT  # x = forward * cos
+                    py += v * sin_ph * DWA_DT  # y = forward * sin
                     ph += w * DWA_DT
 
-                    d = self._distance_to_obstacle_points(
+                    d_sq = self._distance_sq_to_obstacle_points(
                         px, py, obstacle_points)
-                    min_dist = min(min_dist, d)
+                    if d_sq < min_dist_sq:
+                        min_dist_sq = d_sq
+
+                    # Rotate the heading vector for the next substep using
+                    # the recurrence cos(a+b), sin(a+b).
+                    next_cos = cos_ph * cos_delta - sin_ph * sin_delta
+                    next_sin = sin_ph * cos_delta + cos_ph * sin_delta
+                    cos_ph, sin_ph = next_cos, next_sin
+
+                min_dist = (math.sqrt(min_dist_sq)
+                            if min_dist_sq < float('inf')
+                            else float('inf'))
 
                 if min_dist < CRITICAL_DISTANCE:
                     # Allow trajectory if it MOVES AWAY from the obstacle
                     # (end position further than start). This permits
                     # departure from docks where robot starts at 0.32m
-                    # from shelf — ANY trajectory heading away is valid.
+                    # from shelf �?ANY trajectory heading away is valid.
                     if min_dist < start_obs_dist * 0.8:
-                        # Trajectory gets CLOSER to obstacle — reject
+                        # Trajectory gets CLOSER to obstacle �?reject
                         continue
-                    # Otherwise: trajectory stays same or moves away — allow
+                    # Otherwise: trajectory stays same or moves away �?allow
 
                 # ── Heading score (toward goal) ─────────────────
                 desired = math.atan2(gy - py, gx - px)
@@ -1020,7 +1055,7 @@ class WaypointNavigator:
             # Webots LiDAR ray 0 points along the sensor's local +x; with
             # robot heading rh, world ray angle = rh + (2π·i/N).
             angle = (2 * math.pi * i / num_rays) + rh
-            # Project ray endpoint to world coords using cos/sin (NOT sin/cos —
+            # Project ray endpoint to world coords using cos/sin (NOT sin/cos �?
             # this used to be a leftover from the old Webots NUE convention
             # where 'y' was treated as 'z'. Fixed here as part of task #38.)
             ox = rx + r * math.cos(angle)
@@ -1039,6 +1074,20 @@ class WaypointNavigator:
             d = math.sqrt((px - ox)**2 + (py - oy)**2)
             min_dist = min(min_dist, d)
         return min_dist
+
+    @staticmethod
+    def _distance_sq_to_obstacle_points(px, py, obstacle_points):
+        """Squared-distance variant used by the DWA inner loop."""
+        if not obstacle_points:
+            return float('inf')
+        min_dist_sq = float('inf')
+        for ox, oy in obstacle_points:
+            dx = px - ox
+            dy = py - oy
+            d_sq = dx * dx + dy * dy
+            if d_sq < min_dist_sq:
+                min_dist_sq = d_sq
+        return min_dist_sq
 
     @staticmethod
     def _frange(start, stop, step):
@@ -1077,8 +1126,10 @@ class RobotController:
         self._ready_reported = False
         
         # Navigation
+        self.quiet = os.environ.get('SMART_FACTORY_ROBOT_QUIET', '0') == '1'
         self.navigator = WaypointNavigator()
         self.navigator.robot_id = self.robot_id
+        self.navigator.quiet = self.quiet
         self._prepared_joint_plans = {}
         self._active_plan_epoch = 0
         self._highest_prepared_epoch = 0
@@ -1493,19 +1544,22 @@ class RobotController:
                     self.navigator.paused_until = 0.0
                     # Receive navigation waypoints
                     all_waypoints = command.get('all_waypoints', [])
+                    direct = bool(command.get('direct_navigation', False))
                     if all_waypoints:
                         waypoints = [tuple(wp) for wp in all_waypoints]
                         self.navigator.set_waypoints(waypoints)
-                        self.navigator._replan_requested = False  # 新路径=重规划完成
+                        self.navigator.direct_navigation = direct
+                        self.navigator._replan_requested = False  # 新路�?重规划完�?
                         self.navigator._emergency_stopped = False  # 解除停止
                         start = waypoints[0]
                         end = waypoints[-1]
                         print(f"[Robot {self.robot_id}] Received path: {len(waypoints)} steps, "
-                              f"({start[0]:.2f},{start[1]:.2f})→({end[0]:.2f},{end[1]:.2f})")
+                              f"({start[0]:.2f},{start[1]:.2f})�?{end[0]:.2f},{end[1]:.2f})")
                     else:
                         target_pos = command.get('target')
                         if target_pos:
                             self.navigator.set_waypoints([tuple(target_pos)])
+                            self.navigator.direct_navigation = direct
 
                 elif cmd_type == 'release_joint_waypoint':
                     epoch = int(command.get('plan_epoch', 0))
@@ -1609,7 +1663,7 @@ class RobotController:
                 # one Webots step to be picked up.
                 self.navigator.goal_reached = False
             
-            # 前瞻检测请求重规划 → 通知supervisor
+            # 前瞻检测请求重规划 �?通知supervisor
             if self.navigator._replan_requested:
                 payload['replan_requested'] = True
                 self.navigator._replan_requested = False  # 发送后清除
@@ -1682,14 +1736,15 @@ class RobotController:
             if step_count % status_interval == 0:
                 self._send_status()
             
-            # 6. 周期性状态日志(每300步≈10s)
+            # 6. 周期性状态日�?�?00步≈10s)
             if step_count % 300 == 0 and self.navigator.navigation_active:
-                target = self.navigator.get_current_target()
-                wp_progress = f"{self.navigator.current_waypoint_idx}/{len(self.navigator.waypoints)-1}"
-                t_str = f"→({target[0]:.1f},{target[1]:.1f})" if target else "无目标"
-                peers = len(self.navigator.peer_positions)
-                print(f"[Robot {self.robot_id}] pos=({self.position[0]:.2f},{self.position[1]:.2f}) "
-                      f"wp={wp_progress} {t_str} peers={peers} bat={self.battery:.0f}%")
+                if not self.quiet:
+                    target = self.navigator.get_current_target()
+                    wp_progress = f"{self.navigator.current_waypoint_idx}/{len(self.navigator.waypoints)-1}"
+                    t_str = f"\u2192{target[0]:.1f},{target[1]:.1f})" if target else "no-target"
+                    peers = len(self.navigator.peer_positions)
+                    print(f"[Robot {self.robot_id}] pos=({self.position[0]:.2f},{self.position[1]:.2f}) "
+                          f"wp={wp_progress} {t_str} peers={peers} bat={self.battery:.0f}%")
 
 
 # ================================================================

@@ -16,7 +16,7 @@ from typing import List, Dict, Tuple, Optional, Set
 from dataclasses import dataclass, field
 from config import (
     WAYPOINTS, GRAPH_EDGES, LOCATION_TO_NODE,
-    ROBOT_RADIUS, GOAL_TOLERANCE, ALL_LOCATIONS,
+    ROBOT_RADIUS, GOAL_TOLERANCE, ALL_LOCATIONS, MIN_NAV_DISPLACEMENT,
     WORKSTATIONS, STORAGE_AREAS, CHARGING_STATIONS,
     OBSTACLE_BOXES, line_intersects_obstacles, REST_NODES,
     SPACE_TIME_DETOUR_BUDGET_SECONDS,
@@ -97,7 +97,7 @@ class FactoryGraph:
              obstacle box (shelves / workstation tables).
           3. Return the first collision-free candidate.
           4. Fallback: if every node has an obstructed straight path
-             (extremely rare — would mean robot is fully enclosed),
+             (extremely rare �?would mean robot is fully enclosed),
              return the absolute closest one anyway, and let DWA /
              sidestep handle the local manoeuvre.
         
@@ -236,7 +236,7 @@ class MotionCoordinator:
             graph_nodes=self.graph.nodes,
             graph_adj=self.graph.edges,
         )
-        # Lifelong (online, Cooperative A*) planner — preferred for
+        # Lifelong (online, Cooperative A*) planner �?preferred for
         # the continuous-task-stream use-case. CBS is reserved for
         # batch / offline replanning on demand.
         self.lifelong = LifelongPlanner(
@@ -271,7 +271,7 @@ class MotionCoordinator:
             self.grid, horizon_slots=8, time_slot_seconds=1.2,
             separation_cells=2, minimum_distance_m=0.70)
         
-        # Grid path-cell reservations: maps robot_id → set of (col, row) cells
+        # Grid path-cell reservations: maps robot_id �?set of (col, row) cells
         # currently reserved by that robot's active path. When planning for
         # another robot, these cells (plus a 1-cell inflation) are treated
         # as TEMPORARY OBSTACLES so A* routes around active peers.
@@ -314,7 +314,9 @@ class MotionCoordinator:
     def plan_joint_grid_candidate(
             self, agents: Dict[int, Tuple[Tuple[float, float],
                                           Tuple[float, float]]],
-            *, max_seconds: float = 0.20) -> Optional[JointGridPlan]:
+            *, max_seconds: float = 0.20,
+            priority_order: Optional[Tuple[int, ...]] = None
+            ) -> Optional[JointGridPlan]:
         """Build and independently validate one all-active space-time plan."""
         self.joint_grid_candidates_attempted += 1
         started = time.perf_counter()
@@ -325,7 +327,7 @@ class MotionCoordinator:
         # infeasible, keep the legacy 0.70 m tiers as a moving fallback.
         wide_budget = min(max_seconds * 0.55, 0.35)
         candidate = self.joint_grid_planner_wide.plan(
-            agents, max_seconds=wide_budget)
+            agents, max_seconds=wide_budget, priority_order=priority_order)
         if candidate is not None and self.joint_grid_planner_wide.validate(
                 candidate):
             self.joint_grid_candidates_validated += 1
@@ -334,7 +336,7 @@ class MotionCoordinator:
         remaining = max(0.08, max_seconds - (time.perf_counter() - started))
         primary_budget = min(remaining, 0.90)
         candidate = self.joint_grid_planner.plan(
-            agents, max_seconds=primary_budget)
+            agents, max_seconds=primary_budget, priority_order=priority_order)
         if candidate is not None and self.joint_grid_planner.validate(candidate):
             self.joint_grid_candidates_validated += 1
             return candidate
@@ -343,7 +345,7 @@ class MotionCoordinator:
         # times out. This is a temporary throughput degradation, not a stop.
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
         candidate = self.joint_grid_planner_short.plan(
-            agents, max_seconds=remaining)
+            agents, max_seconds=remaining, priority_order=priority_order)
         if candidate is not None and self.joint_grid_planner_short.validate(candidate):
             self.joint_grid_candidates_validated += 1
             return candidate
@@ -355,7 +357,7 @@ class MotionCoordinator:
         # physical clearance envelope before any pair can approach.
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
         candidate = self.joint_grid_planner_soft.plan(
-            agents, max_seconds=remaining)
+            agents, max_seconds=remaining, priority_order=priority_order)
         if candidate is not None and self.joint_grid_planner_soft.validate(candidate):
             candidate.is_relaxed = True
             self.joint_grid_candidates_validated += 1
@@ -443,7 +445,7 @@ class MotionCoordinator:
             List of (x, y) waypoints to follow, or None if no path found.
         """
         # ----------------------------------------------------------
-        # Find START node — three-tier strategy:
+        # Find START node �?three-tier strategy:
         #   1) If robot is AT a known task location (just finished
         #      pickup), use LOCATION_TO_NODE for that location.
         #   2) Otherwise, choose the *closest* graph node, breaking
@@ -538,7 +540,7 @@ class MotionCoordinator:
 
         # Convert to waypoint positions.
         # Strip the first node if it equals current_position (avoids
-        # the redundant "current → current" segment).
+        # the redundant "current �?current" segment).
         waypoints = [step.position for step in path_steps]
         if waypoints and (
                 abs(waypoints[0][0] - current_position[0]) < 0.05 and
@@ -571,12 +573,13 @@ class MotionCoordinator:
         active_robots = [(rid, state) for rid, state in robot_states.items()
                          if state.get('goal_location') is not None]
         
-        # Prioritise: robots with tasks first, then by distance to goal
+        # Prioritise: robots with tasks first, then by task priority, with
+        # the legacy robot-priority table only as the final deterministic tie.
         def sort_key(item):
             rid, state = item
-            priority = self.robot_priorities.get(rid, rid)
             has_task = 1 if state.get('has_task', False) else 0
-            return (-has_task, priority)  # task-bearing robots first
+            task_priority = float(state.get('task_priority', 0.0) or 0.0)
+            return (-has_task, -task_priority, float(rid))
         
         active_robots.sort(key=sort_key)
 
@@ -624,6 +627,19 @@ class MotionCoordinator:
             timed.append((("edge", a.node, b.node), a.time_step, b.time_step))
         self.resource_reservations.reserve_batch(robot_id, timed)
 
+    def _state_priority_keep_key(self, robot_id: int,
+                                 state: Optional[Dict] = None) -> tuple:
+        """Return a higher-is-right-of-way key based on task priority.
+
+        Task priority is the only conflict-domain signal and robot ID is the
+        final deterministic tie-break, matching FactorySupervisor's
+        ``_priority_yield_key`` policy.  The legacy ``robot_priorities``
+        table is no longer part of conflict-owner selection.
+        """
+        state = state or {}
+        task_priority = float(state.get('task_priority', 0.0) or 0.0)
+        return (task_priority, float(robot_id))
+
     def _detect_and_resolve_conflicts(self, robot_states: Dict[int, dict]):
         """
         Detect conflicts between planned paths and resolve them.
@@ -633,12 +649,10 @@ class MotionCoordinator:
         
         for conflict in conflicts:
             self.conflicts_detected.append(conflict)
+            key_a = self._state_priority_keep_key(conflict.robot_a, robot_states.get(conflict.robot_a))
+            key_b = self._state_priority_keep_key(conflict.robot_b, robot_states.get(conflict.robot_b))
             
-            # Determine which robot to re-plan (lower priority)
-            pri_a = self.robot_priorities.get(conflict.robot_a, conflict.robot_a)
-            pri_b = self.robot_priorities.get(conflict.robot_b, conflict.robot_b)
-            
-            replan_robot = conflict.robot_b if pri_a < pri_b else conflict.robot_a
+            replan_robot = conflict.robot_a if key_a <= key_b else conflict.robot_b
             
             # Re-plan with additional constraints
             if replan_robot in robot_states:
@@ -771,7 +785,7 @@ class MotionCoordinator:
 
         return deadlocks
 
-    def resolve_deadlock(self, deadlock_cycle: List[int]):
+    def resolve_deadlock(self, deadlock_cycle: List[int], robot_states=None):
         """
         Resolve a deadlock by forcing the lowest-priority robot to yield.
         The yielding robot backs up or waits at a safe location.
@@ -779,11 +793,11 @@ class MotionCoordinator:
         if not deadlock_cycle:
             return
         
-        # Find lowest priority robot in the cycle
-        lowest_pri_robot = max(
+        state_by_id = robot_states or {}
+        lowest_pri_robot = min(
             deadlock_cycle,
-            key=lambda rid: self.robot_priorities.get(rid, rid))
-        
+            key=lambda rid: self._state_priority_keep_key(
+                rid, state_by_id.get(rid)))
         # Clear this robot's path and re-plan later
         if lowest_pri_robot in self.robot_paths:
             self.robot_paths[lowest_pri_robot] = []
@@ -822,7 +836,7 @@ class MotionCoordinator:
         cbs_input: Dict[int, Tuple[str, str]] = {}
         location_to_node = LOCATION_TO_NODE
         for rid, (pos, goal_loc) in robot_targets.items():
-            # Map current position → start node
+            # Map current position �?start node
             #   Tier 1: if robot is AT a known location, use its mapping
             #   Tier 2: nearest waypoint to (pos)
             start_node = None
@@ -835,7 +849,7 @@ class MotionCoordinator:
             if start_node is None:
                 start_node = self.graph.get_nearest_node(pos)
 
-            # Map goal → node
+            # Map goal �?node
             if goal_loc in location_to_node:
                 goal_node = location_to_node[goal_loc]
             else:
@@ -877,7 +891,7 @@ class MotionCoordinator:
 
             # Coordinate waypoints for the executor:
             # We emit the position of every step. Consecutive identical
-            # positions (waits) are collapsed to one — the executor
+            # positions (waits) are collapsed to one �?the executor
             # interprets a single waypoint as "drive there and stop";
             # the wait time is naturally enforced because subsequent
             # robots won't conflict with this one in the CBS plan.
@@ -912,7 +926,7 @@ class MotionCoordinator:
         return dict(self.cbs.stats) if hasattr(self.cbs, 'stats') else {}
 
     # ==================================================================
-    #  LIFELONG (Cooperative A*) API — for online task arrival streams
+    #  LIFELONG (Cooperative A*) API �?for online task arrival streams
     # ==================================================================
 
     def plan_lifelong(self,
@@ -927,7 +941,7 @@ class MotionCoordinator:
         into the global table.
 
         Use this in place of plan_path_for_robot() when running
-        a continuous task stream — it guarantees no spatio-temporal
+        a continuous task stream �?it guarantees no spatio-temporal
         conflicts WITHOUT rewinding any robot already in motion.
 
         Args:
@@ -940,7 +954,7 @@ class MotionCoordinator:
             list of (x, y) waypoints to follow, or None if no
             collision-free path exists within the planner horizon.
         """
-        # Resolve START node — three-tier strategy identical to
+        # Resolve START node �?three-tier strategy identical to
         # plan_path_for_robot, ensuring consistency.
         start_node = None
         for _loc_name, _loc_pos in ALL_LOCATIONS.items():
@@ -1000,9 +1014,9 @@ class MotionCoordinator:
         """
         Release a robot's reservations in the lifelong planner.
         Call when:
-          • the robot completes its task (delivery_done)
-          • the robot is removed from the active fleet
-          • before re-planning the same robot for a new task
+          �?the robot completes its task (delivery_done)
+          �?the robot is removed from the active fleet
+          �?before re-planning the same robot for a new task
             (plan_lifelong will auto-release first, but you can
              also call this explicitly between phases)
         """
@@ -1037,13 +1051,13 @@ class MotionCoordinator:
         """
         Find the nearest REST_NODE (graph node where a robot can park
         between tasks) that is:
-          • collision-free reachable from `position` (straight line check)
-          • not already statically reserved by another robot
+          �?collision-free reachable from `position` (straight line check)
+          �?not already statically reserved by another robot
         
         Returns (node_name, (x, y)) or None if all rest nodes are taken.
         
         Used by lazy relocation: after completing a delivery, the robot
-        relocates to the closest available rest node — not its
+        relocates to the closest available rest node �?not its
         assigned home spot. This minimises empty travel.
         
         Args:
@@ -1116,7 +1130,7 @@ class MotionCoordinator:
         home_node = self.graph.get_nearest_node(home_xy)
         self.lifelong.reserve_static(robot_id, home_node)
         
-        # Grid reservation (for plan_grid_lifelong) — mark a 5×5 ring
+        # Grid reservation (for plan_grid_lifelong) �?mark a 5×5 ring
         # around the home cell (~1m radius). This ensures other robots'
         # paths keep a safe distance from the parked robot's footprint
         # AND inflated safety zone.
@@ -1125,7 +1139,7 @@ class MotionCoordinator:
         for dc in (-2, -1, 0, 1, 2):
             for dr in (-2, -1, 0, 1, 2):
                 home_cells.add((col + dc, row + dr))
-        # Use the existing reservation table — this means peers will
+        # Use the existing reservation table �?this means peers will
         # treat the parked robot's home cells as blocked. The robot
         # itself bypasses this via the start_proximity exemption in
         # plan_grid_lifelong (4-cell ring around its own start).
@@ -1174,11 +1188,11 @@ class MotionCoordinator:
             self.robot_paths[robot_id].pop(0)
 
     # ────────────────────────────────────────────────────────
-    # Level 2 — Deadlock detection + priority-inheritance break
+    # Level 2 �?Deadlock detection + priority-inheritance break
     # ────────────────────────────────────────────────────────
     def init_deadlock_monitor(self) -> None:
         """Initialize per-robot stuck-time tracking (call once at sim start)."""
-        # robot_id → (last_position, stuck_ticks)
+        # robot_id �?(last_position, stuck_ticks)
         self._stuck_state: Dict[int, Tuple[Tuple[float, float], int]] = {}
         self._deadlock_break_count = 0   # statistic
         self._stuck_threshold = 10       # ticks before declaring stuck
@@ -1208,7 +1222,8 @@ class MotionCoordinator:
                 continue
             # Only monitor robots that should be moving
             from config import RobotState as _RS
-            if state not in (_RS.EN_ROUTE_PICKUP, _RS.EN_ROUTE_DELIVERY,
+            if state not in (_RS.EN_ROUTE_PICKUP, _RS.CARRYING,
+                             _RS.EN_ROUTE_DELIVERY,
                              _RS.RETURNING_TO_CHARGE, _RS.RETURNING_HOME):
                 # Reset for non-moving states
                 if rid in self._stuck_state:
@@ -1224,7 +1239,7 @@ class MotionCoordinator:
                 speed_scale = max(
                     0.5, min(1.0, float(rs.get("speed_scale", 1.0))))
                 if d > self._stuck_position_eps * speed_scale:
-                    # Robot moved — reset stuck counter
+                    # Robot moved �?reset stuck counter
                     self._stuck_state[rid] = (pos, 0)
                 else:
                     new_ticks = ticks + 1
@@ -1238,7 +1253,7 @@ class MotionCoordinator:
                         robot_states: Dict[int, dict],
                         ) -> List[int]:
         """
-        Apply priority inheritance: when ≥2 stuck robots are spatially
+        Apply priority inheritance: when �? stuck robots are spatially
         adjacent (< 1.5m apart), the lower-priority one releases its
         reservations and re-plans (which forces a detour).
         
@@ -1282,7 +1297,7 @@ class MotionCoordinator:
         return [yielder]
 
     # ────────────────────────────────────────────────────────
-    # Level 3 — RHCR: Rolling-Horizon Cooperative Replanning
+    # Level 3 �?RHCR: Rolling-Horizon Cooperative Replanning
     # ────────────────────────────────────────────────────────
     def rhcr_replan(self,
                      robot_states: Dict[int, dict],
@@ -1340,7 +1355,7 @@ class MotionCoordinator:
         # requires a two-phase dispatch/ACK transaction; mutating reservations
         # here would make physical robots follow old plans against new state.
         if self.lifelong.verbose:
-            print(f"  [RHCR] read-only candidate: cost {old_total} → {new_total}")
+            print(f"  [RHCR] read-only candidate: cost {old_total} �?{new_total}")
         return candidate
 
     def get_coordination_stats(self) -> dict:
@@ -1569,7 +1584,7 @@ class MotionCoordinator:
         return result
 
     # ────────────────────────────────────────────────────────
-    # Grid-based path planning — replaces corridor graph for path
+    # Grid-based path planning �?replaces corridor graph for path
     # length optimization. Still uses LifelongPlanner reservation
     # table for multi-robot coordination, but treats waypoints as
     # virtual nodes for the time-step constraint solver.
@@ -1588,7 +1603,7 @@ class MotionCoordinator:
              replacement candidate (transactional re-planning).
           2. Temporarily mark OTHER robots' active path cells (+1-cell
              inflation) as TEMPORARY OBSTACLES in the OccupancyGrid.
-          3. Run GridAStar — A* naturally routes around peers' paths.
+          3. Run GridAStar �?A* naturally routes around peers' paths.
           4. Restore the temporary obstacles.
           5. Record THIS robot's new path cells in the reservation table.
           6. Subsample + drop-first-wp.
@@ -1628,7 +1643,17 @@ class MotionCoordinator:
             goal_xy = WAYPOINTS[goal_location]
         else:
             return None
-        
+
+        # A route whose endpoint is already at the measured robot position is
+        # not a movement plan. Returning it to the supervisor produces a
+        # one-step waypoint that controllers consume without moving, which
+        # creates false goal arrivals and long physical standstills.
+        goal_distance = math.hypot(
+            goal_xy[0] - current_position[0],
+            goal_xy[1] - current_position[1])
+        if goal_distance < MIN_NAV_DISPLACEMENT:
+            return None
+
         # ── Step 1: retain this robot's active reservation ─────
         # Planning is synchronous, but it is still a transaction: callers
         # keep executing the current controller path until a replacement is
@@ -1684,7 +1709,7 @@ class MotionCoordinator:
         
         # Start proximity = 2 cells (forces robot onto different corridor)
         # Goal proximity = 4 cells (robot MUST reach its destination dock,
-        # even if near another robot's path — temporal delay handles timing)
+        # even if near another robot's path �?temporal delay handles timing)
         start_proximity = set()
         goal_proximity = set()
         for dc in range(-2, 3):
@@ -1711,7 +1736,7 @@ class MotionCoordinator:
             raw_path = self.grid_planner.plan(current_position, goal_xy,
                                                 smooth=True)
         finally:
-            # Restore — CRITICAL: always undo modifications
+            # Restore �?CRITICAL: always undo modifications
             for (c, r, original) in modified:
                 self.grid.cells[r][c] = original
         
@@ -1830,6 +1855,13 @@ class MotionCoordinator:
         # Independent post-plan gate: validate the exact polyline that will be
         # dispatched, after lane shifts, subsampling and any space-time
         # detour. A failed gate restores the prior active plan transaction.
+        if (not path or
+                math.hypot(path[-1][0] - current_position[0],
+                           path[-1][1] - current_position[1]) <
+                MIN_NAV_DISPLACEMENT):
+            self.rollback_robot_plan(robot_id)
+            return None
+
         if not self.validate_candidate_plan(
                 robot_id, current_position, path):
             self.rollback_robot_plan(robot_id)
@@ -1841,6 +1873,11 @@ class MotionCoordinator:
                                 path) -> bool:
         """Recheck final geometry, spatial coverage and timed conflicts."""
         if not path:
+            return False
+        if (len(path) == 1 and
+                math.hypot(path[0][0] - current_position[0],
+                           path[0][1] - current_position[1]) <
+                MIN_NAV_DISPLACEMENT):
             return False
         points = [tuple(current_position)] + [tuple(point) for point in path]
         if any(not self._segment_clear(first, second)
@@ -1884,17 +1921,17 @@ class MotionCoordinator:
             self._dispatch_delays.pop(robot_id, None)
     
     def _apply_lane_separation(self, path):
-        """Enforce corridor lane discipline for the ENTIRE path — all 6 corridors.
+        """Enforce corridor lane discipline for the ENTIRE path �?all 6 corridors.
         
-        ═══ Vertical (South-North) corridors ═══
-          West corridor:  southbound → x=-4.25,  northbound → x=-4.75
-          East corridor:  southbound → x=+4.25,  northbound → x=+4.75
+        ══�?Vertical (South-North) corridors ══�?
+          West corridor:  southbound �?x=-4.25,  northbound �?x=-4.75
+          East corridor:  southbound �?x=+4.25,  northbound �?x=+4.75
         
-        ═══ Horizontal (East-West) corridors ═══
-          North outer   (y≈3.25):  eastbound → y=3.25,  westbound → y=3.75
-          South outer   (y≈-3.25): eastbound → y=-3.25, westbound → y=-3.75
-          North inner   (y≈2.0):   eastbound → y=2.0,   westbound → y=2.5
-          South inner   (y≈-2.0):  eastbound → y=-2.0,  westbound → y=-2.5
+        ══�?Horizontal (East-West) corridors ══�?
+          North outer   (y�?.25):  eastbound �?y=3.25,  westbound �?y=3.75
+          South outer   (y�?3.25): eastbound �?y=-3.25, westbound �?y=-3.75
+          North inner   (y�?.0):   eastbound �?y=2.0,   westbound �?y=2.5
+          South inner   (y�?2.0):  eastbound �?y=-2.0,  westbound �?y=-2.5
         
         Strategy: Determine overall direction (dx for horizontal, dy for vertical),
         then shift ALL waypoints in that corridor to the correct lane.
@@ -1916,13 +1953,13 @@ class MotionCoordinator:
         NORTH_INNER_Y = 2.0
         SOUTH_INNER_Y = -2.0
         
-        # ── Overall direction from start → end ────────────────────
+        # ── Overall direction from start �?end ────────────────────
         overall_dx = path[-1][0] - path[0][0]  # >0 eastbound, <0 westbound
         overall_dy = path[-1][1] - path[0][1]  # >0 northbound, <0 southbound
         
         new_path = list(path)
         for i in range(len(new_path)):
-            # ★ 不修改首尾waypoint: 起点=实际位置, 终点=精确目标
+            # �?不修改首尾waypoint: 起点=实际位置, 终点=精确目标
             if i == len(new_path) - 1:
                 continue  # 保留精确目标位置
             x, y = new_path[i]
@@ -1930,57 +1967,57 @@ class MotionCoordinator:
             # ══════════════════════════════════════════════════════
             # VERTICAL corridors: shift x based on north/south
             # Only applies to the "trunk" section of corridors
-            # (|y| < 2.8 — excludes the outer horizontal zone)
+            # (|y| < 2.8 �?excludes the outer horizontal zone)
             # ══════════════════════════════════════════════════════
             
             in_vertical_trunk = abs(y) < 2.8  # not in outer horizontal zones
             
-            # West corridor zone: x ∈ [-3.65, -5.35]
+            # West corridor zone: x �?[-3.65, -5.35]
             if in_vertical_trunk and (abs(x - WEST_CORRIDOR_X) < CORRIDOR_TOL or abs(x - (WEST_CORRIDOR_X - LANE_OFFSET)) < CORRIDOR_TOL):
                 if overall_dy > 0.3:
-                    new_path[i] = (WEST_CORRIDOR_X - LANE_OFFSET, y)  # northbound → x=-4.75
+                    new_path[i] = (WEST_CORRIDOR_X - LANE_OFFSET, y)  # northbound �?x=-4.75
                 else:
-                    new_path[i] = (WEST_CORRIDOR_X, y)                # southbound → x=-4.25
+                    new_path[i] = (WEST_CORRIDOR_X, y)                # southbound �?x=-4.25
             
-            # East corridor zone: x ∈ [3.65, 5.35]
+            # East corridor zone: x �?[3.65, 5.35]
             elif in_vertical_trunk and (abs(x - EAST_CORRIDOR_X) < CORRIDOR_TOL or abs(x - (EAST_CORRIDOR_X + LANE_OFFSET)) < CORRIDOR_TOL):
                 if overall_dy > 0.3:
-                    new_path[i] = (EAST_CORRIDOR_X + LANE_OFFSET, y)  # northbound → x=+4.75
+                    new_path[i] = (EAST_CORRIDOR_X + LANE_OFFSET, y)  # northbound �?x=+4.75
                 else:
-                    new_path[i] = (EAST_CORRIDOR_X, y)                # southbound → x=+4.25
+                    new_path[i] = (EAST_CORRIDOR_X, y)                # southbound �?x=+4.25
             
             # ══════════════════════════════════════════════════════
             # HORIZONTAL corridors: shift y based on east/west
             # Applies to ALL x positions (including corridor ends)
             # ══════════════════════════════════════════════════════
             else:
-                # North outer corridor: y ∈ [2.65, 4.35]
+                # North outer corridor: y �?[2.65, 4.35]
                 if abs(y - NORTH_OUTER_Y) < CORRIDOR_TOL or abs(y - (NORTH_OUTER_Y + LANE_OFFSET)) < CORRIDOR_TOL:
                     if overall_dx < -0.3:
-                        new_path[i] = (x, NORTH_OUTER_Y + LANE_OFFSET)  # westbound → y=3.75
+                        new_path[i] = (x, NORTH_OUTER_Y + LANE_OFFSET)  # westbound �?y=3.75
                     else:
-                        new_path[i] = (x, NORTH_OUTER_Y)                # eastbound → y=3.25
+                        new_path[i] = (x, NORTH_OUTER_Y)                # eastbound �?y=3.25
                 
-                # South outer corridor: y ∈ [-4.35, -2.65]
+                # South outer corridor: y �?[-4.35, -2.65]
                 elif abs(y - SOUTH_OUTER_Y) < CORRIDOR_TOL or abs(y - (SOUTH_OUTER_Y - LANE_OFFSET)) < CORRIDOR_TOL:
                     if overall_dx < -0.3:
-                        new_path[i] = (x, SOUTH_OUTER_Y - LANE_OFFSET)  # westbound → y=-3.75
+                        new_path[i] = (x, SOUTH_OUTER_Y - LANE_OFFSET)  # westbound �?y=-3.75
                     else:
-                        new_path[i] = (x, SOUTH_OUTER_Y)                # eastbound → y=-3.25
+                        new_path[i] = (x, SOUTH_OUTER_Y)                # eastbound �?y=-3.25
                 
-                # North inner corridor: y ∈ [1.4, 2.6]
+                # North inner corridor: y �?[1.4, 2.6]
                 elif abs(y - NORTH_INNER_Y) < CORRIDOR_TOL or abs(y - (NORTH_INNER_Y + LANE_OFFSET)) < CORRIDOR_TOL:
                     if overall_dx < -0.3:
-                        new_path[i] = (x, NORTH_INNER_Y + LANE_OFFSET)  # westbound → y=2.5
+                        new_path[i] = (x, NORTH_INNER_Y + LANE_OFFSET)  # westbound �?y=2.5
                     else:
-                        new_path[i] = (x, NORTH_INNER_Y)                # eastbound → y=2.0
+                        new_path[i] = (x, NORTH_INNER_Y)                # eastbound �?y=2.0
                 
-                # South inner corridor: y ∈ [-2.6, -1.4]
+                # South inner corridor: y �?[-2.6, -1.4]
                 elif abs(y - SOUTH_INNER_Y) < CORRIDOR_TOL or abs(y - (SOUTH_INNER_Y - LANE_OFFSET)) < CORRIDOR_TOL:
                     if overall_dx < -0.3:
-                        new_path[i] = (x, SOUTH_INNER_Y - LANE_OFFSET)  # westbound → y=-2.5
+                        new_path[i] = (x, SOUTH_INNER_Y - LANE_OFFSET)  # westbound �?y=-2.5
                     else:
-                        new_path[i] = (x, SOUTH_INNER_Y)                # eastbound → y=-2.0
+                        new_path[i] = (x, SOUTH_INNER_Y)                # eastbound �?y=-2.0
         
         for a, b in zip(new_path, new_path[1:]):
             if not self._segment_clear(a, b):
@@ -2037,7 +2074,7 @@ class MotionCoordinator:
         If conflict exists, store a dispatch_delay for this robot.
         The supervisor reads this delay and holds the robot before sending it.
         
-        Also returns modified path — no hold waypoints needed since supervisor
+        Also returns modified path �?no hold waypoints needed since supervisor
         handles the timing directly.
         """
         # Hard activation is decided immediately afterwards by atomic grid

@@ -60,16 +60,23 @@ class JointGridPlanner:
 
     def plan(self, agents: Dict[int, Tuple[Tuple[float, float],
                                            Tuple[float, float]]],
-             *, max_seconds: float = 0.20) -> Optional[JointGridPlan]:
+             *, max_seconds: float = 0.20,
+             priority_order: Optional[Tuple[int, ...]] = None
+             ) -> Optional[JointGridPlan]:
         started = time.perf_counter()
         self.last_failure_reason = None
         if not agents:
             return JointGridPlan({}, 0.0, (), 0, self.time_slot_seconds)
         ids = tuple(sorted(agents))
-        orders = [ids]
+        base_order = ids
+        if priority_order is not None:
+            preferred = tuple(priority_order)
+            if set(preferred) == set(ids):
+                base_order = preferred
+        orders = [base_order]
         if len(ids) > 1:
-            orders.append(tuple(reversed(ids)))
-            orders.extend(ids[offset:] + ids[:offset]
+            orders.append(tuple(reversed(base_order)))
+            orders.extend(base_order[offset:] + base_order[:offset]
                           for offset in range(1, len(ids)))
 
         total_expanded = 0
@@ -354,17 +361,16 @@ class JointGridPlanner:
     def validate(self, plan: JointGridPlan,
                  separation_cells: Optional[int] = None) -> bool:
         """Independent timing, static-map and inter-robot validation."""
+        old_minimum_distance_m = self.minimum_distance_m
+        old_separation_cells = self.separation_cells
         if separation_cells is not None:
-            old_minimum_distance_m = self.minimum_distance_m
             self.minimum_distance_m = None
             self.separation_cells = int(separation_cells)
-        else:
-            old_minimum_distance_m = None
         try:
             return self._validate(plan)
         finally:
-            if separation_cells is not None:
-                self.minimum_distance_m = old_minimum_distance_m
+            self.minimum_distance_m = old_minimum_distance_m
+            self.separation_cells = old_separation_cells
 
     def _validate(self, plan: JointGridPlan) -> bool:
         paths = plan.paths
