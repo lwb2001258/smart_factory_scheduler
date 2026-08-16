@@ -1583,6 +1583,16 @@ class MotionCoordinator:
             break
         return result
 
+    @staticmethod
+    def _path_length(points) -> float:
+        """Return the cumulative length of a world-coordinate polyline."""
+        if not points:
+            return 0.0
+        total = 0.0
+        for first, second in zip(points, points[1:]):
+            total += math.hypot(second[0] - first[0], second[1] - first[1])
+        return total
+
     # ────────────────────────────────────────────────────────
     # Grid-based path planning �?replaces corridor graph for path
     # length optimization. Still uses LifelongPlanner reservation
@@ -1671,11 +1681,11 @@ class MotionCoordinator:
                 continue
             coordinates = self.coordinate_paths.get(rid)
             if coordinates and len(coordinates) >= 2:
-                # Only the next 4 m is a hard spatial obstacle. Far-future
-                # sharing is serialized by absolute-time reservations; using
-                # the entire remaining route here caused permanent corridor
-                # ownership whenever a robot stopped.
-                prefix = self._polyline_prefix(coordinates, 4.0)
+                # Only the immediate next 2 m is a hard spatial obstacle.
+                # Far-future sharing is serialized by absolute-time
+                # reservations; a longer hard prefix forced A* to detour
+                # around peers that would already be gone by arrival time.
+                prefix = self._polyline_prefix(coordinates, 2.0)
                 centreline = self._rasterize_polyline(prefix)
                 for col, row in centreline:
                     for dc in range(-1, 2):
@@ -1695,12 +1705,11 @@ class MotionCoordinator:
         start_col, start_row = self.grid.world_to_grid(*current_position)
         goal_col, goal_row = self.grid.world_to_grid(*goal_xy)
         
-        # Stored spatial reservations already include a one-cell footprint
-        # around the controller centreline. Inflate them by one additional
-        # cell here, preserving the original two-cell (~0.5m) safety band
-        # without over-blocking narrow corridors.
-        # This keeps approximately 0.5 m of centreline separation while
-        # still allowing the planner to use alternate factory corridors.
+        # Keep the original two-cell (~0.5 m) peer centreline separation as
+        # the hard spatial obstacle for the immediate planning prefix. That
+        # retains physical clearance. The detour guard below prevents this
+        # band from pushing A* around an entire shelf block when the direct
+        # corridor is usable with time-serialised entry instead.
         inflated_peer_cells = set()
         for (c, r) in other_cells:
             for dc in range(-1, 2):
@@ -1719,7 +1728,7 @@ class MotionCoordinator:
             for dr in range(-4, 5):
                 goal_proximity.add((goal_col + dc, goal_row + dr))
         
-        # Apply temporary OBSTACLE marks
+        # Apply temporary OBSTACLE marks to the immediate peer safety band.
         modified = []  # for restoration: (col, row, original_cell)
         for (c, r) in inflated_peer_cells:
             if (c, r) in start_proximity or (c, r) in goal_proximity:
@@ -1786,9 +1795,28 @@ class MotionCoordinator:
         # Every geometric transform must happen before rasterization and
         # reservation.  Reserving raw_path and then shifting/subsampling it
         # made the physical robot travel through cells that no plan owned.
+        # Detour sanity guard
+        # A separated path is useful, but a "separation" that doubles the
+        # route around a whole shelf block is usually worse than taking the
+        # direct corridor and letting the supervisor serialise entry by time.
+        # Compare suspiciously long candidates against the unrestricted
+        # clean-grid path and discard the detour when it is materially worse.
+        candidate_length = self._path_length(raw_path)
+        if peer_cost_detour or candidate_length > goal_distance * 1.45:
+            unrestricted = self.grid_planner.plan(
+                current_position, goal_xy, smooth=True)
+            if unrestricted:
+                unrestricted_length = self._path_length(unrestricted)
+                max_ratio = 1.25 if peer_cost_detour else 1.35
+                max_extra = 1.5 if peer_cost_detour else 3.0
+                if (candidate_length > unrestricted_length * max_ratio and
+                        candidate_length > unrestricted_length + max_extra):
+                    raw_path = unrestricted
+                    peer_cost_detour = False
+
         preserve_detour = peer_cost_detour
         path = (list(raw_path) if preserve_detour else
-                subsample_path(raw_path, step_m=1.5))
+                subsample_path(raw_path, step_m=1.5, grid=self.grid))
         if (len(path) > 1 and
                 abs(path[0][0] - current_position[0]) < 0.05 and
                 abs(path[0][1] - current_position[1]) < 0.05):

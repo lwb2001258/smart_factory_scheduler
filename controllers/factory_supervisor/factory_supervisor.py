@@ -1627,7 +1627,7 @@ class FactorySupervisor:
                 any_wait_started = getattr(robot, '_joint_any_wait_started', None)
                 if any_wait_started is None:
                     robot._joint_any_wait_started = now
-                elif now - any_wait_started > 8.0:
+                elif now - any_wait_started > JOINT_STALL_RELOCATION_TIMEOUT:
                     stale_wait.append(rid)
                 robot._joint_watch_pos = robot.position
                 robot._joint_watch_since = now
@@ -1692,7 +1692,7 @@ class FactorySupervisor:
                     getattr(robot, 'priority_yield_state', None) in
                     ('standoff_enroute', 'waiting_clear'))
                 if (wait_started is not None and
-                        now - wait_started >= 8.0 and
+                        now - wait_started >= JOINT_STALL_RELOCATION_TIMEOUT and
                         not priority_yield_leg):
                     hard_stalled.append(rid)
             hard_stalled = list(dict.fromkeys(hard_stalled))
@@ -1798,6 +1798,8 @@ class FactorySupervisor:
             r'D:\code\smart_factory_scheduler\results\debug_states.log')
         self._debug_state_enabled = (
             os.environ.get('SMART_FACTORY_DEBUG_STATES_ENABLED', '0') == '1')
+        self._debug_state_interval = max(
+            1, int(os.environ.get('SMART_FACTORY_DEBUG_STATES_INTERVAL', '16')))
         if self._debug_state_enabled:
             with open(self._debug_state_path, 'w', encoding='utf-8') as handle:
                 handle.write('sim_time,robot_id,state,pos_x,pos_y,goal_x,goal_y,'
@@ -4456,6 +4458,12 @@ class FactorySupervisor:
                                  for px, py in peers), default=math.inf)
                 if clearance < min_peer_clearance:
                     continue
+                grid = getattr(self.motion_coordinator, 'grid', None)
+                if grid is not None:
+                    target_cell = grid.world_to_grid(*target)
+                    if (not grid.in_bounds(*target_cell) or
+                            not grid.is_free(*target_cell)):
+                        continue
                 if not self.motion_coordinator._segment_clear(
                         robot.position, target):
                     continue
@@ -4560,6 +4568,12 @@ class FactorySupervisor:
                     default=math.inf)
                 if clearance < 0.90:
                     continue
+                grid = getattr(self.motion_coordinator, 'grid', None)
+                if grid is not None:
+                    target_cell = grid.world_to_grid(*target)
+                    if (not grid.in_bounds(*target_cell) or
+                            not grid.is_free(*target_cell)):
+                        continue
                 if not self.motion_coordinator._segment_clear(
                         robot.position, target):
                     continue
@@ -4752,6 +4766,12 @@ class FactorySupervisor:
         for _score, clearance, target in candidates:
             if clearance < 0.80:
                 continue
+            grid = getattr(self.motion_coordinator, 'grid', None)
+            if grid is not None:
+                target_cell = grid.world_to_grid(*target)
+                if (not grid.in_bounds(*target_cell) or
+                        not grid.is_free(*target_cell)):
+                    continue
             if not self.motion_coordinator._segment_clear(
                     robot.position, target):
                 continue
@@ -5744,7 +5764,8 @@ class FactorySupervisor:
             self._update_robot_states(dt)
             self._check_joint_business_arrivals()
 
-            if self._debug_state_enabled and self.step_count % 16 == 0:
+            if (self._debug_state_enabled and
+                    self.step_count % self._debug_state_interval == 0):
                 try:
                     with open(self._debug_state_path, 'a',
                               encoding='utf-8') as handle:

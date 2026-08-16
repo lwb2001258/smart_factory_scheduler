@@ -506,7 +506,7 @@ ASSIGNMENT_FAILURE_TTL = 5.0  # seconds before retrying a failed robot/task pair
 # robots are relocated as one group so their new positions are checked
 # against each other before any Webots node is moved.
 STALL_RELOCATION_TIMEOUT = 6.0  # reserve physical escape for sustained stalls
-JOINT_STALL_RELOCATION_TIMEOUT = 8.0  # joint-mode route-proximate recovery deadline
+JOINT_STALL_RELOCATION_TIMEOUT = 6.0  # joint-mode route-proximate recovery deadline
 JOINT_STALL_RECOVERY_COOLDOWN = 2.0   # retry interval when recovery routing fails
 STALL_PROGRESS_DISTANCE = 0.10   # normal turning/slowdown still counts as progress
 MIN_NAV_DISPLACEMENT = 0.15  # metres - reject routes that do not move the robot
@@ -701,7 +701,7 @@ REWARD_TASK_FAILURE = -10.0   # assigned task aborted after policy commitment
 # ================================================================
 # LOGGING & METRICS
 # ================================================================
-LOG_INTERVAL = 100  # timesteps between log outputs
+LOG_INTERVAL = 250  # timesteps between log outputs
 METRICS_FILE_PREFIX = "experiment_results"
 
 
