@@ -1906,6 +1906,13 @@ class FactorySupervisor:
         if not active:
             return
 
+        hard_motion = []
+        for rid, robot in active.items():
+            hard_elapsed = self._update_hard_stall_clock(robot)
+            if (hard_elapsed is not None and
+                    hard_elapsed >= JOINT_STALL_RELOCATION_TIMEOUT):
+                hard_motion.append((rid, hard_elapsed))
+
         self._joint_collision_scan(active)
         relocate_due = []
         for rid, robot in active.items():
@@ -1920,12 +1927,14 @@ class FactorySupervisor:
         relocate_due.sort(
             key=lambda item: (-float(item[1]),
                               self._priority_yield_key(item[0])))
+        recovered_rid = None
         for rid, _elapsed in relocate_due:
             robot = self.robots[rid]
             if getattr(robot, '_joint_stall_recovery_until', 0.0) > now:
                 continue
             recovered = self._joint_stall_recovery(rid)
             if recovered:
+                recovered_rid = rid
                 robot._deadlock_stuck_since = None
                 robot._deadlock_watch_pos = robot.position
                 robot._joint_watch_pos = robot.position
@@ -1933,6 +1942,9 @@ class FactorySupervisor:
                 robot._joint_any_wait_started = None
                 robot._joint_wait_started = None
                 break
+        pending_hard_motion = [
+            item for item in hard_motion if item[0] != recovered_rid
+        ]
         emergency = []
         stale_wait = []
         stalled = []
@@ -2008,8 +2020,9 @@ class FactorySupervisor:
             if now - robot._joint_watch_since >= 3.0:
                 stalled.append(rid)
 
-        if emergency or stale_wait or stalled:
-            ids = set(emergency + stale_wait + stalled)
+        if emergency or stale_wait or stalled or pending_hard_motion:
+            ids = set(emergency + stale_wait + stalled +
+                      [rid for rid, _elapsed in pending_hard_motion])
             # Mark liveness fallback for the next rolling-planner miss.  The
             # coordinated space-time planner remains preferred; this flag only
             # permits emergency Cooperative-A* routes when the fleet is
@@ -2036,6 +2049,8 @@ class FactorySupervisor:
                 getattr(self.robots[rid], '_joint_watch_since', None) is not None and
                 now - self.robots[rid]._joint_watch_since >= 5.0
             ]
+            hard_stalled.extend(
+                [rid for rid, _elapsed in pending_hard_motion])
             route_less_hard = [
                 rid for rid in stalled
                 if getattr(self.robots[rid], '_joint_route_less_since', None) is not None and
@@ -4360,6 +4375,8 @@ class FactorySupervisor:
         robot._joint_any_wait_started = None
         robot._joint_wait_started = None
         robot._joint_route_less_since = None
+        robot._hard_stall_watch_pos = robot.position
+        robot._hard_stall_since = None
 
     def _joint_stall_recovery(self, rid) -> bool:
         """Move one long-stalled joint-mode robot to its nearest safe route point.
@@ -5050,6 +5067,17 @@ class FactorySupervisor:
                 self._next_joint_grid_tick = min(
                     getattr(self, '_next_joint_grid_tick', now + 2.0),
                     now + 1.0)
+                return True
+            if ENABLE_NONPHYSICAL_RECOVERY and self._teleport_stalled_group([rid]):
+                self._clear_joint_stall_state(robot)
+                robot._joint_escape_until = now + 2.0
+                self._joint_liveness_needed = True
+                self._next_joint_grid_tick = min(
+                    getattr(self, '_next_joint_grid_tick', now + 2.0),
+                    now + 1.0)
+                print(f"[JointStallEscalate] T={now:.1f}s robot={rid} "
+                      f"physical escape unavailable; relocated to a safe "
+                      f"nearby route point")
                 return True
         return False
 

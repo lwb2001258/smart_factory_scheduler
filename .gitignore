@@ -6,3 +6,4 @@
 /results/ppo_review_fix_smoke/
 /results/smoke_factory_grounded/
 /results/smoke_factory_grounded_v2/
+.pytest_cache/
