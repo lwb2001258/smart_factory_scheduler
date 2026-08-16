@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-from grid_planner import CELL_OBSTACLE, OccupancyGrid
+from grid_planner import CELL_OBSTACLE, GRID_RES, OccupancyGrid
 from config import line_intersects_obstacles
 
 
@@ -46,11 +46,14 @@ class JointGridPlanner:
     def __init__(self, grid: OccupancyGrid, *, horizon_slots: int = 4,
                  time_slot_seconds: float = 3.0,
                  separation_cells: int = 4,
+                 minimum_distance_m: Optional[float] = None,
                  max_expansions_per_robot: int = 12000):
         self.grid = grid
         self.horizon_slots = int(horizon_slots)
         self.time_slot_seconds = float(time_slot_seconds)
         self.separation_cells = int(separation_cells)
+        self.minimum_distance_m = (None if minimum_distance_m is None
+                                   else float(minimum_distance_m))
         self.max_expansions_per_robot = int(max_expansions_per_robot)
         self.last_failure_reason = None
         self._static_heuristic_cache = {}
@@ -85,7 +88,7 @@ class JointGridPlanner:
                 continue
             candidate_plan = JointGridPlan(
                 candidate, 0.0, order, expanded, self.time_slot_seconds)
-            if not self.validate(candidate_plan, self.separation_cells):
+            if not self.validate(candidate_plan):
                 continue
             elapsed = time.perf_counter() - started
             return JointGridPlan(candidate, elapsed, order, total_expanded,
@@ -232,14 +235,30 @@ class JointGridPlanner:
         for slot in range(len(path), self.horizon_slots + 1):
             vertex[(goal, slot)] = rid
 
+    def _conflict_radius_cells(self):
+        if self.minimum_distance_m is None:
+            return self.separation_cells
+        return int(math.ceil(self.minimum_distance_m / GRID_RES)) + 1
+
+    def _cells_conflict(self, first: Cell, second: Cell) -> bool:
+        if self.minimum_distance_m is None:
+            return ((first[0] - second[0]) ** 2 +
+                    (first[1] - second[1]) ** 2) <= self.separation_cells ** 2
+        first_xy = self.grid.grid_to_world(*first)
+        second_xy = self.grid.grid_to_world(*second)
+        return (math.hypot(first_xy[0] - second_xy[0],
+                           first_xy[1] - second_xy[1]) <=
+                self.minimum_distance_m)
+
     def _vertex_conflict(self, cell, slot, rid, vertex):
-        radius = self.separation_cells
+        radius = self._conflict_radius_cells()
         for dc in range(-radius, radius + 1):
             for dr in range(-radius, radius + 1):
-                if dc * dc + dr * dr > radius * radius:
+                neighbour = (cell[0] + dc, cell[1] + dr)
+                owner = vertex.get((neighbour, slot))
+                if owner is None or owner == rid:
                     continue
-                owner = vertex.get(((cell[0] + dc, cell[1] + dr), slot))
-                if owner is not None and owner != rid:
+                if self._cells_conflict(cell, neighbour):
                     return True
         return False
 
@@ -247,9 +266,12 @@ class JointGridPlanner:
         for other_first, other_second, owner in edges.get(slot, ()):
             if owner == rid:
                 continue
-            if self._segment_distance(
-                    first, second, other_first, other_second) <= \
-                    self.separation_cells:
+            distance_cells = self._segment_distance(
+                first, second, other_first, other_second)
+            if self.minimum_distance_m is None:
+                if distance_cells <= self.separation_cells:
+                    return True
+            elif distance_cells * GRID_RES <= self.minimum_distance_m:
                 return True
         return False
 
@@ -332,8 +354,19 @@ class JointGridPlanner:
     def validate(self, plan: JointGridPlan,
                  separation_cells: Optional[int] = None) -> bool:
         """Independent timing, static-map and inter-robot validation."""
-        if separation_cells is None:
-            separation_cells = self.separation_cells
+        if separation_cells is not None:
+            old_minimum_distance_m = self.minimum_distance_m
+            self.minimum_distance_m = None
+            self.separation_cells = int(separation_cells)
+        else:
+            old_minimum_distance_m = None
+        try:
+            return self._validate(plan)
+        finally:
+            if separation_cells is not None:
+                self.minimum_distance_m = old_minimum_distance_m
+
+    def _validate(self, plan: JointGridPlan) -> bool:
         paths = plan.paths
         if not paths:
             return True
@@ -366,12 +399,16 @@ class JointGridPlanner:
                     path_b = paths[rid_b]
                     b = path_b[min(slot, len(path_b) - 1)].cell
                     prev_b = path_b[min(max(0, slot - 1), len(path_b) - 1)].cell
-                    if ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 <=
-                            separation_cells ** 2):
+                    if self._cells_conflict(a, b):
                         return False
                     if slot and prev_a == b and prev_b == a:
                         return False
-                    if slot and JointGridPlanner._segment_distance(
-                            prev_a, a, prev_b, b) <= separation_cells:
-                        return False
+                    if slot:
+                        distance_cells = JointGridPlanner._segment_distance(
+                            prev_a, a, prev_b, b)
+                        if self.minimum_distance_m is None:
+                            if distance_cells <= self.separation_cells:
+                                return False
+                        elif distance_cells * GRID_RES <= self.minimum_distance_m:
+                            return False
         return True

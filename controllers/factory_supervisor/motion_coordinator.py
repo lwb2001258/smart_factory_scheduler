@@ -255,15 +255,21 @@ class MotionCoordinator:
         # low enough for useful progress. The short fallback preserves
         # robustness when a dense eight-robot start configuration exceeds
         # the primary search budget.
+        # Wide tier: keep a larger physical envelope when the dense start
+        # permits it.  A slightly shorter horizon makes this tier solvable
+        # under the synchronous Webots planning budget.
+        self.joint_grid_planner_wide = JointGridPlanner(
+            self.grid, horizon_slots=8, time_slot_seconds=1.2,
+            separation_cells=3, minimum_distance_m=0.75)
         self.joint_grid_planner = JointGridPlanner(
             self.grid, horizon_slots=12, time_slot_seconds=1.2,
-            separation_cells=3)
+            separation_cells=3, minimum_distance_m=0.70)
         self.joint_grid_planner_short = JointGridPlanner(
             self.grid, horizon_slots=4, time_slot_seconds=1.2,
-            separation_cells=3)
+            separation_cells=3, minimum_distance_m=0.70)
         self.joint_grid_planner_soft = JointGridPlanner(
             self.grid, horizon_slots=8, time_slot_seconds=1.2,
-            separation_cells=2)
+            separation_cells=2, minimum_distance_m=0.70)
         
         # Grid path-cell reservations: maps robot_id → set of (col, row) cells
         # currently reserved by that robot's active path. When planning for
@@ -312,11 +318,24 @@ class MotionCoordinator:
         """Build and independently validate one all-active space-time plan."""
         self.joint_grid_candidates_attempted += 1
         started = time.perf_counter()
-        primary_budget = min(max_seconds, 0.90)
+        # Try the wide-envelope tier first.  A 0.75 m centreline plan is
+        # still solvable for most rolling windows and absorbs the small
+        # pure-pursuit tracking error that otherwise pushes a 0.70 m plan
+        # down to about 0.62 m.  If the dense state is temporarily
+        # infeasible, keep the legacy 0.70 m tiers as a moving fallback.
+        wide_budget = min(max_seconds * 0.55, 0.35)
+        candidate = self.joint_grid_planner_wide.plan(
+            agents, max_seconds=wide_budget)
+        if candidate is not None and self.joint_grid_planner_wide.validate(
+                candidate):
+            self.joint_grid_candidates_validated += 1
+            return candidate
+
+        remaining = max(0.08, max_seconds - (time.perf_counter() - started))
+        primary_budget = min(remaining, 0.90)
         candidate = self.joint_grid_planner.plan(
             agents, max_seconds=primary_budget)
-        if candidate is not None and self.joint_grid_planner.validate(
-                candidate, self.joint_grid_planner.separation_cells):
+        if candidate is not None and self.joint_grid_planner.validate(candidate):
             self.joint_grid_candidates_validated += 1
             return candidate
 
@@ -325,8 +344,7 @@ class MotionCoordinator:
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
         candidate = self.joint_grid_planner_short.plan(
             agents, max_seconds=remaining)
-        if candidate is not None and self.joint_grid_planner_short.validate(
-                candidate, self.joint_grid_planner_short.separation_cells):
+        if candidate is not None and self.joint_grid_planner_short.validate(candidate):
             self.joint_grid_candidates_validated += 1
             return candidate
 
@@ -338,8 +356,7 @@ class MotionCoordinator:
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
         candidate = self.joint_grid_planner_soft.plan(
             agents, max_seconds=remaining)
-        if candidate is not None and self.joint_grid_planner_soft.validate(
-                candidate, self.joint_grid_planner_soft.separation_cells):
+        if candidate is not None and self.joint_grid_planner_soft.validate(candidate):
             candidate.is_relaxed = True
             self.joint_grid_candidates_validated += 1
             return candidate
