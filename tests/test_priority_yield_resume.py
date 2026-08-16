@@ -42,6 +42,29 @@ class PriorityYieldResumeTests(unittest.TestCase):
         self.assertFalse(sup._priority_yield_is_exempt(sup.robots[1]))
         self.assertTrue(sup._priority_yield_is_exempt(sup.robots[2]))
 
+    def test_side_crossing_forward_robot_waits_for_lateral_robot(self):
+        sup = self._supervisor()
+        sup.robots = {
+            1: self._robot(1, (-2.0, 0.0), task_priority=5.0,
+                           goal=(2.0, 0.0)),
+            2: self._robot(2, (0.0, -2.0), task_priority=1.0,
+                           goal=(0.0, 2.0)),
+        }
+        self.assertEqual('side', sup._classify_conflict_pair(1, 2))
+        winner, yielder = sup._side_crossing_pair((1, 2))
+        self.assertEqual((2, 1), (winner, yielder))
+
+    def test_same_direction_robot_behind_is_follower(self):
+        sup = self._supervisor()
+        sup.robots = {
+            1: self._robot(1, (-2.0, 0.0), task_priority=5.0,
+                           goal=(4.0, 0.0)),
+            2: self._robot(2, (-1.0, 0.0), task_priority=1.0,
+                           goal=(4.0, 0.0)),
+        }
+        self.assertEqual('same', sup._classify_conflict_pair(1, 2))
+        self.assertEqual((1, 2), sup._same_direction_follower((1, 2)))
+
     def test_priority_key_uses_task_then_id(self):
         sup = self._supervisor()
         sup.robots = {

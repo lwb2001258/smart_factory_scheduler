@@ -134,6 +134,9 @@ class RobotInfo:
         self.priority_yield_original_goal = None
         self.priority_yield_cooldown_until = 0.0
         self._joint_stall_recovery_until = 0.0
+        self._joint_route_less_since = None
+        self._hard_stall_watch_pos = initial_position
+        self._hard_stall_since = None
         self.speed_scale = 1.0
         self.joint_speed_until = 0.0
         self.joint_speed_started = 0.0
@@ -655,6 +658,20 @@ class FactorySupervisor:
             robot._deadlock_stuck_since = self.sim_time
         return self.sim_time - robot._deadlock_stuck_since
 
+    def _update_hard_stall_clock(self, robot):
+        """Track actual no-motion time independent of short legal holds."""
+        watch_pos = getattr(robot, '_hard_stall_watch_pos', robot.position)
+        moved = math.hypot(robot.position[0] - watch_pos[0],
+                            robot.position[1] - watch_pos[1])
+        threshold = STALL_PROGRESS_DISTANCE * max(0.5, robot.speed_scale)
+        if moved >= threshold:
+            robot._hard_stall_watch_pos = robot.position
+            robot._hard_stall_since = None
+            return None
+        if getattr(robot, '_hard_stall_since', None) is None:
+            robot._hard_stall_since = self.sim_time
+        return self.sim_time - robot._hard_stall_since
+
     def _coordinate_emergency_pair(self) -> bool:
         """Assign one deterministic yielder for a close emergency pair."""
         candidates = []
@@ -807,6 +824,7 @@ class FactorySupervisor:
         be too late.
         """
         now = self.sim_time
+        route_intervention = False
         if getattr(self, '_shield_debug_enabled', None) is None:
             self._shield_debug_enabled = os.environ.get(
                 'SMART_FACTORY_DEBUG_SHIELD', '0') == '1'
@@ -853,6 +871,24 @@ class FactorySupervisor:
                         f'{actual_components},layered_low_only\n')
             for component in actual_components:
                 component = tuple(sorted(component))
+                scoped_pairs = [
+                    (component[index], component[j], 0.0,
+                     math.hypot(self.robots[component[index]].position[0] -
+                                self.robots[component[j]].position[0],
+                                self.robots[component[index]].position[1] -
+                                self.robots[component[j]].position[1]))
+                    for index in range(len(component))
+                    for j in range(index + 1, len(component))
+                ]
+                kind = self._priority_yield_component_kind(component,
+                                                           scoped_pairs)
+                if kind == 'same':
+                    if self._apply_same_direction_following(
+                            component, actual=True):
+                        continue
+                elif kind == 'side':
+                    if self._priority_yield_side_wait(component, scoped_pairs):
+                        continue
                 component_distances = [
                     math.hypot(self.robots[a].position[0] -
                                self.robots[b].position[0],
@@ -869,6 +905,7 @@ class FactorySupervisor:
                     _, yielder = selection
                 if closest < 0.70:
                     if self._joint_try_escape_component(component):
+                        route_intervention = True
                         continue
                     # No validated moving standoff exists for an already
                     # critical cluster. A very short coordinated hold keeps
@@ -879,12 +916,14 @@ class FactorySupervisor:
                     for rid in component:
                         self._set_robot_speed_scale(
                             rid, 0.35 if rid == yielder else 0.65)
+                    route_intervention = True
                     continue
                 for rid in component:
                     scale = 0.45 if rid == yielder else 0.75
                     if self._set_robot_speed_scale(rid, scale):
                         self.robots[rid].joint_shield_until = now + 2.0
-            return True
+                route_intervention = True
+            return route_intervention
 
         conflicts = self._trajectory_conflicts(
             trajectories, minimum_distance)
@@ -918,6 +957,10 @@ class FactorySupervisor:
             self._next_shield_log = now + 2.0
         for component in components:
             component = tuple(sorted(component))
+            kind = self._priority_yield_component_kind(component, conflicts)
+            if kind == 'same':
+                self._apply_same_direction_following(component, actual=False)
+                continue
             earliest = min(
                 (conflict[2] for conflict in conflicts
                  if conflict[0] in component and conflict[1] in component),
@@ -995,6 +1038,21 @@ class FactorySupervisor:
         if self._priority_yield_is_exempt(self.robots[yielder]):
             return None
         return winner, yielder
+
+    def _priority_yield_ordered(self, winner: int, yielder: int):
+        """Honour an explicit geometry right-of-way unless it is unsafe.
+
+        Unlike ``_priority_yield_pair`` this does not re-rank by task priority:
+        it only swaps the roles when the geometric yielder is exempt and the
+        geometric winner is not.
+        """
+        if winner not in self.robots or yielder not in self.robots:
+            return None
+        if not self._priority_yield_is_exempt(self.robots[yielder]):
+            return winner, yielder
+        if not self._priority_yield_is_exempt(self.robots[winner]):
+            return yielder, winner
+        return None
 
     def _priority_yield_select(self, component, conflicts=None):
         """Choose (winner, yielder) without priority oscillation."""
@@ -1100,6 +1158,95 @@ class FactorySupervisor:
         if 'side' in kinds:
             return 'side'
         return 'same'
+
+    def _side_crossing_pair(self, component):
+        """Choose right-of-way for a side/cross conflict by geometry.
+
+        For two crossing paths, the robot whose current motion points toward
+        the other robot is the straight/forward robot; that robot should wait.
+        The peer crossing its path is the lateral robot and gets right-of-way.
+        Task priority remains the fallback for ambiguous geometry.
+        """
+        component = tuple(sorted(component))
+        best = None
+        best_score = -2.0
+        for index, rid_a in enumerate(component):
+            robot_a = self.robots[rid_a]
+            va = self._robot_motion_vector(rid_a)
+            for rid_b in component[index + 1:]:
+                robot_b = self.robots[rid_b]
+                vb = self._robot_motion_vector(rid_b)
+                rel_x = robot_b.position[0] - robot_a.position[0]
+                rel_y = robot_b.position[1] - robot_a.position[1]
+                distance = math.hypot(rel_x, rel_y)
+                if distance < 0.05:
+                    continue
+                rel_x /= distance
+                rel_y /= distance
+                ahead_a = va[0] * rel_x + va[1] * rel_y
+                ahead_b = vb[0] * -rel_x + vb[1] * -rel_y
+                score = max(ahead_a, ahead_b)
+                if ahead_a >= ahead_b and ahead_a > 0.25:
+                    pair = self._priority_yield_ordered(rid_b, rid_a)
+                elif ahead_b > 0.25:
+                    pair = self._priority_yield_ordered(rid_a, rid_b)
+                else:
+                    pair = None
+                if pair is None or score <= best_score:
+                    continue
+                best_score = score
+                best = pair
+        if best is not None:
+            return best
+        return self._priority_yield_select(component)
+
+    def _same_direction_follower(self, component):
+        """Return (follower, leader) for same-direction traffic.
+
+        The follower is the robot behind along the shared motion direction and
+        the leader is the robot ahead. Task priority is only a fallback when
+        the geometry is ambiguous.
+        """
+        component = tuple(sorted(component))
+        for rid_a, rid_b in itertools.combinations(component, 2):
+            if self._classify_conflict_pair(rid_a, rid_b) != 'same':
+                continue
+            va = self._robot_motion_vector(rid_a)
+            vb = self._robot_motion_vector(rid_b)
+            direction = (va[0] + vb[0], va[1] + vb[1])
+            length = math.hypot(*direction)
+            if length <= 1e-9:
+                continue
+            direction = (direction[0] / length, direction[1] / length)
+            pos_a = self.robots[rid_a].position
+            pos_b = self.robots[rid_b].position
+            projection_a = pos_a[0] * direction[0] + pos_a[1] * direction[1]
+            projection_b = pos_b[0] * direction[0] + pos_b[1] * direction[1]
+            if projection_a <= projection_b:
+                return rid_a, rid_b
+            return rid_b, rid_a
+        pair = self._priority_yield_select(component)
+        if pair is None:
+            return None
+        winner, yielder = pair
+        return yielder, winner
+
+    def _apply_same_direction_following(self, component, actual=False) -> bool:
+        """Keep same-direction traffic moving with the follower slowed."""
+        pair = self._same_direction_follower(component)
+        if pair is None:
+            return False
+        follower, leader = pair
+        if getattr(self.robots[follower], 'priority_yield_state', None) is not None:
+            return False
+        now = self.sim_time
+        if actual:
+            self._hold_robot(follower, 0.45)
+        self._set_robot_speed_scale(leader, 0.85 if actual else 1.0)
+        self._set_robot_speed_scale(follower, 0.40 if actual else 0.55)
+        self.robots[leader].joint_shield_until = now + 1.0
+        self.robots[follower].joint_shield_until = now + 1.5
+        return True
 
     def _priority_yield_segment_peer_clear(self, yielder: int, target) -> bool:
         """Reject standoff paths that cut through current peer positions."""
@@ -1565,12 +1712,13 @@ class FactorySupervisor:
     def _priority_yield_side_wait(self, component, conflicts) -> bool:
         """Resolve a side/cross conflict with an in-place wait, no detour.
 
-        The lower-priority robot keeps its current route and simply holds at
-        its measured position until the higher-priority robot has cleared the
-        predicted crossing window. This avoids both a standoff leg and an
-        unnecessary replan around the whole shelf block.
+        The robot whose intended motion points toward the peer is the
+        forward/straight robot and holds at its measured position; the peer
+        crossing its path is lateral and gets right-of-way. Task priority is
+        used only when the geometry is ambiguous. The waiting robot keeps its
+        current route and never takes a standoff leg or a shelf detour.
         """
-        selection = self._priority_yield_select(component, conflicts)
+        selection = self._side_crossing_pair(component)
         if selection is None:
             return False
         winner, yielder = selection
@@ -1801,6 +1949,17 @@ class FactorySupervisor:
                     robot.controller_joint_wait_until,
                     robot.dispatch_not_before,
                 ))
+            route_less = self._has_active_navigation(robot) and (
+                not robot.waypoints or
+                robot.current_waypoint_idx >= len(robot.waypoints))
+            route_less_since = getattr(robot, '_joint_route_less_since', None)
+            if route_less and not priority_yield_leg and robot.pending_waypoints is None:
+                if route_less_since is None:
+                    robot._joint_route_less_since = now
+                elif now - route_less_since >= 3.0:
+                    stalled.append(rid)
+            else:
+                robot._joint_route_less_since = None
             if getattr(robot, '_replan_requested', False) or robot.emergency_braking:
                 emergency.append(rid)
                 if getattr(robot, '_joint_emergency_since', None) is None:
@@ -1873,8 +2032,16 @@ class FactorySupervisor:
                     robot._joint_emergency_since = None
             hard_stalled = [
                 rid for rid in stalled
-                if now - self.robots[rid]._joint_watch_since >= 5.0
+                if getattr(self.robots[rid], '_joint_route_less_since', None) is None and
+                getattr(self.robots[rid], '_joint_watch_since', None) is not None and
+                now - self.robots[rid]._joint_watch_since >= 5.0
             ]
+            route_less_hard = [
+                rid for rid in stalled
+                if getattr(self.robots[rid], '_joint_route_less_since', None) is not None and
+                now - self.robots[rid]._joint_route_less_since >= 3.0
+            ]
+            hard_stalled.extend(route_less_hard)
             emergency_hard = [
                 rid for rid in emergency
                 if self.robots[rid].emergency_braking and
@@ -4192,6 +4359,7 @@ class FactorySupervisor:
         robot._joint_watch_since = now
         robot._joint_any_wait_started = None
         robot._joint_wait_started = None
+        robot._joint_route_less_since = None
 
     def _joint_stall_recovery(self, rid) -> bool:
         """Move one long-stalled joint-mode robot to its nearest safe route point.
@@ -4702,8 +4870,10 @@ class FactorySupervisor:
             return False
         candidates.sort(key=lambda item: item[0], reverse=True)
         for _score, clearance, target in candidates:
-            path = self.motion_coordinator.plan_grid_lifelong(
-                rid, robot.position, target)
+            path = self._static_turning_path(robot.position, target)
+            if not path or not self._recovery_path_peer_clear(rid, path):
+                path = self.motion_coordinator.plan_grid_lifelong(
+                    rid, robot.position, target)
             if not path:
                 continue
             if not self._recovery_path_peer_clear(rid, path):
