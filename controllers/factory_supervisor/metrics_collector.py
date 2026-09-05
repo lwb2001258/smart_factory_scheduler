@@ -56,10 +56,12 @@ class MetricsCollector:
     Collects and manages all performance metrics during simulation.
     """
     
-    def __init__(self, scenario_name: str, scheduler_name: str, num_robots: int):
+    def __init__(self, scenario_name: str, scheduler_name: str, num_robots: int,
+                 provenance: Optional[dict] = None):
         self.scenario_name = scenario_name
         self.scheduler_name = scheduler_name
         self.num_robots = num_robots
+        self.provenance = dict(provenance or {})
         
         # Time-series data
         self.step_records: List[StepRecord] = []
@@ -121,7 +123,8 @@ class MetricsCollector:
         self.rl_timeout_count = 0
         self.rl_policy_decisions = 0
         self.rl_fallback_decisions = 0
-        
+        self.rl_event_ledger: List[dict] = []
+
         # Output path
         self.output_dir = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -134,6 +137,13 @@ class MetricsCollector:
             self.output_dir,
             f"experiment_{scenario_name}_{scheduler_name}_{timestamp}.json"
         )
+
+    def record_rl_event(self, event: dict):
+        """Record a canonical, JSON-safe RL event emitted by runtime code."""
+        if isinstance(event, dict):
+            self.rl_event_ledger.append(dict(event))
+            if len(self.rl_event_ledger) > 10000:
+                del self.rl_event_ledger[:1000]
 
     def record_scheduling_latency(self, seconds: float):
         if math.isfinite(seconds) and seconds >= 0:
@@ -465,6 +475,12 @@ class MetricsCollector:
             'pickup': task.pickup_location,
             'delivery': task.delivery_location,
             'priority': task.priority,
+            'priority_rank': task.priority_rank,
+            'target_completion_time': task.target_completion_time,
+            'deadline': task.deadline,
+            'deadline_type': task.deadline_type,
+            'deadline_source': task.deadline_source,
+            'late_penalty_per_second': task.late_penalty_per_second,
         })
     
     def record_task_completion(self, task: TransportTask, robot_id: int, sim_time: float):
@@ -481,6 +497,13 @@ class MetricsCollector:
             'execution_time': task.execution_time,
             'pickup': task.pickup_location,
             'delivery': task.delivery_location,
+            'priority_rank': task.priority_rank,
+            'deadline': task.deadline,
+            'deadline_type': task.deadline_type,
+            'tardiness': task.tardiness,
+            'on_time': (None if task.deadline is None else
+                        sim_time <= task.deadline + 1e-9),
+            'business_weight': task.business_weight,
         })
     
     def record_conflict_scan(self, conflicts, sim_time: float) -> None:
@@ -629,6 +652,24 @@ class MetricsCollector:
         active_wait_seconds = sum(
             max(0.0, float(total_time) - episode['started_at'])
             for episode in self._active_planned_waits.values())
+        deadline_completions = [item for item in self.task_completions
+                                if item.get('deadline') is not None]
+        tardiness_values = [float(item.get('tardiness') or 0.0)
+                            for item in deadline_completions]
+        on_time_count = sum(bool(item.get('on_time'))
+                            for item in deadline_completions)
+        weighted_tardiness = sum(
+            float(item.get('tardiness') or 0.0) *
+            float(item.get('business_weight') or 1.0)
+            for item in deadline_completions)
+        arrived_deadline_tasks = [item for item in self.task_arrivals
+                                  if item.get('deadline') is not None]
+        completed_ids = {item['task_id'] for item in self.task_completions
+                         if item.get('task_id') is not None}
+        overdue_unfinished = sum(
+            float(item.get('deadline')) < float(total_time) and
+            item['task_id'] not in completed_ids
+            for item in arrived_deadline_tasks)
         return {
             # Primary KPIs
             "throughput_per_minute": throughput,
@@ -636,6 +677,18 @@ class MetricsCollector:
             "total_tasks_generated": task_stats.get('total_generated', 0),
             "avg_task_completion_time": avg_completion,
             "avg_waiting_time": avg_waiting,
+            "deadline_tasks_arrived": len(arrived_deadline_tasks),
+            "deadline_tasks_completed": len(deadline_completions),
+            "on_time_completed": on_time_count,
+            "on_time_rate_all_arrivals": (
+                on_time_count / max(len(arrived_deadline_tasks), 1)),
+            "hard_deadline_breaches": (
+                sum(value > 0.0 for value in tardiness_values) +
+                overdue_unfinished),
+            "overdue_unfinished_tasks": overdue_unfinished,
+            "total_tardiness_seconds": sum(tardiness_values),
+            "weighted_tardiness": weighted_tardiness,
+            "max_tardiness_seconds": max(tardiness_values, default=0.0),
             "avg_robot_idle_pct": avg_idle_pct,
             "total_distance_all_robots": total_distance,
             "total_conflicts_resolved": coord_stats.get('conflicts_resolved', 0),
@@ -736,11 +789,13 @@ class MetricsCollector:
                 "num_robots": self.num_robots,
                 "sim_duration": total_time,
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "provenance": self.provenance,
             },
             "summary_metrics": final_metrics,
             "task_stats": task_stats,
             "coordination_stats": coord_stats,
             "task_completions": self.task_completions,
+            "rl_event_ledger": self.rl_event_ledger,
             "conflict_events": self.conflict_events,
             "route_dispatch_events": self.route_dispatch_events,
             "route_override_events": self.route_override_events,

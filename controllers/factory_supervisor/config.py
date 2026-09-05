@@ -5,11 +5,20 @@ All factory layout, robot, scheduling, and experiment parameters.
 
 import math
 import os
+import random
 
 # ================================================================
 # SIMULATION PARAMETERS
 # ================================================================
 TIMESTEP = 16          # Webots basic time step in ms
+
+
+def initial_battery_for_robot(experiment_seed: int, robot_id: int,
+                              minimum: float = 25.0,
+                              maximum: float = 100.0) -> float:
+    """Mode-independent deterministic initial battery sample."""
+    return random.Random(
+        int(experiment_seed) * 1000 + int(robot_id)).uniform(minimum, maximum)
 SIM_DURATION = float(os.environ.get("SMART_FACTORY_SIM_DURATION", "1800.0"))
 # A duration is an automatic stop condition only for scripted experiments.
 # Opening the world directly in the Webots GUI is interactive and must keep
@@ -622,7 +631,7 @@ STARTUP_CONFIG = {
 # ================================================================
 # RL TRAINING PARAMETERS (PPO)
 # ================================================================
-RL_ENVIRONMENT_VERSION = "rl-scheduling-v6-noop-bootstrap-ppo-validation"
+RL_ENVIRONMENT_VERSION = "rl-scheduling-v7-deadline-time-aware"
 
 RL_CONFIG = {
     "learning_rate": 3e-4,
@@ -653,18 +662,19 @@ RL_SCHEDULING_CONFIG = {
         "no_op_enabled": True,
     },
     "reward": {
-        "task_completion": 10.0,
-        "valid_assignment": 0.5,
-        "priority": 0.5,
+        "completion": 5.0,
+        "on_time": 3.0,
+        "hard_breach_once": -8.0,
+        "tardiness": -2.0,
+        "valid_assignment": 0.0,
         "invalid_action": -5.0,
-        "no_op": -2.0,
+        "avoidable_wait": -1.0,
+        "forced_wait": 0.0,
         "collision": -100.0,
-        # A deadlock is handled by runtime recovery and is not itself a
-        # safety violation. Penalise only an actual collision.
-        "deadlock": 0.0,
-        "age_bonus": 0.5,
-        "waiting_weight": -0.03,
-        "distance_weight": -0.08,
+        "deadlock_recovery": -1.0,
+        "age_rescue": 0.2,
+        "wait_increment": -0.10,
+        "empty_distance": -0.10,
     },
     "dqn": {
         "backend": "numpy-cpu",

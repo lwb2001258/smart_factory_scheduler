@@ -20,10 +20,13 @@ import os
 import random
 import time
 import numpy as np
+
+from rl_contract import RL_SCHEDULING_CONTRACT
 from dataclasses import dataclass, field
 from typing import Callable, List, Dict, Optional, Tuple, Any
 from abc import ABC, abstractmethod
 from task_generator import TransportTask
+from task_timing import TaskTimingEstimate, estimate_task_timing
 from config import (
     TaskStatus, RobotState, RL_CONFIG,
     REWARD_TASK_COMPLETE, REWARD_IDLE_PENALTY,
@@ -57,6 +60,9 @@ class Assignment:
     robot_id: int
     task: TransportTask
     estimated_cost: Optional[float] = None
+    empty_distance: Optional[float] = None
+    loaded_distance: Optional[float] = None
+    timing: Optional[TaskTimingEstimate] = None
 
 
 @dataclass
@@ -474,28 +480,61 @@ class RoundRobinScheduler(BaseScheduler):
         self.last_assigned_index = -1
 
 
+def estimate_pair_timing(robot_id: int, task: TransportTask,
+                         robot_states: Dict[int, dict],
+                         context: SchedulingContext) -> TaskTimingEstimate:
+    """Return physical pair timing without embedding scheduler weights."""
+    robot_pos = robot_states[robot_id]["position"]
+    provider = context.path_cost_provider
+    segment = getattr(provider, "segment", None)
+    if callable(segment):
+        empty = float(segment(robot_pos, task.pickup_position))
+        loaded = float(segment(task.pickup_position, task.delivery_position))
+    elif provider is not None:
+        total = float(provider(robot_id, task))
+        direct_empty = math.hypot(
+            robot_pos[0] - task.pickup_position[0],
+            robot_pos[1] - task.pickup_position[1])
+        direct_loaded = math.hypot(
+            task.pickup_position[0] - task.delivery_position[0],
+            task.pickup_position[1] - task.delivery_position[1])
+        direct_total = direct_empty + direct_loaded
+        ratio = 0.5 if direct_total <= 1e-9 else direct_empty / direct_total
+        empty, loaded = total * ratio, total * (1.0 - ratio)
+    else:
+        empty = math.hypot(
+            robot_pos[0] - task.pickup_position[0],
+            robot_pos[1] - task.pickup_position[1])
+        loaded = math.hypot(
+            task.pickup_position[0] - task.delivery_position[0],
+            task.pickup_position[1] - task.delivery_position[1])
+    if not math.isfinite(empty + loaded):
+        raise ValueError("unreachable pair")
+    congestion_seconds = float(context.configuration.get(
+        "congestion_delay_seconds", 0.0))
+    return estimate_task_timing(
+        task, current_time=context.current_time, empty_distance=empty,
+        loaded_distance=loaded,
+        speed=float(context.configuration.get("effective_speed", 0.22)),
+        congestion_buffer_seconds=congestion_seconds)
+
+
 def _pair_cost(robot_id: int, task: TransportTask,
                robot_states: Dict[int, dict],
                context: SchedulingContext) -> float:
-    if context.path_cost_provider is not None:
-        try:
-            travel = float(context.path_cost_provider(robot_id, task))
-        except Exception:
-            return float("inf")
-        if not math.isfinite(travel) or travel < 0:
-            return float("inf")
-    else:
-        robot_pos = robot_states[robot_id]["position"]
-        pickup = task.pickup_position
-        delivery = task.delivery_position
-        empty = math.hypot(robot_pos[0] - pickup[0], robot_pos[1] - pickup[1])
-        loaded = math.hypot(pickup[0] - delivery[0], pickup[1] - delivery[1])
-        travel = empty + loaded
+    try:
+        timing = estimate_pair_timing(robot_id, task, robot_states, context)
+    except (TypeError, ValueError, OverflowError):
+        return float("inf")
+    travel = timing.empty_distance + timing.loaded_distance
     weights = {
         "travel": 1.0,
         "priority": 1.0,
         "waiting": 0.01,
         "congestion": 0.05,
+        "hard_breach": 1000.0,
+        "tardiness": 2.0,
+        "deadline_urgency": 10.0,
     }
     weights.update(context.configuration.get("cost_weights", {}))
     waiting = max(0.0, context.current_time - float(task.arrival_time))
@@ -515,9 +554,16 @@ def _pair_cost(robot_id: int, task: TransportTask,
         congestion = sum(samples) / len(samples) if samples else 0.0
     cost = (
         weights["travel"] * travel
-        - weights["priority"] * max(0.0, float(task.priority) - 1.0)
+        - weights["priority"] * max(0.0, float(task.priority_rank) / 100.0 - 1.0)
         - weights["waiting"] * waiting
         + weights["congestion"] * congestion
+        + weights["hard_breach"] * float(
+            timing.hard_slack is not None and timing.hard_slack < 0.0)
+        + weights["tardiness"] * float(timing.predicted_tardiness or 0.0)
+        + weights["deadline_urgency"] * (
+            min(60.0, float(timing.hard_slack)) / 60.0
+            if timing.hard_slack is not None and timing.hard_slack >= 0.0
+            else 0.0)
     )
     return max(0.0, cost)
 
@@ -568,9 +614,12 @@ def _result_from_matching(name: str, matrix: CostMatrix,
                 row >= len(matrix.robot_ids) or column >= len(matrix.tasks) or
                 not matrix.feasible[row, column]):
             continue
+        timing = estimate_pair_timing(
+            matrix.robot_ids[row], matrix.tasks[column], robot_states, context)
         candidate = Assignment(
             matrix.robot_ids[row], matrix.tasks[column],
-            float(matrix.values[row, column]))
+            float(matrix.values[row, column]), timing.empty_distance,
+            timing.loaded_distance, timing)
         valid, _ = validate_assignment(
             candidate, pending_tasks, robot_states, context)
         if valid:
@@ -1140,8 +1189,10 @@ class PPONetwork:
             "pairwise_v1" if self.action_dim > MAX_ROBOTS
             else "legacy_robot_state_v1")
         np.savez(filepath,
-                 schema_version=np.array([3], dtype=np.int64),
+                 schema_version=np.array([4], dtype=np.int64),
                  environment_version=np.array([RL_ENVIRONMENT_VERSION]),
+                 contract_fingerprint=np.array([
+                     RL_SCHEDULING_CONTRACT.fingerprint()]),
                  action_semantics=np.array([action_semantics]),
                  observation_schema=np.array([observation_schema]),
                  state_dim=np.array([self.state_dim], dtype=np.int64),
@@ -1169,10 +1220,10 @@ class PPONetwork:
                     f"checkpoint metadata/weights missing: {sorted(missing)}")
             schema_version = int(data["schema_version"][0])
             environment_version = str(data["environment_version"][0])
-            if schema_version not in {2, 3}:
+            if schema_version not in {2, 3, 4}:
                 raise ModelValidationError(
-                    f"checkpoint schema {schema_version} not in supported {{2, 3}}")
-            if schema_version == 3:
+                    f"checkpoint schema {schema_version} not in supported {{2, 3, 4}}")
+            if schema_version >= 3:
                 semantic_fields = {"action_semantics", "observation_schema"}
                 semantic_missing = semantic_fields.difference(data.files)
                 if semantic_missing:
@@ -1187,6 +1238,14 @@ class PPONetwork:
                     raise ModelValidationError(
                         "PPO action semantics mismatch: "
                         f"{action_semantics!r} != {expected_action_semantics!r}")
+            if schema_version >= 4:
+                if "contract_fingerprint" not in data.files:
+                    raise ModelValidationError(
+                        "PPO contract fingerprint metadata missing")
+                if (str(data["contract_fingerprint"][0]) !=
+                        RL_SCHEDULING_CONTRACT.fingerprint()):
+                    raise ModelValidationError(
+                        "PPO contract fingerprint mismatch")
             if environment_version != RL_ENVIRONMENT_VERSION:
                 raise ModelValidationError(
                     "PPO environment version mismatch: "
@@ -1641,14 +1700,18 @@ def create_scheduler(scheduler_type: str, model_path: Optional[str] = None,
             time_budget_ms=float(os.environ.get("SA_TIME_BUDGET_MS", "5"))),
     }
     
-    if scheduler_type in {"DQN", "SARSA"}:
+    advanced_rl = {"SARSA_LAMBDA", "RAINBOW_DQN", "A2C", "DISCRETE_SAC", "QR_DQN"}
+    if scheduler_type in {"DQN", "SARSA"} | advanced_rl:
         try:
             from rl_schedulers import (
-                DQNScheduler, RLSchedulerSafetyWrapper, SarsaScheduler)
-            scheduler = (
-                DQNScheduler(model_path, seed=seed)
-                if scheduler_type == "DQN"
-                else SarsaScheduler(model_path, seed=seed))
+                AdvancedRLScheduler, DQNScheduler, RLSchedulerSafetyWrapper,
+                SarsaScheduler)
+            if scheduler_type == "DQN":
+                scheduler = DQNScheduler(model_path, seed=seed)
+            elif scheduler_type == "SARSA":
+                scheduler = SarsaScheduler(model_path, seed=seed)
+            else:
+                scheduler = AdvancedRLScheduler(scheduler_type, model_path, seed=seed)
             return RLSchedulerSafetyWrapper(scheduler)
         except ModelValidationError as exc:
             if not allow_safe_fallback:
@@ -1690,4 +1753,4 @@ def create_scheduler(scheduler_type: str, model_path: Optional[str] = None,
         return schedulers[scheduler_type]()
     
     raise ValueError(f"Unknown scheduler type: {scheduler_type}. "
-                     f"Available: {list(schedulers.keys()) + ['PPO_RL', 'DQN', 'SARSA']}")
+                     f"Available: {list(schedulers.keys()) + ['PPO_RL', 'DQN', 'SARSA'] + sorted(advanced_rl)}")

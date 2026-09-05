@@ -1,0 +1,21 @@
+{
+  "algorithm": "QR_DQN",
+  "seed": 7,
+  "episodes": 1,
+  "checkpoint": "results\\advanced_rl_workflow_smoke\\QR_DQN\\model.npz",
+  "environment_mode": "abstract",
+  "manifest_scenario": "A",
+  "validation": {
+    "reward": 49.46084671476604,
+    "updates": 0,
+    "mean_update": null
+  },
+  "history": [
+    {
+      "reward": 48.86618513496103,
+      "updates": 11,
+      "mean_update": 4.672974881800738
+    }
+  ],
+  "test_not_used_for_selection": true
+}

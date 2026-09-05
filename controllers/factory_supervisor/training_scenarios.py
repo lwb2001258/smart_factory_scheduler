@@ -11,6 +11,7 @@ from grid_planner import OccupancyGrid
 from motion_coordinator import MotionCoordinator
 from schedulers import SchedulingContext
 from task_generator import TransportTask
+from experiment_manifest import generate_experiment_manifest
 
 
 _STATIC_COORDINATOR = None
@@ -122,11 +123,49 @@ def factory_scenario(seed: int, max_robots=8, max_tasks=20,
         locations = {**STORAGE_AREAS, **WORKSTATIONS}
         if index:
             arrival_time += float(rng.exponential(mean_interval))
+        priority_rank = int(rng.choice([100, 200, 200, 200, 300, 400]))
         tasks.append(TransportTask(
             index + 1, pickup, delivery, locations[pickup],
             locations[delivery], arrival_time,
-            priority=float(rng.uniform(1.0, 1.5))))
+            priority=priority_rank / 200.0,
+            priority_rank=priority_rank,
+            target_completion_time=arrival_time + 240.0,
+            deadline=arrival_time + 300.0,
+            deadline_type="hard", deadline_source="training_sla"))
     oracle = FactoryAStarCostOracle(robots, robot_count)
     return robots, tasks, SchedulingContext(
         current_time=0.0, path_cost_provider=oracle,
         configuration={"training_geometry": "factory-grid-astar-v3-online"})
+
+
+def manifest_scenario(seed: int, scenario: str, max_tasks: int = 20):
+    """Build a training snapshot from the exact A/B/C evaluation domain."""
+    manifest = generate_experiment_manifest(scenario, seed, duration=1800.0)
+    robots = {
+        rid: {"position": tuple(position), "state": RobotState.IDLE,
+              "battery": float(battery), "current_task": None,
+              "tasks_completed": 0, "total_distance": 0.0}
+        for rid, position, battery in manifest.robots
+    }
+    locations = {**STORAGE_AREAS, **WORKSTATIONS}
+    tasks = [TransportTask(
+        item.task_id, item.pickup_location, item.delivery_location,
+        locations[item.pickup_location], locations[item.delivery_location],
+        item.arrival_time, priority=item.priority,
+        priority_rank=item.priority_rank,
+        target_completion_time=item.target_completion_time,
+        deadline=item.deadline, deadline_type=item.deadline_type,
+        deadline_source=item.deadline_source,
+        late_penalty_per_second=item.late_penalty_per_second,
+        pickup_service_time=item.pickup_service_time,
+        delivery_service_time=item.delivery_service_time)
+        for item in manifest.tasks[:max_tasks]]
+    oracle = FactoryAStarCostOracle(robots, len(robots))
+    return robots, tasks, SchedulingContext(
+        current_time=0.0, path_cost_provider=oracle,
+        configuration={
+            "training_geometry": "factory-grid-astar-v3-online",
+            "manifest_version": manifest.version,
+            "manifest_fingerprint": manifest.fingerprint(),
+            "scenario": scenario,
+        })

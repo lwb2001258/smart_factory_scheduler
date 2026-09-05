@@ -1,4 +1,4 @@
-"""Scheduler adapters and fail-closed safety wrapper for DQN/SARSA."""
+"""Scheduler adapters and fail-closed safety wrapper for RL policies."""
 
 import os
 import time
@@ -13,6 +13,10 @@ from schedulers import (
     PPONetwork, SchedulerResult, SchedulingContext, validate_assignment,
 )
 from task_generator import TransportTask
+
+
+ADVANCED_RL_ALGORITHMS = {
+    "SARSA_LAMBDA", "RAINBOW_DQN", "A2C", "DISCRETE_SAC", "QR_DQN"}
 
 
 class _AgentScheduler(BaseScheduler):
@@ -95,6 +99,45 @@ class DQNScheduler(_AgentScheduler):
             assignment.estimated_cost if assignment else None,
             time.perf_counter() - started, valid, self.name,
             {"reason": reason, "action": locals().get("action")})
+
+
+class AdvancedRLScheduler(_AgentScheduler):
+    """Deployment adapter shared by all new pair-action RL agents."""
+
+    def __init__(self, algorithm: str, model_path: str, seed: int = 42,
+                 env_config: Optional[RLEnvironmentConfig] = None):
+        if algorithm not in ADVANCED_RL_ALGORITHMS:
+            raise ValueError(f"unsupported advanced RL algorithm: {algorithm}")
+        env = SchedulingEnvironment(env_config, simulation_mode="webots")
+        super().__init__(algorithm, env)
+        if not model_path:
+            raise ModelValidationError(f"{algorithm} checkpoint is required for inference")
+        from advanced_rl_agents import advanced_agent_from_checkpoint
+        self.agent = advanced_agent_from_checkpoint(
+            algorithm, model_path, env.observation_dim, env.action_dim,
+            env.no_op_action, seed)
+
+    def assign(self, pending_tasks, robot_states,
+               context: Optional[SchedulingContext] = None):
+        started = time.perf_counter(); context = context or SchedulingContext()
+        try:
+            state = self.environment.set_snapshot(robot_states, pending_tasks, context)
+            mask = self.environment.get_action_mask()
+            policy_state = (self.agent.discretize(state)
+                            if self.name == "SARSA_LAMBDA" else state)
+            action = self.agent.select_action(policy_state, mask, training=False)
+            assignment = self.environment.assignment_for_action(action)
+            valid, reason = validate_assignment(assignment, pending_tasks,
+                                                robot_states, context)
+        except Exception as exc:
+            assignment, valid = None, False
+            reason = f"{self.name.lower()}_inference_error:{type(exc).__name__}"
+        return SchedulerResult(
+            [assignment] if valid and assignment else [],
+            assignment.estimated_cost if assignment else None,
+            time.perf_counter()-started, valid, self.name,
+            {"reason": reason, "action": locals().get("action"),
+             "pairwise_action": True})
 
 
 class PairwisePPOScheduler(_AgentScheduler):
@@ -195,6 +238,24 @@ class RLSchedulerSafetyWrapper(BaseScheduler):
                 self.policy_decisions += 1
                 result.diagnostics.update({
                     "fallback": False,
+                    "inference_ms": result.computation_time * 1000.0,
+                    "policy_decisions": self.policy_decisions,
+                    "fallback_decisions": self.fallback_decisions,
+                    "timeout_count": self.timeout_count,
+                    "timeout_limit_ms": self.timeout_seconds * 1000.0,
+                })
+                return result
+            benign = result.diagnostics.get("reason", "") in {
+                "no_candidates", "no_feasible_pair", "empty_assignment",
+                "empty_assignments"}
+            if benign and not timed_out:
+                # A temporarily empty feasible graph is domain state, not a
+                # policy failure. Falling back cannot create a legal edge and
+                # would permanently inflate fallback counters/disable RL.
+                self.consecutive_failures = 0
+                result.diagnostics.update({
+                    "fallback": False,
+                    "benign_no_decision": True,
                     "inference_ms": result.computation_time * 1000.0,
                     "policy_decisions": self.policy_decisions,
                     "fallback_decisions": self.fallback_decisions,

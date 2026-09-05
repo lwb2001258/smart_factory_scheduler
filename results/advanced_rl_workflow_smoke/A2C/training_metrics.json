@@ -1,0 +1,21 @@
+{
+  "algorithm": "A2C",
+  "seed": 7,
+  "episodes": 1,
+  "checkpoint": "results\\advanced_rl_workflow_smoke\\A2C\\model.npz",
+  "environment_mode": "abstract",
+  "manifest_scenario": "A",
+  "validation": {
+    "reward": 49.240539079208475,
+    "updates": 0,
+    "mean_update": null
+  },
+  "history": [
+    {
+      "reward": 48.244383402984184,
+      "updates": 11,
+      "mean_update": 4.36431715972684
+    }
+  ],
+  "test_not_used_for_selection": true
+}

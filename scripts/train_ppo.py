@@ -41,7 +41,7 @@ from task_generator import TaskGenerator
 from motion_coordinator import MotionCoordinator
 from schedulers import Assignment, PPONetwork, RLScheduler
 from training_scenarios import factory_free_positions
-from training_scenarios import factory_scenario
+from training_scenarios import factory_scenario, manifest_scenario
 from rl_environment import (RLEnvironmentConfig, RewardConfig,
                             SchedulingEnvironment)
 
@@ -58,17 +58,20 @@ class PPOBuffer:
         self.log_probs = []
         self.dones = []
         self.action_masks = []
+        self.bootstrap_discounts = []
         self.advantages = []
         self.returns = []
     
     def add(self, state, action, reward, value, log_prob, done,
-            action_mask=None):
+            action_mask=None, bootstrap_discount=0.99):
         self.states.append(state)
         self.actions.append(action)
         self.rewards.append(reward)
         self.values.append(value)
         self.log_probs.append(log_prob)
         self.dones.append(done)
+        self.bootstrap_discounts.append(
+            0.0 if done else float(bootstrap_discount))
         if action_mask is None:
             action_mask = np.ones(1, dtype=bool)
         self.action_masks.append(np.asarray(action_mask, dtype=bool).copy())
@@ -87,8 +90,11 @@ class PPOBuffer:
             else:
                 next_value = self.values[t + 1]
             
-            delta = self.rewards[t] + gamma * next_value * (1 - self.dones[t]) - self.values[t]
-            gae = delta + gamma * lam * (1 - self.dones[t]) * gae
+            discount = (self.bootstrap_discounts[t]
+                        if self.bootstrap_discounts else
+                        gamma * (1 - self.dones[t]))
+            delta = self.rewards[t] + discount * next_value - self.values[t]
+            gae = delta + discount * lam * gae
             self.advantages[t] = gae
             self.returns[t] = gae + self.values[t]
         
@@ -105,6 +111,7 @@ class PPOBuffer:
         self.log_probs.clear()
         self.dones.clear()
         self.action_masks.clear()
+        self.bootstrap_discounts.clear()
         self.advantages.clear()
         self.returns.clear()
     
@@ -135,12 +142,11 @@ class PPOTrainer:
         # an explicit NO_OP, and the same feasibility mask.
         self.env_config = RLEnvironmentConfig()
         self.reward_config = RewardConfig(
-            task_completion=self.config.get('reward_completion', 12.0),
-            valid_assignment=self.config.get('reward_assignment', 0.75),
-            priority=self.config.get('reward_priority', 0.4),
-            distance_weight=self.config.get('penalty_distance', -0.05),
-            waiting_weight=self.config.get('penalty_waiting', -0.02),
-            age_bonus=self.config.get('reward_age_bonus', 0.3),
+            completion=self.config.get('reward_completion', 5.0),
+            valid_assignment=self.config.get('reward_assignment', 0.0),
+            empty_distance=self.config.get('penalty_distance', -0.10),
+            wait_increment=self.config.get('penalty_waiting', -0.10),
+            age_rescue=self.config.get('reward_age_bonus', 0.2),
         )
         probe = SchedulingEnvironment(
             self.env_config, self.reward_config,
@@ -194,10 +200,11 @@ class PPOTrainer:
     def train_pairwise_episode(self, num_robots: int, max_tasks: int,
                                seed: int, training: bool = True) -> dict:
         """Train/evaluate PPO in the same environment as DQN and SARSA."""
-        robots, tasks, context = factory_scenario(
-            seed, min_robots=num_robots, max_robots=num_robots,
-            max_tasks=self.env_config.max_tasks,
-            max_generated_tasks=max_tasks)
+        scenario_name = {3: "A", 5: "B", 8: "C"}.get(num_robots)
+        if scenario_name is None:
+            raise ValueError("manifest curriculum supports 3, 5, or 8 robots")
+        robots, tasks, context = manifest_scenario(
+            seed, scenario_name, max_tasks=max_tasks)
         env = SchedulingEnvironment(
             self.env_config, self.reward_config,
             simulation_mode="abstract")
@@ -220,7 +227,9 @@ class PPOTrainer:
             if training:
                 self.buffer.add(
                     state, action, float(reward), value, log_prob,
-                    float(terminated or truncated), mask)
+                    float(terminated or truncated), mask,
+                    bootstrap_discount=(0.0 if terminated or truncated else
+                                        env.last_bootstrap_discount))
             state = next_state
             total_reward += float(reward)
             steps += 1
@@ -925,6 +934,10 @@ class PPOTrainer:
                 'total_updates': self.training_step,
                 'update_diagnostics': self.update_diagnostics,
                 'environment_version': RL_ENVIRONMENT_VERSION,
+                'contract_fingerprint': (
+                    self.env_config and
+                    SchedulingEnvironment(
+                        self.env_config).contract_metadata()["fingerprint"]),
                 'observation_dim': self.state_dim,
                 'action_dim': self.action_dim,
                 'action_semantics': 'robot_slot_x_task_slot_plus_no_op',
@@ -963,12 +976,13 @@ def main():
     parser.add_argument("--hidden-size", type=int, default=256)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--resume", help="Existing .npz checkpoint to continue from")
-    parser.add_argument("--reward-completion", type=float, default=12.0)
-    parser.add_argument("--reward-assignment", type=float, default=0.75)
-    parser.add_argument("--reward-priority", type=float, default=0.4)
-    parser.add_argument("--reward-age-bonus", type=float, default=0.3)
-    parser.add_argument("--penalty-distance", type=float, default=-0.05)
-    parser.add_argument("--penalty-waiting", type=float, default=-0.02)
+    parser.add_argument("--reward-completion", type=float, default=5.0)
+    parser.add_argument("--reward-assignment", type=float, default=0.0)
+    parser.add_argument("--reward-priority", type=float, default=0.0,
+                        help="Deprecated; raw priority is not rewarded")
+    parser.add_argument("--reward-age-bonus", type=float, default=0.2)
+    parser.add_argument("--penalty-distance", type=float, default=-0.10)
+    parser.add_argument("--penalty-waiting", type=float, default=-0.10)
     
     args = parser.parse_args()
     

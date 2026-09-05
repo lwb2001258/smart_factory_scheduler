@@ -1,0 +1,71 @@
+{
+  "algorithm": "SARSA",
+  "episodes": 2,
+  "seed": 42,
+  "environment_mode": "abstract",
+  "training_geometry": "factory-grid-astar-v3-online",
+  "curriculum": "A-like(3/5)->B-like(5/8)->C-like(8/12)",
+  "training_seconds": 0.7590455999597907,
+  "best_validation_score": 2001.6093547815162,
+  "history": [
+    {
+      "episode": 1,
+      "reward": 38.5,
+      "loss": null,
+      "epsilon": 0.999,
+      "validation": {
+        "mean_reward": 160.93547815162168,
+        "std_reward": 3.8939721709242603,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.6093547815162
+    },
+    {
+      "episode": 2,
+      "reward": 65.5,
+      "loss": null,
+      "epsilon": 0.998001,
+      "validation": {
+        "mean_reward": 160.93547815162168,
+        "std_reward": 3.8939721709242603,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.6093547815162
+    }
+  ],
+  "best_validation_reward": 160.93547815162168,
+  "best_validation_metrics": {
+    "mean_reward": 160.93547815162168,
+    "std_reward": 3.8939721709242603,
+    "mean_completed": 20.0,
+    "invalid_actions": 0
+  },
+  "reward_config": {
+    "completion": 5.0,
+    "on_time": 3.0,
+    "hard_breach_once": -8.0,
+    "tardiness": -2.0,
+    "valid_assignment": 0.0,
+    "empty_distance": -0.1,
+    "wait_increment": -0.1,
+    "age_rescue": 0.2,
+    "age_scale_seconds": 120.0,
+    "max_age_units": 2.0,
+    "time_scale_seconds": 120.0,
+    "distance_scale_metres": 30.0,
+    "max_tardiness_units": 3.0,
+    "reassignment": -0.25,
+    "replan": -0.05,
+    "deadlock_recovery": -1.0,
+    "failed_retryable": -2.0,
+    "failed_final": -8.0,
+    "post_pickup_abort": -12.0,
+    "invalid_action": -5.0,
+    "avoidable_wait": -1.0,
+    "forced_wait": 0.0,
+    "collision": -100.0
+  },
+  "test_not_used_for_selection": true
+}

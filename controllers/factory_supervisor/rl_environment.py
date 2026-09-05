@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
+import math
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -9,10 +10,14 @@ import numpy as np
 from config import (BATTERY_CAPACITY, BATTERY_DRAIN_RATE, CHARGING_STATIONS,
                     FULL_BATTERY_THRESHOLD, MAX_ROBOTS, MIN_TASK_BATTERY,
                     RL_ENVIRONMENT_VERSION, RobotState, TaskStatus)
+from rl_contract import RL_SCHEDULING_CONTRACT
+from rl_event_ledger import RLEventLedger, reward_for_event
 from schedulers import (
-    Assignment, SchedulingContext, build_cost_matrix, validate_assignment,
+    Assignment, SchedulingContext, build_cost_matrix, estimate_pair_timing,
+    validate_assignment,
 )
 from task_generator import TransportTask
+from time_discount import elapsed_bootstrap_discount
 
 
 ENVIRONMENT_VERSION = RL_ENVIRONMENT_VERSION
@@ -32,23 +37,38 @@ class RLEnvironmentConfig:
 
 @dataclass(frozen=True)
 class RewardConfig:
-    task_completion: float = 10.0
-    valid_assignment: float = 0.5
-    priority: float = 0.5
-    distance_weight: float = -0.08
-    # A bounded age bonus prevents starvation, while the negative waiting
-    # term still optimises mean delay.  Keeping these separate avoids the old
-    # behaviour where unbounded waiting was positively rewarded.
-    age_bonus: float = 0.5
+    completion: float = 5.0
+    on_time: float = 3.0
+    hard_breach_once: float = -8.0
+    tardiness: float = -2.0
+    valid_assignment: float = 0.0
+    empty_distance: float = -0.10
+    wait_increment: float = -0.10
+    age_rescue: float = 0.20
     age_scale_seconds: float = 120.0
-    max_age_bonus_units: float = 2.0
-    waiting_weight: float = -0.03
+    max_age_units: float = 2.0
+    time_scale_seconds: float = 120.0
+    distance_scale_metres: float = 30.0
+    max_tardiness_units: float = 3.0
+    reassignment: float = -0.25
+    replan: float = -0.05
+    deadlock_recovery: float = -1.0
+    failed_retryable: float = -2.0
+    failed_final: float = -8.0
+    post_pickup_abort: float = -12.0
     invalid_action: float = -5.0
-    no_op: float = -2.0
+    avoidable_wait: float = -1.0
+    forced_wait: float = 0.0
     collision: float = -100.0
-    # Waiting/deadlock recovery is reward-neutral unless a real collision is
-    # reported separately.
-    deadlock: float = 0.0
+
+    # Compatibility aliases for old reporting code; no raw priority reward.
+    @property
+    def task_completion(self):
+        return self.completion
+
+    @property
+    def no_op(self):
+        return self.avoidable_wait
 
 
 class SchedulingEnvironment:
@@ -58,9 +78,9 @@ class SchedulingEnvironment:
     and mask only. Abstract mode operates on private deep copies for training.
     """
 
-    ROBOT_FEATURES = 8
-    TASK_FEATURES = 9
-    GLOBAL_FEATURES = 6
+    ROBOT_FEATURES = RL_SCHEDULING_CONTRACT.robot_features
+    TASK_FEATURES = RL_SCHEDULING_CONTRACT.task_features
+    GLOBAL_FEATURES = RL_SCHEDULING_CONTRACT.global_features
 
     def __init__(self, config: Optional[RLEnvironmentConfig] = None,
                  reward: Optional[RewardConfig] = None,
@@ -87,6 +107,27 @@ class SchedulingEnvironment:
         self._completed_ids = set()
         self._cost_matrix = None
         self.rng = np.random.default_rng(0)
+        self.event_ledger = RLEventLedger()
+        self._breached_ids = set()
+        self._decision_sequence = 0
+        self.last_elapsed_seconds = 0.0
+        self.last_bootstrap_discount = 1.0
+        self._terminal_settled = False
+
+    def contract_metadata(self) -> dict:
+        """Return immutable model-interface metadata for audit/provenance."""
+        metadata = RL_SCHEDULING_CONTRACT.metadata()
+        metadata["fingerprint"] = RL_SCHEDULING_CONTRACT.fingerprint()
+        if (self.config.max_robots != RL_SCHEDULING_CONTRACT.max_robots or
+                self.config.max_tasks != RL_SCHEDULING_CONTRACT.max_tasks):
+            metadata["runtime_override"] = {
+                "max_robots": self.config.max_robots,
+                "max_tasks": self.config.max_tasks,
+                "observation_dim": self.observation_dim,
+                "action_dim": self.action_dim,
+                "no_op_action": self.no_op_action,
+            }
+        return metadata
 
     def reset(self, robot_states: Optional[Dict[int, dict]] = None,
               tasks: Optional[List[TransportTask]] = None,
@@ -107,6 +148,12 @@ class SchedulingEnvironment:
             bind(self._robots)
         self._step = 0
         self._completed_ids.clear()
+        self.event_ledger = RLEventLedger()
+        self._breached_ids.clear()
+        self._decision_sequence = 0
+        self.last_elapsed_seconds = 0.0
+        self.last_bootstrap_discount = 1.0
+        self._terminal_settled = False
         self._refresh_slots()
         self._cost_matrix = None
         # Mirror Supervisor's pre-dispatch battery guard for an initial
@@ -209,6 +256,26 @@ class SchedulingEnvironment:
         congestion = self._context.congestion_map
         mean_congestion = float(np.mean(congestion)) if congestion else 0.0
         mask = self.get_action_mask()
+        at_risk = 0
+        breached = 0
+        for task in self._task_slots:
+            if task.deadline is None:
+                continue
+            if float(task.deadline) < float(self._context.current_time):
+                breached += 1
+                continue
+            estimates = []
+            for rid in self._robot_slots:
+                try:
+                    estimates.append(estimate_pair_timing(
+                        rid, task, self._robots, self._context))
+                except (TypeError, ValueError, OverflowError):
+                    continue
+            best_slack = max(
+                (item.hard_slack for item in estimates
+                 if item.hard_slack is not None), default=None)
+            if best_slack is not None and best_slack <= 60.0:
+                at_risk += 1
         global_features = [
             np.clip(self._context.current_time / cfg.time_scale, 0, 10),
             pending / max(1, cfg.max_tasks),
@@ -216,6 +283,8 @@ class SchedulingEnvironment:
             np.clip(mean_congestion, 0, 10),
             float(mask[:-1].mean()) if self.no_op_action else 0.0,
             self._step / max(1, cfg.max_steps_per_episode),
+            at_risk / max(1, cfg.max_tasks),
+            breached / max(1, cfg.max_tasks),
         ]
         robot_values = []
         robot_mask = []
@@ -255,6 +324,25 @@ class SchedulingEnvironment:
                     matrix.values[:, ti][feasible] if ti is not None
                     else np.zeros(0))
                 expected = float(costs.min()) if costs.size else 0.0
+                timing_candidates = []
+                for ri, rid in enumerate(matrix.robot_ids):
+                    if ti is None or not matrix.feasible[ri, ti]:
+                        continue
+                    try:
+                        timing_candidates.append(estimate_pair_timing(
+                            rid, task, self._robots, self._context))
+                    except (TypeError, ValueError, OverflowError):
+                        continue
+                timing = min(
+                    timing_candidates,
+                    key=lambda item: item.conservative_completion,
+                    default=None)
+                soft_slack = 0.0 if timing is None or timing.soft_slack is None else (
+                    timing.soft_slack / cfg.time_scale)
+                hard_slack = 0.0 if timing is None or timing.hard_slack is None else (
+                    timing.hard_slack / cfg.time_scale)
+                predicted_late = 0.0 if timing is None else float(
+                    timing.predicted_tardiness or 0.0) / cfg.time_scale
                 task_values.extend([
                     px / cfg.position_scale_x, py / cfg.position_scale_y,
                     dx / cfg.position_scale_x, dy / cfg.position_scale_y,
@@ -263,6 +351,10 @@ class SchedulingEnvironment:
                     float(task.status == TaskStatus.PENDING),
                     feasible_fraction,
                     min(expected / cfg.distance_scale, 10),
+                    float(task.deadline is not None),
+                    np.clip(soft_slack, -10, 10),
+                    np.clip(hard_slack, -10, 10),
+                    np.clip(predicted_late, 0, 10),
                 ])
                 task_mask.append(1.0)
             else:
@@ -279,42 +371,60 @@ class SchedulingEnvironment:
         if self.simulation_mode != "abstract":
             raise RuntimeError("step is only available in abstract mode")
         mask = self.get_action_mask()
+        self.last_elapsed_seconds = 0.0
+        self.last_bootstrap_discount = 1.0
         self._step += 1
         if not (0 <= action < self.action_dim) or not mask[action]:
-            return self.observe(), self.reward_config.invalid_action, False, (
-                self._step >= self.config.max_steps_per_episode
-            ), {"invalid_action": True}
+            event = self.event_ledger.append(
+                "invalid_action", self._context.current_time, action=action)
+            truncated = self._step >= self.config.max_steps_per_episode
+            reward = reward_for_event(event, self.reward_config)
+            reward += self._settle_terminal_pending(False, truncated)
+            return self.observe(), reward, False, truncated, {
+                "invalid_action": True}
         if action == self.no_op_action:
             had_active = self._has_active_executions()
             had_future = self._has_future_arrivals()
+            event_start = len(self.event_ledger.events)
             completed = self._advance_to_next_completion()
             terminated = self._is_terminal_state()
-            reward = (completed * self.reward_config.task_completion
-                      if completed else
-                      (0.0 if had_active or had_future
-                       else self.reward_config.no_op))
+            if completed:
+                reward = sum(
+                    reward_for_event(item, self.reward_config)
+                    for item in self.event_ledger.events[event_start:])
+            else:
+                event = self.event_ledger.append(
+                    "no_op", self._context.current_time,
+                    productive_wait=bool(had_active or had_future))
+                reward = reward_for_event(event, self.reward_config)
             self._cost_matrix = None
-            return self.observe(), float(reward), terminated, False, {
+            truncated = (not terminated and
+                         self._step >= self.config.max_steps_per_episode)
+            reward += self._settle_terminal_pending(terminated, truncated)
+            return self.observe(), float(reward), terminated, truncated, {
                 "no_op": True, "completed_this_step": completed,
                 "completed_count": len(self._completed_ids)}
         assignment = self.assignment_for_action(action)
         if assignment is None:
-            return self.observe(), self.reward_config.invalid_action, False, False, {
+            event = self.event_ledger.append(
+                "invalid_action", self._context.current_time, action=action,
+                reason="assignment_decode_failed")
+            truncated = self._step >= self.config.max_steps_per_episode
+            reward = reward_for_event(event, self.reward_config)
+            reward += self._settle_terminal_pending(False, truncated)
+            return self.observe(), reward, False, truncated, {
                 "invalid_action": True}
         task = assignment.task
         robot = self._robots[assignment.robot_id]
         wait = max(0.0, self._context.current_time - task.arrival_time)
-        reward = (
-            self.reward_config.valid_assignment
-            + self.reward_config.priority * max(0.0, float(task.priority))
-            + self.reward_config.age_bonus * min(
-                wait / max(self.reward_config.age_scale_seconds, 1e-6),
-                self.reward_config.max_age_bonus_units)
-            + self.reward_config.distance_weight * float(assignment.estimated_cost or 0)
-            + self.reward_config.waiting_weight * min(
-                wait / max(self.reward_config.age_scale_seconds, 1e-6),
-                self.reward_config.max_age_bonus_units)
-        )
+        assignment_event = self.event_ledger.append(
+            "assignment_committed", self._context.current_time,
+            robot_id=assignment.robot_id, task_id=task.task_id,
+            priority_rank=int(task.priority_rank), waiting_seconds=wait,
+            empty_distance=float(assignment.empty_distance or 0.0),
+            estimated_cost=float(assignment.estimated_cost or 0.0),
+            decision_id=self._next_decision_id())
+        reward = reward_for_event(assignment_event, self.reward_config)
         # Commit the dispatch exactly as FactorySupervisor does. Completion is
         # a later discrete event, so multiple robots can remain active at the
         # same time instead of one robot completing every task instantaneously.
@@ -326,9 +436,14 @@ class SchedulingEnvironment:
         robot["has_task"] = True
         robot["goal_location"] = task.pickup_location
 
-        travel_distance = max(0.0, float(assignment.estimated_cost or 0.0))
-        travel_seconds = travel_distance / ABSTRACT_LINEAR_SPEED
-        pickup_distance = self._pickup_leg_distance(assignment)
+        pickup_distance = max(0.0, float(
+            assignment.empty_distance if assignment.empty_distance is not None
+            else self._pickup_leg_distance(assignment)))
+        loaded_distance = max(0.0, float(assignment.loaded_distance or 0.0))
+        travel_distance = pickup_distance + loaded_distance
+        travel_seconds = (travel_distance / ABSTRACT_LINEAR_SPEED
+                          + task.pickup_service_time
+                          + task.delivery_service_time)
         pickup_seconds = pickup_distance / ABSTRACT_LINEAR_SPEED
         robot["_abstract_execution"] = {
             "kind": "task",
@@ -336,6 +451,7 @@ class SchedulingEnvironment:
             "pickup_time": self._context.current_time + pickup_seconds,
             "completion_time": self._context.current_time + travel_seconds,
             "distance": travel_distance,
+            "decision_id": assignment_event.values["decision_id"],
         }
         self._cost_matrix = None
 
@@ -343,11 +459,16 @@ class SchedulingEnvironment:
         # event. This is the event-driven equivalent of Webots continuing to
         # step while no idle robot is available.
         completed = 0
+        event_start = len(self.event_ledger.events)
         if not self.get_action_mask()[:-1].any():
             completed = self._advance_to_next_completion()
-            reward += completed * self.reward_config.task_completion
+            if completed:
+                new_events = self.event_ledger.events[event_start:]
+                reward += sum(reward_for_event(item, self.reward_config)
+                              for item in new_events)
         terminated = self._is_terminal_state()
         truncated = self._step >= self.config.max_steps_per_episode
+        reward += self._settle_terminal_pending(terminated, truncated)
         return self.observe(), float(reward), bool(terminated), bool(truncated), {
             "assignment": (assignment.robot_id, task.task_id),
             "completed_this_step": completed,
@@ -369,6 +490,17 @@ class SchedulingEnvironment:
         if not event_times:
             return 0
         event_time = min(event_times)
+        elapsed = max(0.0, event_time - now)
+        self.last_elapsed_seconds = elapsed
+        self.last_bootstrap_discount = elapsed_bootstrap_discount(elapsed)
+        pending_count = sum(
+            task.status == TaskStatus.PENDING and task.arrival_time <= now + 1e-9
+            for task in self._tasks)
+        if elapsed > 0.0 and pending_count:
+            self.event_ledger.append(
+                "queue_wait_advanced", event_time,
+                pending_wait_increment=elapsed * pending_count,
+                elapsed_seconds=elapsed)
         self._context = replace(self._context, current_time=event_time)
         completed = 0
         for _, rid in executions:
@@ -395,10 +527,12 @@ class SchedulingEnvironment:
                 continue
             task = execution["task"]
             task.pickup_time = float(execution["pickup_time"])
+            task.cargo_state = "onboard"
             task.status = TaskStatus.IN_PROGRESS
             robot["state"] = RobotState.EN_ROUTE_DELIVERY
             task.completion_time = event_time
             task.status = TaskStatus.COMPLETED
+            task.cargo_state = "delivered"
             robot["position"] = tuple(task.delivery_position)
             travel_distance = float(execution["distance"])
             travel_seconds = max(0.0, event_time - float(task.assignment_time))
@@ -416,6 +550,23 @@ class SchedulingEnvironment:
             robot.pop("_abstract_execution", None)
             self._completed_ids.add(task.task_id)
             completed += 1
+            tardiness = task.tardiness
+            on_time = tardiness is None or tardiness <= 1e-9
+            if (task.deadline is not None and not on_time and
+                    task.task_id not in self._breached_ids):
+                self._breached_ids.add(task.task_id)
+                self.event_ledger.append(
+                    "deadline_breached", event_time, robot_id=rid,
+                    task_id=task.task_id,
+                    business_weight=task.business_weight,
+                    decision_id=execution.get("decision_id"))
+            self.event_ledger.append(
+                "task_completed_on_time" if on_time else "task_completed_late",
+                event_time, robot_id=rid, task_id=task.task_id,
+                count=1, on_time=on_time,
+                tardiness_seconds=float(tardiness or 0.0),
+                business_weight=task.business_weight,
+                decision_id=execution.get("decision_id"))
             self._schedule_charge_if_required(rid, event_time)
         self._cost_matrix = None
         return completed
@@ -480,3 +631,22 @@ class SchedulingEnvironment:
 
     def is_terminal(self) -> bool:
         return self._is_terminal_state()
+
+    def _next_decision_id(self) -> str:
+        self._decision_sequence += 1
+        return f"decision-{self._decision_sequence}"
+
+    def _settle_terminal_pending(self, terminated: bool,
+                                 truncated: bool) -> float:
+        if self._terminal_settled or not (terminated or truncated):
+            return 0.0
+        self._terminal_settled = True
+        remaining = [task for task in self._tasks
+                     if task.status != TaskStatus.COMPLETED]
+        if not remaining:
+            return 0.0
+        loss = sum(float(task.business_weight) for task in remaining)
+        event = self.event_ledger.append(
+            "episode_terminated_with_pending", self._context.current_time,
+            remaining_count=len(remaining), remaining_business_loss=loss)
+        return reward_for_event(event, self.reward_config)

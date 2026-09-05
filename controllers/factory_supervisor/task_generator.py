@@ -30,6 +30,16 @@ class TransportTask:
     pickup_time: Optional[float] = None
     completion_time: Optional[float] = None
     priority: float = 1.0         # Higher = more urgent
+    priority_rank: int = 200      # Higher = more urgent; stable business rank
+    target_completion_time: Optional[float] = None
+    deadline: Optional[float] = None  # Delivery service completion deadline
+    deadline_type: str = "none"      # none / soft / hard
+    deadline_source: str = "none"
+    late_penalty_per_second: float = 1.0
+    pickup_service_time: float = 0.0  # Webots service is instantaneous in v1
+    delivery_service_time: float = 0.0
+    cargo_state: str = "not_picked"  # not_picked / onboard / delivered
+    reassignment_count: int = 0
 
     @property
     def waiting_time(self) -> Optional[float]:
@@ -51,6 +61,19 @@ class TransportTask:
         if self.completion_time is not None and self.assignment_time is not None:
             return self.completion_time - self.assignment_time
         return None
+
+    @property
+    def tardiness(self) -> Optional[float]:
+        """Seconds late at delivery completion, or None without a deadline."""
+        if self.deadline is None or self.completion_time is None:
+            return None
+        return max(0.0, self.completion_time - self.deadline)
+
+    @property
+    def business_weight(self) -> float:
+        """Bounded value used for completion and lateness accounting."""
+        return {400: 4.0, 300: 2.5, 200: 1.0, 100: 0.5}.get(
+            int(self.priority_rank), max(0.5, self.priority_rank / 200.0))
 
 
 class TaskGenerator:
@@ -127,6 +150,15 @@ class TaskGenerator:
             pickup_loc, delivery_loc = self._generate_task_pair()
             
             self.task_counter += 1
+            priority_draw = self.rng.random()
+            if priority_draw < 0.02:
+                priority_rank, sla = 400, 120.0
+            elif priority_draw < 0.15:
+                priority_rank, sla = 300, 180.0
+            elif priority_draw < 0.80:
+                priority_rank, sla = 200, 300.0
+            else:
+                priority_rank, sla = 100, 480.0
             task = TransportTask(
                 task_id=self.task_counter,
                 pickup_location=pickup_loc,
@@ -134,7 +166,12 @@ class TaskGenerator:
                 pickup_position=ALL_LOCATIONS[pickup_loc],
                 delivery_position=ALL_LOCATIONS[delivery_loc],
                 arrival_time=current_time,
-                priority=1.0 + self.rng.random() * 0.5  # slight priority variation
+                priority=priority_rank / 200.0,
+                priority_rank=priority_rank,
+                target_completion_time=current_time + 0.8 * sla,
+                deadline=current_time + sla,
+                deadline_type="hard",
+                deadline_source="simulation_sla",
             )
             
             self.tasks_generated.append(task)

@@ -1,0 +1,380 @@
+{
+  "algorithm": "DQN",
+  "episodes": 50,
+  "seed": 42,
+  "environment_mode": "abstract",
+  "training_geometry": "factory-grid-astar-v3-online",
+  "curriculum": "A-like(3/5)->B-like(5/8)->C-like(8/12)",
+  "training_seconds": 11.058917800022755,
+  "best_validation_score": 2001.6093469437253,
+  "history": [
+    {
+      "episode": 1,
+      "reward": 38.5,
+      "loss": null,
+      "epsilon": 1.0
+    },
+    {
+      "episode": 2,
+      "reward": 37.0,
+      "loss": null,
+      "epsilon": 1.0
+    },
+    {
+      "episode": 3,
+      "reward": 47.5,
+      "loss": null,
+      "epsilon": 1.0
+    },
+    {
+      "episode": 4,
+      "reward": 40.0,
+      "loss": null,
+      "epsilon": 1.0
+    },
+    {
+      "episode": 5,
+      "reward": 41.5,
+      "loss": null,
+      "epsilon": 1.0
+    },
+    {
+      "episode": 6,
+      "reward": 44.5,
+      "loss": null,
+      "epsilon": 1.0
+    },
+    {
+      "episode": 7,
+      "reward": 40.0,
+      "loss": 3.862950086593628,
+      "epsilon": 0.9998628
+    },
+    {
+      "episode": 8,
+      "reward": 49.0,
+      "loss": 3.2604623079299926,
+      "epsilon": 0.9996668
+    },
+    {
+      "episode": 9,
+      "reward": 40.0039412244682,
+      "loss": 3.5253089557994497,
+      "epsilon": 0.9994512
+    },
+    {
+      "episode": 10,
+      "reward": 40.0,
+      "loss": 3.814368414878845,
+      "epsilon": 0.9992552,
+      "validation": {
+        "mean_reward": 160.91312765474333,
+        "std_reward": 3.8775260741132676,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.6091312765475
+    },
+    {
+      "episode": 11,
+      "reward": 37.0,
+      "loss": 3.45925480669195,
+      "epsilon": 0.9990396
+    },
+    {
+      "episode": 12,
+      "reward": 44.5,
+      "loss": 3.352815937995911,
+      "epsilon": 0.9988436
+    },
+    {
+      "episode": 13,
+      "reward": 38.5,
+      "loss": 3.352514386177063,
+      "epsilon": 0.9986476
+    },
+    {
+      "episode": 14,
+      "reward": 38.528128128404354,
+      "loss": 3.1265011072158813,
+      "epsilon": 0.9984516
+    },
+    {
+      "episode": 15,
+      "reward": 43.0,
+      "loss": 2.809905030510642,
+      "epsilon": 0.998236
+    },
+    {
+      "episode": 16,
+      "reward": 62.5,
+      "loss": 3.0433067977428436,
+      "epsilon": 0.9979224
+    },
+    {
+      "episode": 17,
+      "reward": 68.5,
+      "loss": 3.00564007461071,
+      "epsilon": 0.9976088
+    },
+    {
+      "episode": 18,
+      "reward": 64.0,
+      "loss": 2.9597641676664352,
+      "epsilon": 0.9972952
+    },
+    {
+      "episode": 19,
+      "reward": 70.0,
+      "loss": 2.9592000246047974,
+      "epsilon": 0.9969816
+    },
+    {
+      "episode": 20,
+      "reward": 64.0017317919156,
+      "loss": 2.7876572981476784,
+      "epsilon": 0.996668,
+      "validation": {
+        "mean_reward": 160.9346943725349,
+        "std_reward": 3.8941049643256997,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.6093469437253
+    },
+    {
+      "episode": 21,
+      "reward": 71.5,
+      "loss": 3.061965872259701,
+      "epsilon": 0.9963348
+    },
+    {
+      "episode": 22,
+      "reward": 67.00410358098054,
+      "loss": 2.717950791120529,
+      "epsilon": 0.9960212
+    },
+    {
+      "episode": 23,
+      "reward": 58.004210247647215,
+      "loss": 2.6686775013804436,
+      "epsilon": 0.9957076
+    },
+    {
+      "episode": 24,
+      "reward": 67.0,
+      "loss": 2.52660159021616,
+      "epsilon": 0.995394
+    },
+    {
+      "episode": 25,
+      "reward": 70.02937848476863,
+      "loss": 2.6688864305615425,
+      "epsilon": 0.9950804
+    },
+    {
+      "episode": 26,
+      "reward": 62.5,
+      "loss": 2.665462613105774,
+      "epsilon": 0.9947668
+    },
+    {
+      "episode": 27,
+      "reward": 73.0,
+      "loss": 2.2514503672719,
+      "epsilon": 0.9944532
+    },
+    {
+      "episode": 28,
+      "reward": 62.5,
+      "loss": 2.441304894054637,
+      "epsilon": 0.99412
+    },
+    {
+      "episode": 29,
+      "reward": 62.5,
+      "loss": 2.450893107582541,
+      "epsilon": 0.9937868
+    },
+    {
+      "episode": 30,
+      "reward": 61.0,
+      "loss": 2.323999762535095,
+      "epsilon": 0.9934732,
+      "validation": {
+        "mean_reward": 160.92045511100554,
+        "std_reward": 3.880514147601895,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.60920455111
+    },
+    {
+      "episode": 31,
+      "reward": 96.00420474230016,
+      "loss": 2.298774247368177,
+      "epsilon": 0.9930028
+    },
+    {
+      "episode": 32,
+      "reward": 94.5,
+      "loss": 2.206453944245974,
+      "epsilon": 0.9925324
+    },
+    {
+      "episode": 33,
+      "reward": 97.5,
+      "loss": 2.1716957141955695,
+      "epsilon": 0.992062
+    },
+    {
+      "episode": 34,
+      "reward": 96.0,
+      "loss": 2.138861964146296,
+      "epsilon": 0.9915916
+    },
+    {
+      "episode": 35,
+      "reward": 93.0,
+      "loss": 2.1401009654998777,
+      "epsilon": 0.9911016
+    },
+    {
+      "episode": 36,
+      "reward": 94.5,
+      "loss": 2.123634864886602,
+      "epsilon": 0.9906312
+    },
+    {
+      "episode": 37,
+      "reward": 121.5,
+      "loss": 2.2059782842795053,
+      "epsilon": 0.9901608
+    },
+    {
+      "episode": 38,
+      "reward": 97.5,
+      "loss": 4.569072812795639,
+      "epsilon": 0.9896904
+    },
+    {
+      "episode": 39,
+      "reward": 106.5,
+      "loss": 3.169101059436798,
+      "epsilon": 0.98922
+    },
+    {
+      "episode": 40,
+      "reward": 100.51541063344872,
+      "loss": 2.891118383407593,
+      "epsilon": 0.98873,
+      "validation": {
+        "mean_reward": 160.9115326238254,
+        "std_reward": 3.872558798733327,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.6091153262382
+    },
+    {
+      "episode": 41,
+      "reward": 96.01288271978063,
+      "loss": 2.754978995323181,
+      "epsilon": 0.98824
+    },
+    {
+      "episode": 42,
+      "reward": 112.5,
+      "loss": 2.7761676013469696,
+      "epsilon": 0.9877696
+    },
+    {
+      "episode": 43,
+      "reward": 105.0,
+      "loss": 2.6170164396365485,
+      "epsilon": 0.9872992
+    },
+    {
+      "episode": 44,
+      "reward": 112.5,
+      "loss": 2.6587937424580255,
+      "epsilon": 0.9868288
+    },
+    {
+      "episode": 45,
+      "reward": 97.50328278193419,
+      "loss": 2.674205074707667,
+      "epsilon": 0.9863584
+    },
+    {
+      "episode": 46,
+      "reward": 94.5,
+      "loss": 2.571375222206116,
+      "epsilon": 0.9858684
+    },
+    {
+      "episode": 47,
+      "reward": 97.5,
+      "loss": 2.876789312362671,
+      "epsilon": 0.9853784
+    },
+    {
+      "episode": 48,
+      "reward": 88.5,
+      "loss": 2.7665771146615348,
+      "epsilon": 0.984908
+    },
+    {
+      "episode": 49,
+      "reward": 96.0,
+      "loss": 2.850587303439776,
+      "epsilon": 0.9844376
+    },
+    {
+      "episode": 50,
+      "reward": 105.0,
+      "loss": 3.024308052062988,
+      "epsilon": 0.9839476,
+      "validation": {
+        "mean_reward": 160.90731817465317,
+        "std_reward": 3.8719351834068236,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.6090731817465
+    }
+  ],
+  "best_validation_reward": 160.9346943725349,
+  "best_validation_metrics": {
+    "mean_reward": 160.9346943725349,
+    "std_reward": 3.8941049643256997,
+    "mean_completed": 20.0,
+    "invalid_actions": 0
+  },
+  "reward_config": {
+    "completion": 5.0,
+    "on_time": 3.0,
+    "hard_breach_once": -8.0,
+    "tardiness": -2.0,
+    "valid_assignment": 0.0,
+    "empty_distance": -0.1,
+    "wait_increment": -0.1,
+    "age_rescue": 0.2,
+    "age_scale_seconds": 120.0,
+    "max_age_units": 2.0,
+    "time_scale_seconds": 120.0,
+    "distance_scale_metres": 30.0,
+    "max_tardiness_units": 3.0,
+    "reassignment": -0.25,
+    "replan": -0.05,
+    "deadlock_recovery": -1.0,
+    "failed_retryable": -2.0,
+    "failed_final": -8.0,
+    "post_pickup_abort": -12.0,
+    "invalid_action": -5.0,
+    "avoidable_wait": -1.0,
+    "forced_wait": 0.0,
+    "collision": -100.0
+  },
+  "test_not_used_for_selection": true
+}

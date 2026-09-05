@@ -10,6 +10,7 @@ from typing import Dict, Optional, Sequence, Tuple
 import numpy as np
 
 from rl_environment import ENVIRONMENT_VERSION
+from rl_contract import RL_SCHEDULING_CONTRACT
 from schedulers import ModelValidationError
 
 
@@ -72,11 +73,13 @@ class SarsaAgent:
 
     def update(self, state: Tuple[int, ...], action: int, reward: float,
                next_state: Tuple[int, ...], next_action: int,
-               done: bool) -> float:
+               done: bool, bootstrap_discount: Optional[float] = None) -> float:
         q = self.values(state)
         target = float(reward)
         if not done:
-            target += self.config.gamma * float(
+            discount = (self.config.gamma if bootstrap_discount is None else
+                        float(bootstrap_discount))
+            target += discount * float(
                 self.values(next_state)[next_action])
         td_error = target - float(q[action])
         q[action] += self.config.learning_rate * td_error
@@ -91,6 +94,7 @@ class SarsaAgent:
     def save(self, path: str) -> None:
         payload = {
             "algorithm": "SARSA", "environment_version": ENVIRONMENT_VERSION,
+            "contract_fingerprint": RL_SCHEDULING_CONTRACT.fingerprint(),
             "action_dim": self.action_dim, "no_op_action": self.no_op_action,
             "epsilon": self.epsilon, "episode": self.episode,
             "config": asdict(self.config), "seed": self.seed,
@@ -111,6 +115,10 @@ class SarsaAgent:
             raise ModelValidationError("SARSA environment version mismatch")
         if payload.get("action_dim") != self.action_dim:
             raise ModelValidationError("SARSA action dimension mismatch")
+        fingerprint = payload.get("contract_fingerprint")
+        if (fingerprint is not None and
+                fingerprint != RL_SCHEDULING_CONTRACT.fingerprint()):
+            raise ModelValidationError("SARSA contract fingerprint mismatch")
         self.epsilon = float(payload["epsilon"])
         self.episode = int(payload["episode"])
         self.q_table = {}
@@ -219,11 +227,14 @@ class ReplayBuffer:
     def __len__(self):
         return len(self.data)
 
-    def add(self, state, action, reward, next_state, done, next_action_mask):
+    def add(self, state, action, reward, next_state, done, next_action_mask,
+            bootstrap_discount=None):
+        discount = 0.0 if done else (
+            1.0 if bootstrap_discount is None else float(bootstrap_discount))
         self.data.append((
             np.asarray(state, np.float32).copy(), int(action), float(reward),
             np.asarray(next_state, np.float32).copy(), bool(done),
-            np.asarray(next_action_mask, bool).copy()))
+            np.asarray(next_action_mask, bool).copy(), discount))
 
     def sample(self, size: int):
         indices = self.rng.choice(len(self.data), size=size, replace=False)
@@ -234,6 +245,7 @@ class ReplayBuffer:
             np.stack([r[3] for r in rows]),
             np.asarray([r[4] for r in rows], np.float32),
             np.stack([r[5] for r in rows]),
+            np.asarray([r[6] for r in rows], np.float32),
         )
 
 
@@ -272,9 +284,12 @@ class DQNAgent:
         return int(legal[np.argmax(q[legal])])
 
     def remember(self, *transition) -> None:
+        if len(transition) == 6:
+            transition = (*transition, self.config.gamma)
         self.replay.add(*transition)
 
-    def _targets(self, rewards, next_states, dones, next_masks):
+    def _targets(self, rewards, next_states, dones, next_masks,
+                 bootstrap_discounts=None):
         online_q = self.online.forward(next_states)
         target_q = self.target.forward(next_states)
         future = np.zeros(len(rewards), np.float32)
@@ -287,7 +302,10 @@ class DQNAgent:
                 future[index] = target_q[index, action]
             else:
                 future[index] = np.max(target_q[index, legal])
-        targets = rewards + self.config.gamma * (1.0 - dones) * future
+        discounts = (self.config.gamma * (1.0 - dones)
+                     if bootstrap_discounts is None else
+                     np.asarray(bootstrap_discounts, np.float32))
+        targets = rewards + discounts * future
         if not np.isfinite(targets).all():
             raise ValueError("non-finite DQN target")
         return targets
@@ -296,9 +314,10 @@ class DQNAgent:
         minimum = max(self.config.warmup_steps, self.config.batch_size)
         if len(self.replay) < minimum:
             return None
-        states, actions, rewards, next_states, dones, masks = (
+        states, actions, rewards, next_states, dones, masks, discounts = (
             self.replay.sample(self.config.batch_size))
-        targets = self._targets(rewards, next_states, dones, masks)
+        targets = self._targets(
+            rewards, next_states, dones, masks, discounts)
         q, cache = self.online.forward(states, cache=True)
         chosen = q[np.arange(len(actions)), actions]
         error = chosen - targets
@@ -339,6 +358,7 @@ class DQNAgent:
     def save(self, path: str) -> None:
         payload = {
             "algorithm": "DQN", "environment_version": ENVIRONMENT_VERSION,
+            "contract_fingerprint": RL_SCHEDULING_CONTRACT.fingerprint(),
             "state_dim": self.state_dim, "action_dim": self.action_dim,
             "no_op_action": self.no_op_action, "config": asdict(self.config),
             "training_step": self.training_step, "episode": self.episode,
@@ -362,6 +382,10 @@ class DQNAgent:
                   payload.get("state_dim"), payload.get("action_dim"))
         if actual != expected:
             raise ModelValidationError("DQN checkpoint metadata mismatch")
+        fingerprint = payload.get("contract_fingerprint")
+        if (fingerprint is not None and
+                fingerprint != RL_SCHEDULING_CONTRACT.fingerprint()):
+            raise ModelValidationError("DQN contract fingerprint mismatch")
         for network_name, network in (("online", self.online),
                                       ("target", self.target)):
             params = payload.get(network_name, {})

@@ -17,11 +17,14 @@ sys.path.insert(0, str(SUPERVISOR))
 from rl_agents import DQNAgent, DQNConfig, SarsaAgent, SarsaConfig
 from rl_environment import (RLEnvironmentConfig, RewardConfig,
                             SchedulingEnvironment)
-from training_scenarios import factory_scenario
+from training_scenarios import manifest_scenario
 
 
 def scenario(seed: int, max_robots=8, max_tasks=20):
-    return factory_scenario(seed, max_robots=max_robots, max_tasks=max_tasks)
+    scenario_name = {3: "A", 5: "B", 8: "C"}.get(max_robots)
+    if scenario_name is None:
+        raise ValueError("manifest curriculum supports 3, 5, or 8 robots")
+    return manifest_scenario(seed, scenario_name, max_tasks=max_tasks)
 
 
 def evaluate(agent, algorithm: str, seeds, env_config, reward_config=None):
@@ -69,14 +72,13 @@ def validation_selection_score(metrics):
 def train(args):
     env_config = RLEnvironmentConfig()
     reward_config = RewardConfig(
-        task_completion=args.reward_completion,
+        completion=args.reward_completion,
         valid_assignment=args.reward_assignment,
-        priority=args.reward_priority,
-        distance_weight=args.penalty_distance,
-        waiting_weight=args.penalty_waiting,
-        age_bonus=args.reward_age_bonus,
+        empty_distance=args.penalty_distance,
+        wait_increment=args.penalty_waiting,
+        age_rescue=args.reward_age_bonus,
         invalid_action=args.penalty_invalid,
-        no_op=args.penalty_no_op,
+        avoidable_wait=args.penalty_no_op,
         collision=args.penalty_collision)
     probe = SchedulingEnvironment(env_config, reward_config)
     if args.algorithm == "sarsa":
@@ -137,11 +139,15 @@ def train(args):
             if args.algorithm == "sarsa":
                 next_key = agent.discretize(next_state)
                 next_action = agent.select_action(next_key, next_mask, True)
-                agent.update(key, action, reward, next_key, next_action, done)
+                agent.update(
+                    key, action, reward, next_key, next_action, done,
+                    bootstrap_discount=(0.0 if done else
+                                        env.last_bootstrap_discount))
                 key, action = next_key, next_action
             else:
                 agent.remember(
-                    state, action, reward, next_state, done, next_mask)
+                    state, action, reward, next_state, done, next_mask,
+                    0.0 if done else env.last_bootstrap_discount)
                 loss = agent.train_step()
                 if loss is not None:
                     losses.append(loss)
@@ -210,14 +216,15 @@ def parse_args():
     parser.add_argument("--replay-capacity", type=int, default=100000)
     parser.add_argument("--warmup-steps", type=int, default=5000)
     parser.add_argument("--target-update", type=int, default=500)
-    parser.add_argument("--reward-completion", type=float, default=10.0)
-    parser.add_argument("--reward-assignment", type=float, default=0.5)
-    parser.add_argument("--reward-priority", type=float, default=0.5)
-    parser.add_argument("--reward-age-bonus", type=float, default=0.5)
-    parser.add_argument("--penalty-distance", type=float, default=-0.08)
-    parser.add_argument("--penalty-waiting", type=float, default=-0.03)
+    parser.add_argument("--reward-completion", type=float, default=5.0)
+    parser.add_argument("--reward-assignment", type=float, default=0.0)
+    parser.add_argument("--reward-priority", type=float, default=0.0,
+                        help="Deprecated; raw priority is not rewarded")
+    parser.add_argument("--reward-age-bonus", type=float, default=0.2)
+    parser.add_argument("--penalty-distance", type=float, default=-0.10)
+    parser.add_argument("--penalty-waiting", type=float, default=-0.10)
     parser.add_argument("--penalty-invalid", type=float, default=-5.0)
-    parser.add_argument("--penalty-no-op", type=float, default=-2.0)
+    parser.add_argument("--penalty-no-op", type=float, default=-1.0)
     parser.add_argument("--penalty-collision", type=float, default=-100.0)
     return parser.parse_args()
 

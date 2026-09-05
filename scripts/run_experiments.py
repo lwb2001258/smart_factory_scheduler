@@ -22,7 +22,6 @@ import subprocess
 import time
 import argparse
 import statistics
-import random
 import math
 from typing import Dict, List
 
@@ -37,14 +36,35 @@ from config import SCENARIOS, NUM_REPEATS
 # EXPERIMENT CONFIGURATION
 # ================================================================
 
+ADVANCED_RL_TYPES = ["SARSA_LAMBDA", "RAINBOW_DQN", "A2C", "DISCRETE_SAC", "QR_DQN"]
+RL_SCHEDULER_TYPES = {"SARSA", "DQN", "PPO_RL", *ADVANCED_RL_TYPES}
 SCHEDULER_TYPES = [
     "FCFS", "NearestNeighbour", "RoundRobin", "Greedy", "Random",
-    "Hungarian", "Auction", "GA", "SA", "PPO_RL", "SARSA", "DQN"]
+    "Hungarian", "Auction", "GA", "SA", "PPO_RL", "SARSA", "DQN",
+    *ADVANCED_RL_TYPES]
 SCENARIO_KEYS = ["A", "B", "C"]
 RANDOM_SEEDS = [42, 123, 456, 789, 1024]
 
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'results')
 WORLD_FILE = os.path.join(os.path.dirname(__file__), '..', 'worlds', 'smart_factory.wbt')
+
+
+def resolve_checkpoint_path(model_path: str = None) -> str:
+    """Resolve a checkpoint for controller processes with a different cwd."""
+    if not model_path:
+        return model_path
+    resolved = os.path.abspath(os.path.expanduser(model_path))
+    if not os.path.isfile(resolved):
+        raise FileNotFoundError(f"checkpoint not found: {resolved}")
+    return resolved
+
+
+def console_safe(value) -> str:
+    """Make redirected controller output printable on Windows GBK consoles."""
+    text = "" if value is None else str(value)
+    encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+    return text.encode(encoding, errors="backslashreplace").decode(
+        encoding, errors="replace")
 
 
 def webots_wall_timeout_seconds(sim_duration: float = None) -> float:
@@ -56,6 +76,14 @@ def webots_wall_timeout_seconds(sim_duration: float = None) -> float:
     second, plus startup/shutdown overhead, while retaining the old ten-minute
     floor for short runs.
     """
+    override = os.environ.get("SMART_FACTORY_WEBOTS_WALL_TIMEOUT")
+    if override is not None:
+        try:
+            value = float(override)
+        except (TypeError, ValueError):
+            value = 0.0
+        if math.isfinite(value) and value > 0.0:
+            return value
     if sim_duration is None:
         raw = os.environ.get("SMART_FACTORY_SIM_DURATION", "1800.0")
         try:
@@ -67,9 +95,34 @@ def webots_wall_timeout_seconds(sim_duration: float = None) -> float:
     return max(600.0, sim_duration * 2.0 + 120.0)
 
 
+def validate_native_rl_result(result: dict, scheduler: str) -> None:
+    """Reject an RL-labelled result that was produced by fallback decisions."""
+    if not isinstance(result, dict):
+        raise RuntimeError("native RL experiment produced no result")
+    metrics = result.get("summary_metrics", {})
+    policy_decisions = int(metrics.get("rl_policy_decisions", 0))
+    fallback_decisions = int(metrics.get("rl_fallback_decisions", 0))
+    scheduler_fallbacks = int(metrics.get("scheduler_fallbacks", 0))
+    commits = metrics.get("scheduler_commits_by_algorithm", {}) or {}
+    native_commits = int(commits.get(scheduler, 0))
+    fallback_commits = sum(
+        int(value) for name, value in commits.items()
+        if "FALLBACK" in str(name).upper())
+    if policy_decisions <= 0 or native_commits <= 0:
+        raise RuntimeError(
+            f"{scheduler} produced no verifiable native policy commits")
+    if fallback_decisions or scheduler_fallbacks or fallback_commits:
+        raise RuntimeError(
+            f"{scheduler} result is fallback-contaminated: "
+            f"rl_fallback={fallback_decisions}, "
+            f"scheduler_fallback={scheduler_fallbacks}, "
+            f"fallback_commits={fallback_commits}")
+
+
 def run_single_experiment(scenario: str, scheduler: str, seed: int,
                          webots_path: str = "webots",
-                         model_path: str = None) -> dict:
+                         model_path: str = None,
+                         allow_rl_fallback: bool = False) -> dict:
     """
     Run a single experiment by launching Webots with the appropriate
     controller arguments.
@@ -80,6 +133,28 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
     print(f"Running: Scenario {scenario} | Scheduler: {scheduler} | Seed: {seed}")
     print(f"{'='*60}")
     
+    from experiment_manifest import generate_experiment_manifest
+    # Webots starts controllers with the controller directory as cwd, not the
+    # experiment runner's cwd.  Always pass an absolute checkpoint path so a
+    # valid relative CLI path cannot turn into a controller startup failure.
+    model_path = resolve_checkpoint_path(model_path)
+    duration = float(os.environ.get("SMART_FACTORY_SIM_DURATION", "1800.0"))
+    manifest = generate_experiment_manifest(scenario, seed, duration)
+    checkpoint_audit = {
+        "manifest_version": manifest.version,
+        "manifest_fingerprint": manifest.fingerprint(),
+        "seed": int(seed),
+    }
+    if scheduler in RL_SCHEDULER_TYPES:
+        if not model_path and not allow_rl_fallback:
+            raise ValueError(
+                f"{scheduler} requires a checkpoint for a native RL experiment")
+        if model_path:
+            from rl_model_registry import audit_checkpoint
+            checkpoint_audit.update(audit_checkpoint(
+                scheduler, model_path,
+                allow_legacy_ppo=allow_rl_fallback).to_dict())
+
     # Try to run with Webots
     env = os.environ.copy()
     env["SCENARIO"] = scenario
@@ -88,10 +163,30 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
     # Distinguish automated experiments from opening the world interactively.
     # Only batch runs should stop and close Webots at SIM_DURATION.
     env["SMART_FACTORY_AUTO_STOP"] = "1"
+    # Webots launches Python controllers as child processes.  If a controller
+    # exits before it can request simulationQuit(), Webots can remain alive
+    # until the outer wall timeout.  Unbuffered output preserves the actual
+    # controller exception in TimeoutExpired diagnostics instead of losing it
+    # in the child's stdio buffer.
+    env["PYTHONUNBUFFERED"] = "1"
     if model_path:
         env["MODEL_PATH"] = model_path
     else:
         env.pop("MODEL_PATH", None)
+    env["RL_REQUIRE_NATIVE"] = "0" if allow_rl_fallback else "1"
+    env["EXPERIMENT_MANIFEST_FINGERPRINT"] = manifest.fingerprint()
+    env["EXPERIMENT_MANIFEST_VERSION"] = manifest.version
+    if checkpoint_audit.get("sha256"):
+        env["RL_CHECKPOINT_SHA256"] = checkpoint_audit["sha256"]
+        env["RL_CHECKPOINT_CONTRACT"] = checkpoint_audit["action_contract"]
+        env["RL_CHECKPOINT_ALGORITHM"] = checkpoint_audit[
+            "checkpoint_algorithm"]
+        env["RL_ENVIRONMENT_VERSION_USED"] = checkpoint_audit[
+            "environment_version"]
+        env["RL_CONTRACT_FINGERPRINT"] = checkpoint_audit[
+            "contract_fingerprint"]
+        env["RL_CHECKPOINT_CONTRACT_VERIFIED"] = (
+            "1" if checkpoint_audit["checkpoint_contract_verified"] else "0")
     
     try:
         # Check if webots is available
@@ -103,6 +198,8 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
         webots_available = result.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired):
         webots_available = False
+    checkpoint_audit["run_mode"] = "webots" if webots_available else "standalone"
+    env["SMART_FACTORY_RUN_MODE"] = checkpoint_audit["run_mode"]
     
     webots_run_ok = False
     if webots_available:
@@ -112,20 +209,33 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
               f"{wall_timeout:.0f}s)...")
         try:
             result = subprocess.run(
-                [webots_path, "--batch", "--no-rendering", "--mode=fast", WORLD_FILE],
+                [webots_path, "--batch", "--no-rendering", "--mode=fast",
+                 "--stdout", "--stderr", WORLD_FILE],
                 env=env,
                 capture_output=True, encoding="utf-8", errors="replace",
                 text=True,
                 timeout=wall_timeout
             )
-            print(result.stdout[-500:] if len(result.stdout) > 500 else result.stdout)
+            tail = result.stdout[-500:] if len(result.stdout) > 500 else result.stdout
+            print(console_safe(tail))
             if result.returncode != 0:
-                print(f"Webots error: {result.stderr[-300:]}")
+                print(f"Webots error: {console_safe(result.stderr[-300:])}")
             else:
                 webots_run_ok = True
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as exc:
             print("WARNING: Webots simulation exceeded its dynamic wall-clock "
                   f"timeout ({wall_timeout:.0f}s) before completing!")
+            captured_out = exc.stdout or ""
+            captured_err = exc.stderr or ""
+            if isinstance(captured_out, bytes):
+                captured_out = captured_out.decode("utf-8", errors="replace")
+            if isinstance(captured_err, bytes):
+                captured_err = captured_err.decode("utf-8", errors="replace")
+            if captured_out:
+                print(console_safe(captured_out[-1000:]))
+            if captured_err:
+                print("Webots timeout stderr: " +
+                      console_safe(captured_err[-1000:]))
         if not webots_run_ok:
             # Never load a stale result from a previous run after a failed
             # Webots launch; that would make validation appear successful.
@@ -134,14 +244,23 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
         # Run standalone simulation (without Webots physics)
         print("Webots not found. Running standalone simulation...")
         run_standalone_simulation(
-            scenario, scheduler, seed, model_path=model_path)
+            scenario, scheduler, seed, model_path=model_path,
+            allow_rl_fallback=allow_rl_fallback,
+            checkpoint_audit=checkpoint_audit)
     
     # Find and load the most recent results file
-    return load_latest_results(scenario, scheduler)
+    experiment_result = load_latest_results(scenario, scheduler)
+    if scheduler in RL_SCHEDULER_TYPES and not allow_rl_fallback:
+        validate_native_rl_result(experiment_result, scheduler)
+        from evaluation_gate import validate_evaluation_result
+        validate_evaluation_result(experiment_result, scheduler)
+    return experiment_result
 
 
 def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
-                              model_path: str = None):
+                              model_path: str = None,
+                              allow_rl_fallback: bool = False,
+                              checkpoint_audit: dict = None):
     """
     Run the simulation in standalone mode (without Webots).
     Uses simplified physics for testing algorithm logic.
@@ -165,7 +284,8 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
                         LOW_BATTERY_THRESHOLD, TASK_ABORT_BATTERY_THRESHOLD,
                         FULL_BATTERY_THRESHOLD,
                         CHARGING_STATIONS, PARKING_SPOTS, REST_NODES,
-                        WAYPOINTS as _CFG_WAYPOINTS)
+                        WAYPOINTS as _CFG_WAYPOINTS,
+                        initial_battery_for_robot)
     from task_generator import TaskGenerator
     from motion_coordinator import MotionCoordinator
     from schedulers import (
@@ -173,11 +293,10 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
         NearestNeighbourScheduler, SchedulingContext)
     from training_scenarios import FactoryAStarCostOracle, path_length
     from metrics_collector import MetricsCollector
+    from rl_event_ledger import RLEventLedger
     
     scenario_config = SCENARIOS[scenario]
     num_robots = scenario_config['num_robots']
-    rng = random.Random(seed)
-    
     # Initialise components
     task_gen = TaskGenerator(
         mean_interval=scenario_config['task_interval'],
@@ -187,11 +306,15 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
     )
     coordinator = MotionCoordinator(num_active_robots=num_robots)
     scheduler_obj = create_scheduler(
-        scheduler, model_path=model_path, seed=seed)
+        scheduler, model_path=model_path, seed=seed,
+        allow_safe_fallback=allow_rl_fallback)
     safe_schedulers = [
         HungarianScheduler(), GreedyScheduler(), NearestNeighbourScheduler()]
     failed_pairs = {}
-    metrics = MetricsCollector(scenario, scheduler, num_robots)
+    metrics = MetricsCollector(
+        scenario, scheduler, num_robots,
+        provenance=checkpoint_audit or {})
+    rl_event_ledger = RLEventLedger()
     
     # Robot starting positions (must match worlds/smart_factory.wbt)
     initial_positions = PARKING_SPOTS
@@ -215,8 +338,8 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
             'has_task': False,
             'goal_location': None,
         }
-        robot_states[rid]['battery'] = float(rng.uniform(
-            INITIAL_BATTERY_MIN, INITIAL_BATTERY_MAX))
+        robot_states[rid]['battery'] = initial_battery_for_robot(
+            seed, rid, INITIAL_BATTERY_MIN, INITIAL_BATTERY_MAX)
         robot_tasks[rid] = None
         robot_waypoints[rid] = []
         robot_idle_time[rid] = 0.0
@@ -320,6 +443,10 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
         if rs['state'] == RobotState.EN_ROUTE_PICKUP and task:
             # Reached pickup. Plan delivery path.
             task.pickup_time = sim_time
+            task.cargo_state = "onboard"
+            metrics.record_rl_event(rl_event_ledger.append(
+                "pickup_reached", sim_time, robot_id=rid,
+                task_id=task.task_id).to_dict())
             rs['state'] = RobotState.EN_ROUTE_DELIVERY
             rs['goal_location'] = task.delivery_location
             
@@ -355,8 +482,23 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
         task = robot_tasks[rid]
         task.status = TaskStatus.COMPLETED
         task.completion_time = sim_time
+        task.cargo_state = "delivered"
         robot_tasks_completed[rid] += 1
         metrics.record_task_completion(task, rid, sim_time)
+        tardiness = task.tardiness
+        on_time = tardiness is None or tardiness <= 1e-9
+        if task.deadline is not None and not on_time:
+            metrics.record_rl_event(rl_event_ledger.append(
+                "deadline_breached", sim_time, robot_id=rid,
+                task_id=task.task_id,
+                business_weight=task.business_weight,
+                decision_id=getattr(task, "rl_decision_id", None)).to_dict())
+        metrics.record_rl_event(rl_event_ledger.append(
+            "task_completed_on_time" if on_time else "task_completed_late",
+            sim_time, robot_id=rid, task_id=task.task_id, count=1,
+            on_time=on_time, tardiness_seconds=float(tardiness or 0.0),
+            business_weight=task.business_weight,
+            decision_id=getattr(task, "rl_decision_id", None)).to_dict())
         
         robot_tasks[rid] = None
         rs['state'] = RobotState.IDLE
@@ -497,6 +639,7 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
                 decision = scheduler_obj.assign(
                     pending, states_for_scheduler, context
                 )
+                metrics.record_rl_diagnostics(decision.diagnostics)
                 active_scheduler = scheduler_obj
                 if not decision.is_feasible or not decision.assignments:
                     reason = decision.diagnostics.get("reason", "")
@@ -545,6 +688,18 @@ def run_standalone_simulation(scenario: str, scheduler: str, seed: int,
                     coordinator.release_home(rid)
                     robot_waypoints[rid] = list(path)
                     active_scheduler.on_assignment_committed(assignment)
+                    assignment_event = rl_event_ledger.append(
+                        "assignment_committed", sim_time, robot_id=rid,
+                        task_id=task.task_id,
+                        priority_rank=int(task.priority_rank),
+                        waiting_seconds=max(0.0, sim_time-task.arrival_time),
+                        empty_distance=float(assignment.empty_distance or 0.0),
+                        estimated_cost=float(assignment.estimated_cost or 0.0),
+                        decision_id=f"standalone-r{rid}-t{task.task_id}",
+                        algorithm=decision.algorithm_name or
+                        active_scheduler.name)
+                    task.rl_decision_id = assignment_event.values["decision_id"]
+                    metrics.record_rl_event(assignment_event.to_dict())
                     metrics.record_scheduler_commit(
                         active_scheduler.name,
                         native=(active_scheduler is scheduler_obj))
@@ -722,7 +877,8 @@ def run_all_experiments(scenarios: List[str] = None,
                        schedulers: List[str] = None,
                        seeds: List[int] = None,
                        webots_path: str = "webots",
-                       model_paths: Dict[str, str] = None):
+                       model_paths: Dict[str, str] = None,
+                       allow_rl_fallback: bool = False):
     """
     Run all experimental combinations.
     """
@@ -758,7 +914,8 @@ def run_all_experiments(scenarios: List[str] = None,
                 
                 result = run_single_experiment(
                     scenario, scheduler, seed, webots_path,
-                    model_path=model_paths.get(scheduler)
+                    model_path=model_paths.get(scheduler),
+                    allow_rl_fallback=allow_rl_fallback,
                 )
                 all_results[scenario][scheduler].append(result)
     
@@ -875,6 +1032,13 @@ def main():
     parser.add_argument("--sarsa-model")
     parser.add_argument("--dqn-model")
     parser.add_argument("--ppo-model")
+    parser.add_argument(
+        "--advanced-model", action="append", default=[], metavar="ALGORITHM=PATH",
+        help="Repeat for advanced RL checkpoints, e.g. A2C=models/a2c.npz")
+    parser.add_argument(
+        "--allow-rl-fallback", action="store_true",
+        help=("Diagnostic/legacy mode: allow missing or legacy RL models and "
+              "safe fallback. Results are not native-RL evaluations."))
     
     args = parser.parse_args()
     
@@ -886,18 +1050,25 @@ def main():
     else:
         webots_path = args.webots
     
+    advanced_paths = {}
+    for entry in args.advanced_model:
+        if "=" not in entry:
+            parser.error("--advanced-model must use ALGORITHM=PATH")
+        name, path = entry.split("=", 1); name = name.upper()
+        if name not in ADVANCED_RL_TYPES:
+            parser.error(f"unknown advanced RL algorithm: {name}")
+        advanced_paths[name] = path
+    model_paths = {name: path for name, path in (
+        ("SARSA", args.sarsa_model), ("DQN", args.dqn_model),
+        ("PPO_RL", args.ppo_model)) if path}
+    model_paths.update(advanced_paths)
     run_all_experiments(
         scenarios=args.scenario,
         schedulers=args.scheduler,
         seeds=seeds,
         webots_path=webots_path,
-        model_paths={
-            name: path for name, path in (
-                ("SARSA", args.sarsa_model),
-                ("DQN", args.dqn_model),
-                ("PPO_RL", args.ppo_model),
-            ) if path
-        },
+        model_paths=model_paths,
+        allow_rl_fallback=args.allow_rl_fallback,
     )
 
 

@@ -1,0 +1,26 @@
+{
+  "algorithm": "SARSA_LAMBDA",
+  "seed": 42,
+  "episodes": 2,
+  "checkpoint": "results\\deadline_workflow_smoke\\sarsa_lambda\\model.json",
+  "environment_mode": "abstract",
+  "manifest_scenario": "A",
+  "validation": {
+    "reward": 35.5,
+    "updates": 0,
+    "mean_update": null
+  },
+  "history": [
+    {
+      "reward": 38.5,
+      "updates": 10,
+      "mean_update": 3.85
+    },
+    {
+      "reward": 37.0,
+      "updates": 10,
+      "mean_update": 4.087994945049286
+    }
+  ],
+  "test_not_used_for_selection": true
+}

@@ -1,0 +1,21 @@
+{
+  "algorithm": "SARSA_LAMBDA",
+  "seed": 7,
+  "episodes": 1,
+  "checkpoint": "results\\advanced_rl_workflow_smoke\\SARSA_LAMBDA\\model.json",
+  "environment_mode": "abstract",
+  "manifest_scenario": "A",
+  "validation": {
+    "reward": 49.594171432414946,
+    "updates": 0,
+    "mean_update": null
+  },
+  "history": [
+    {
+      "reward": 47.89993330490998,
+      "updates": 11,
+      "mean_update": 4.686339934779839
+    }
+  ],
+  "test_not_used_for_selection": true
+}

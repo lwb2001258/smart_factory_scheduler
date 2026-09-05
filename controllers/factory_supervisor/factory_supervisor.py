@@ -62,7 +62,7 @@ from config import (
     ENABLE_NONPHYSICAL_RECOVERY,
     BATTERY_CAPACITY, BATTERY_DRAIN_RATE, BATTERY_CHARGE_RATE,
     INITIAL_BATTERY_MIN, INITIAL_BATTERY_MAX,
-    LOG_INTERVAL, LOCATION_TO_NODE
+    LOG_INTERVAL, LOCATION_TO_NODE, initial_battery_for_robot
 )
 from task_generator import TaskGenerator, TransportTask
 from motion_coordinator import MotionCoordinator
@@ -70,9 +70,11 @@ from schedulers import (
     create_scheduler, BaseScheduler, GreedyScheduler, HungarianScheduler,
     NearestNeighbourScheduler,
     Assignment, SchedulingContext, SchedulerResult,
+    validate_assignment,
 )
 from startup_gate import StartupGate
 from metrics_collector import MetricsCollector, SafetyEvent
+from rl_event_ledger import RLEventLedger
 from joint_plan_transaction import JointPlanTransaction
 
 
@@ -2114,6 +2116,7 @@ class FactorySupervisor:
         
         # Scenario configuration
         self.scenario_config = SCENARIOS[scenario]
+        self.seed = int(seed)
         self.num_robots = self.scenario_config['num_robots']
         self.scenario_name = scenario
         self._battery_rng = random.Random(seed)
@@ -2141,8 +2144,12 @@ class FactorySupervisor:
                 'initial_task_immediately', False)
         )
         self.motion_coordinator = MotionCoordinator(num_active_robots=self.num_robots)
+        require_native_rl = os.environ.get(
+            "RL_REQUIRE_NATIVE", "0").strip().lower() in {
+                "1", "true", "yes", "on"}
         self.scheduler = create_scheduler(
-            scheduler_type, model_path, seed=seed, allow_safe_fallback=True)
+            scheduler_type, model_path, seed=seed,
+            allow_safe_fallback=not require_native_rl)
         self.safe_schedulers = [
             HungarianScheduler(), GreedyScheduler(),
             NearestNeighbourScheduler()]
@@ -2151,11 +2158,41 @@ class FactorySupervisor:
         self._joint_plan_transaction = None
         self._joint_collision_danger = {}
         self._joint_preempt_component_until: Dict[Tuple[int, ...], float] = {}
+        provenance = {}
+        if os.environ.get("RL_CHECKPOINT_SHA256"):
+            provenance["sha256"] = os.environ[
+                "RL_CHECKPOINT_SHA256"]
+        if os.environ.get("RL_CHECKPOINT_CONTRACT"):
+            provenance["action_contract"] = os.environ[
+                "RL_CHECKPOINT_CONTRACT"]
+        if os.environ.get("RL_CHECKPOINT_ALGORITHM"):
+            provenance["checkpoint_algorithm"] = os.environ[
+                "RL_CHECKPOINT_ALGORITHM"]
+        if os.environ.get("RL_ENVIRONMENT_VERSION_USED"):
+            provenance["environment_version"] = os.environ[
+                "RL_ENVIRONMENT_VERSION_USED"]
+        if os.environ.get("RL_CONTRACT_FINGERPRINT"):
+            provenance["contract_fingerprint"] = os.environ[
+                "RL_CONTRACT_FINGERPRINT"]
+        if os.environ.get("RL_CHECKPOINT_CONTRACT_VERIFIED"):
+            provenance["checkpoint_contract_verified"] = (
+                os.environ["RL_CHECKPOINT_CONTRACT_VERIFIED"] == "1")
+        if os.environ.get("EXPERIMENT_MANIFEST_FINGERPRINT"):
+            provenance["manifest_fingerprint"] = os.environ[
+                "EXPERIMENT_MANIFEST_FINGERPRINT"]
+        if os.environ.get("EXPERIMENT_MANIFEST_VERSION"):
+            provenance["manifest_version"] = os.environ[
+                "EXPERIMENT_MANIFEST_VERSION"]
+        provenance["run_mode"] = os.environ.get(
+            "SMART_FACTORY_RUN_MODE", "interactive_webots")
+        provenance["seed"] = int(seed)
         self.metrics = MetricsCollector(
             scenario_name=scenario,
             scheduler_name=self.scheduler.name,
-            num_robots=self.num_robots
+            num_robots=self.num_robots,
+            provenance=provenance,
         )
+        self.rl_event_ledger = RLEventLedger()
         
         # Robot tracking
         self.robots: Dict[int, RobotInfo] = {}
@@ -2257,8 +2294,9 @@ class FactorySupervisor:
         
         for rid in range(1, self.num_robots + 1):
             pos = initial_positions.get(rid, (0.0, 0.0))
-            initial_battery = self._battery_rng.uniform(
-                INITIAL_BATTERY_MIN, INITIAL_BATTERY_MAX)
+            initial_battery = initial_battery_for_robot(
+                experiment_seed=self.seed, robot_id=rid,
+                minimum=INITIAL_BATTERY_MIN, maximum=INITIAL_BATTERY_MAX)
             self.robots[rid] = RobotInfo(rid, pos, initial_battery)
             
             # Resolve the Webots scene node via its DEF name
@@ -5256,8 +5294,11 @@ class FactorySupervisor:
                                         RobotState.CHARGING)):
                 if robot.battery < TASK_ABORT_BATTERY_THRESHOLD:
                     if robot.current_task is not None:
-                        self._requeue_task_for_low_battery(rid, cancel=True)
-                    self._send_to_charging(rid)
+                        if self._requeue_task_for_low_battery(
+                                rid, cancel=True):
+                            self._send_to_charging(rid)
+                    else:
+                        self._send_to_charging(rid)
                 elif robot.current_task is None:
                     # Idle low-battery robots charge before receiving work;
                     # active robots in the 15-25% band finish their task.
@@ -5437,6 +5478,11 @@ class FactorySupervisor:
                 robot.state = RobotState.CARRYING
                 robot.current_task.status = TaskStatus.IN_PROGRESS
                 robot.current_task.pickup_time = self.sim_time
+                robot.current_task.cargo_state = "onboard"
+                event = self.rl_event_ledger.append(
+                    "pickup_reached", self.sim_time, robot_id=robot_id,
+                    task_id=robot.current_task.task_id)
+                self.metrics.record_rl_event(event.to_dict())
                 robot.goal_location = robot.current_task.delivery_location
                 robot.waypoints = delivery_path
                 robot.current_waypoint_idx = 0
@@ -5453,6 +5499,7 @@ class FactorySupervisor:
             # Arrived at delivery location - task complete!
             robot.current_task.status = TaskStatus.COMPLETED
             robot.current_task.completion_time = self.sim_time
+            robot.current_task.cargo_state = "delivered"
             robot.tasks_completed += 1
             
             print(f"[T={self.sim_time:.1f}] Robot {robot_id} COMPLETED task "
@@ -5465,6 +5512,28 @@ class FactorySupervisor:
             self.metrics.record_task_completion(
                 robot.current_task, robot_id, self.sim_time
             )
+            tardiness = robot.current_task.tardiness
+            on_time = tardiness is None or tardiness <= 1e-9
+            breached = getattr(self, "_deadline_breached_tasks", set())
+            if (robot.current_task.deadline is not None and not on_time and
+                    robot.current_task.task_id not in breached):
+                breached.add(robot.current_task.task_id)
+                self._deadline_breached_tasks = breached
+                breach_event = self.rl_event_ledger.append(
+                    "deadline_breached", self.sim_time, robot_id=robot_id,
+                    task_id=robot.current_task.task_id,
+                    business_weight=robot.current_task.business_weight,
+                    decision_id=getattr(
+                        robot.current_task, "rl_decision_id", None))
+                self.metrics.record_rl_event(breach_event.to_dict())
+            event = self.rl_event_ledger.append(
+                "task_completed_on_time" if on_time else "task_completed_late",
+                self.sim_time, robot_id=robot_id,
+                task_id=robot.current_task.task_id, count=1,
+                on_time=on_time, tardiness_seconds=float(tardiness or 0.0),
+                business_weight=robot.current_task.business_weight,
+                decision_id=getattr(robot.current_task, "rl_decision_id", None))
+            self.metrics.record_rl_event(event.to_dict())
             
             # Release this robot's task-time reservations so others can
             # route through where it has been (lifelong CBS bookkeeping).
@@ -5795,7 +5864,13 @@ class FactorySupervisor:
         robot = self.robots[robot_id]
         task = robot.current_task
         if task is None:
-            return
+            return False
+        if getattr(task, "cargo_state", "not_picked") == "onboard":
+            # Cargo physically carried by a robot cannot be returned to the
+            # pickup queue. Keep the assignment authoritative for a safe
+            # delivery/recovery path.
+            task.status = TaskStatus.IN_PROGRESS
+            return False
         # This project currently defines PENDING/ASSIGNED/IN_PROGRESS/
         # COMPLETED/FAILED (there is no CANCELLED enum member).  Only an
         # active task can be interrupted and returned to the pending queue.
@@ -5819,9 +5894,13 @@ class FactorySupervisor:
         action = "cancelled" if cancel else "requeued"
         print(f"[T={self.sim_time:.1f}] Robot {robot_id} battery="
               f"{robot.battery:.1f}%: task {action}; charging required")
+        return True
 
     def _assign_tasks(self):
         """Serialize dispatch requests and coalesce re-entrant events."""
+        if self.sim_time < float(getattr(
+                self, "_next_dispatch_attempt_at", 0.0)):
+            return
         if getattr(self, "dispatch_in_progress", False):
             self.dispatch_pending = True
             return
@@ -5851,6 +5930,27 @@ class FactorySupervisor:
                 self, "startup_failed", False):
             return
         pending = self.task_generator.get_pending_tasks()
+        last_wait_time = float(getattr(
+            self, "_last_rl_wait_accounting_time", self.sim_time))
+        wait_elapsed = max(0.0, self.sim_time - last_wait_time)
+        accumulated_wait = float(getattr(
+            self, "_rl_pending_wait_accumulator", 0.0))
+        accumulated_wait += wait_elapsed * len(pending)
+        last_wait_emit = float(getattr(
+            self, "_last_rl_wait_emit_time", self.sim_time))
+        should_emit_wait = (
+            accumulated_wait > 0.0 and
+            (self.sim_time - last_wait_emit >= 1.0 or not pending))
+        if should_emit_wait:
+            wait_event = self.rl_event_ledger.append(
+                "queue_wait_advanced", self.sim_time,
+                pending_wait_increment=accumulated_wait,
+                elapsed_seconds=max(0.0, self.sim_time-last_wait_emit))
+            self.metrics.record_rl_event(wait_event.to_dict())
+            accumulated_wait = 0.0
+            self._last_rl_wait_emit_time = self.sim_time
+        self._rl_pending_wait_accumulator = accumulated_wait
+        self._last_rl_wait_accounting_time = self.sim_time
         if not pending:
             return
         if not self.initial_dispatch_attempted:
@@ -5865,8 +5965,8 @@ class FactorySupervisor:
         # controller snapshots and keeps every scheduler consistent.
         for rid, robot in self.robots.items():
             if robot.battery < TASK_ABORT_BATTERY_THRESHOLD and robot.current_task is not None:
-                self._requeue_task_for_low_battery(rid, cancel=True)
-                self._send_to_charging(rid)
+                if self._requeue_task_for_low_battery(rid, cancel=True):
+                    self._send_to_charging(rid)
             elif (robot.current_task is None and
                   robot.state == RobotState.IDLE and
                   robot.battery < LOW_BATTERY_THRESHOLD):
@@ -5884,6 +5984,9 @@ class FactorySupervisor:
         max_assignments = min(len(pending), len([r for r in self.robots.values() 
                                                   if r.state == RobotState.IDLE]))
         
+        assignment_batch = []
+        batch_scheduler = self.scheduler
+        batch_id = f"batch-{int(self.sim_time * 1000)}"
         for _ in range(max_assignments):
             pending = self.task_generator.get_pending_tasks()
             if not pending:
@@ -5904,8 +6007,18 @@ class FactorySupervisor:
                 failed_pairs=frozenset(self._failed_assignment_pairs),
                 configuration={"runtime_geometry": "factory-grid-astar-v3"},
             )
+            queued_assignment = bool(assignment_batch)
             try:
-                decision = self.scheduler.assign(pending, robot_states, context)
+                if queued_assignment:
+                    decision = SchedulerResult(
+                        assignments=[assignment_batch.pop(0)],
+                        computation_time=0.0, is_feasible=True,
+                        algorithm_name=batch_scheduler.name,
+                        diagnostics={"reason": "batched_candidate",
+                                     "batch_id": batch_id})
+                else:
+                    decision = self.scheduler.assign(
+                        pending, robot_states, context)
             except Exception as exc:
                 decision = SchedulerResult(
                     algorithm_name=getattr(self.scheduler, "name", "unknown"),
@@ -5914,13 +6027,18 @@ class FactorySupervisor:
                 print(f"[Supervisor] Scheduler {decision.algorithm_name} "
                       f"exception: {exc}; trying safe fallback chain")
             scheduling_seconds = decision.computation_time
-            active_scheduler = self.scheduler
+            active_scheduler = batch_scheduler if queued_assignment else self.scheduler
             self.metrics.record_rl_diagnostics(decision.diagnostics)
             # A safety-wrapped RL scheduler can return a feasible Hungarian
             # assignment internally.  Count and attribute that decision as a
             # fallback instead of silently reporting it as native RL work.
             if decision.diagnostics.get("fallback", False):
                 self.metrics.record_scheduler_fallback(invalid_output=False)
+            if (not decision.is_feasible or not decision.assignments) and \
+                    decision.diagnostics.get("benign_no_decision", False):
+                self.metrics.record_scheduling_latency(scheduling_seconds)
+                self._next_dispatch_attempt_at = self.sim_time + 0.25
+                break
             if not decision.is_feasible or not decision.assignments:
                 reason = decision.diagnostics.get("reason", "")
                 self.metrics.record_scheduler_fallback(
@@ -5947,9 +6065,25 @@ class FactorySupervisor:
                         break
             self.metrics.record_scheduling_latency(scheduling_seconds)
             if not decision.is_feasible or not decision.assignments:
+                self._next_dispatch_attempt_at = self.sim_time + 0.25
                 break
 
+            if not queued_assignment and len(decision.assignments) > 1:
+                assignment_batch.extend(decision.assignments[1:])
+                batch_scheduler = active_scheduler
+                decision.diagnostics["batch_id"] = batch_id
+                decision.diagnostics["batch_candidate_count"] = len(
+                    decision.assignments)
             assignment = decision.assignments[0]
+            valid, invalid_reason = validate_assignment(
+                assignment, pending, robot_states, context)
+            if not valid:
+                active_scheduler.on_assignment_rejected(
+                    assignment, invalid_reason)
+                self._failed_assignment_pairs[
+                    (assignment.robot_id, assignment.task.task_id)
+                ] = self.sim_time + ASSIGNMENT_FAILURE_TTL
+                continue
             robot_id, task = assignment.robot_id, assignment.task
             
             robot = self.robots[robot_id]
@@ -6006,11 +6140,25 @@ class FactorySupervisor:
                           f"{task.task_id}/robot {robot_id}: command send failed")
                     continue
                 active_scheduler.on_assignment_committed(assignment)
+                event = self.rl_event_ledger.append(
+                    "assignment_committed", self.sim_time,
+                    robot_id=robot_id, task_id=task.task_id,
+                    priority_rank=int(task.priority_rank),
+                    waiting_seconds=max(0.0, self.sim_time-task.arrival_time),
+                    empty_distance=float(assignment.empty_distance or 0.0),
+                    estimated_cost=float(assignment.estimated_cost or 0.0),
+                    decision_id=f"{batch_id}-r{robot_id}-t{task.task_id}",
+                    algorithm=decision.algorithm_name or active_scheduler.name)
+                event.values["batch_id"] = decision.diagnostics.get(
+                    "batch_id", batch_id)
+                task.rl_decision_id = event.values["decision_id"]
+                self.metrics.record_rl_event(event.to_dict())
                 self.metrics.record_scheduler_commit(
                     decision.algorithm_name or active_scheduler.name,
                     native=(active_scheduler is self.scheduler and
                             not decision.diagnostics.get("fallback", False)))
                 self.initial_dispatch_triggered = True
+                self._next_dispatch_attempt_at = self.sim_time
                 self._failed_assignment_pairs.pop(
                     (robot_id, task.task_id), None)
                 print(f"[T={self.sim_time:.1f}] Assigned task {task.task_id} to robot "

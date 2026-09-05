@@ -1,0 +1,21 @@
+{
+  "algorithm": "DISCRETE_SAC",
+  "seed": 7,
+  "episodes": 1,
+  "checkpoint": "results\\advanced_rl_workflow_smoke\\DISCRETE_SAC\\model.npz",
+  "environment_mode": "abstract",
+  "manifest_scenario": "A",
+  "validation": {
+    "reward": 49.240539079208475,
+    "updates": 0,
+    "mean_update": null
+  },
+  "history": [
+    {
+      "reward": 48.772754345934565,
+      "updates": 11,
+      "mean_update": 43.448694827453096
+    }
+  ],
+  "test_not_used_for_selection": true
+}

@@ -43,6 +43,13 @@ BATTERY_DEPLETION_TIME_SECONDS = 1800.0
 BATTERY_DRAIN_RATE = BATTERY_CAPACITY / BATTERY_DEPLETION_TIME_SECONDS
 INITIAL_BATTERY_MIN = 25.0
 
+
+def initial_battery_for_robot(experiment_seed: int, robot_id: int) -> float:
+    """Keep startup battery identical to Supervisor/standalone manifests."""
+    return random.Random(
+        int(experiment_seed) * 1000 + int(robot_id)).uniform(
+            INITIAL_BATTERY_MIN, BATTERY_CAPACITY)
+
 GOAL_THRESHOLD = 0.35     # m - distance to consider waypoint reached
 HEADING_THRESHOLD = 0.15  # rad - heading alignment threshold
 
@@ -1139,8 +1146,9 @@ class RobotController:
         # State
         self.position = (0.0, 0.0)
         self.heading = 0.0
-        self.battery = random.Random(self.robot_id).uniform(
-            INITIAL_BATTERY_MIN, BATTERY_CAPACITY)
+        experiment_seed = int(os.environ.get("SEED", "42"))
+        self.battery = initial_battery_for_robot(
+            experiment_seed, self.robot_id)
         
         print(f"[Robot {self.robot_id}] Initialized")
 

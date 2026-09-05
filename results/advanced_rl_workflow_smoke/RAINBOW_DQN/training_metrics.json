@@ -1,0 +1,21 @@
+{
+  "algorithm": "RAINBOW_DQN",
+  "seed": 7,
+  "episodes": 1,
+  "checkpoint": "results\\advanced_rl_workflow_smoke\\RAINBOW_DQN\\model.npz",
+  "environment_mode": "abstract",
+  "manifest_scenario": "A",
+  "validation": {
+    "reward": 49.158745270284534,
+    "updates": 0,
+    "mean_update": null
+  },
+  "history": [
+    {
+      "reward": 48.244383402984184,
+      "updates": 8,
+      "mean_update": 3.9617615193128586
+    }
+  ],
+  "test_not_used_for_selection": true
+}

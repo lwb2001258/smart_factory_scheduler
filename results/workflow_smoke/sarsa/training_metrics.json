@@ -1,0 +1,47 @@
+{
+  "algorithm": "SARSA",
+  "episodes": 1,
+  "seed": 77,
+  "environment_mode": "abstract",
+  "training_geometry": "factory-grid-astar-v3-online",
+  "curriculum": "A-like(3/5)->B-like(5/8)->C-like(8/12)",
+  "training_seconds": 0.5575591000379063,
+  "best_validation_score": 2001.9812681526548,
+  "history": [
+    {
+      "episode": 1,
+      "reward": 49.33009882979503,
+      "loss": null,
+      "epsilon": 0.999,
+      "validation": {
+        "mean_reward": 198.1268152654789,
+        "std_reward": 1.9960053323582103,
+        "mean_completed": 20.0,
+        "invalid_actions": 0
+      },
+      "validation_selection_score": 2001.9812681526548
+    }
+  ],
+  "best_validation_reward": 198.1268152654789,
+  "best_validation_metrics": {
+    "mean_reward": 198.1268152654789,
+    "std_reward": 1.9960053323582103,
+    "mean_completed": 20.0,
+    "invalid_actions": 0
+  },
+  "reward_config": {
+    "task_completion": 10.0,
+    "valid_assignment": 0.5,
+    "priority": 0.5,
+    "distance_weight": -0.08,
+    "age_bonus": 0.5,
+    "age_scale_seconds": 120.0,
+    "max_age_bonus_units": 2.0,
+    "waiting_weight": -0.03,
+    "invalid_action": -5.0,
+    "no_op": -2.0,
+    "collision": -100.0,
+    "deadlock": 0.0
+  },
+  "test_not_used_for_selection": true
+}

@@ -11,10 +11,26 @@ sys.path.insert(0, str(SUPERVISOR_DIR))
 
 from factory_supervisor import FactorySupervisor, RobotInfo
 from config import RobotState
+from task_generator import TransportTask
 from joint_grid_planner import TimedCell
 
 
 class SupervisorPredictionTests(unittest.TestCase):
+    def test_low_battery_cannot_requeue_onboard_cargo(self):
+        supervisor = FactorySupervisor.__new__(FactorySupervisor)
+        supervisor.sim_time = 10.0
+        robot = RobotInfo(1, (0.0, 0.0))
+        task = TransportTask(
+            1, "A", "B", (0.0, 0.0), (1.0, 0.0), 0.0,
+            cargo_state="onboard")
+        robot.current_task = task
+        robot.state = RobotState.EN_ROUTE_DELIVERY
+        supervisor.robots = {1: robot}
+        self.assertFalse(supervisor._requeue_task_for_low_battery(
+            1, cancel=True))
+        self.assertIs(robot.current_task, task)
+        self.assertEqual("onboard", task.cargo_state)
+
     def test_joint_wait_protocol_rejects_nonfinite_oversized_and_unknown(self):
         supervisor = FactorySupervisor.__new__(FactorySupervisor)
         supervisor.sim_time = 10.0
