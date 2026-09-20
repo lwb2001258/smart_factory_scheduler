@@ -12,6 +12,7 @@ import heapq
 import itertools
 import math
 import time
+from collections import OrderedDict
 from typing import List, Dict, Tuple, Optional, Set
 from dataclasses import dataclass, field
 from config import (
@@ -26,6 +27,7 @@ from cbs_planner import CBSPlanner, LifelongPlanner
 from grid_planner import OccupancyGrid, GridAStar, subsample_path
 from joint_grid_planner import JointGridPlan, JointGridPlanner
 from safety_coordination import ReservationManager, priority_key
+from motion_safety import MOTION_SAFETY
 
 
 @dataclass(order=True)
@@ -229,6 +231,7 @@ class MotionCoordinator:
 
     def __init__(self, num_active_robots: int = 8):
         self.num_active_robots = num_active_robots
+        self.metrics = None
         self.graph = FactoryGraph()
         self.planner = AStarPlanner(self.graph)
         # CBS multi-agent planner (uses the same factory graph)
@@ -259,17 +262,25 @@ class MotionCoordinator:
         # permits it.  A slightly shorter horizon makes this tier solvable
         # under the synchronous Webots planning budget.
         self.joint_grid_planner_wide = JointGridPlanner(
-            self.grid, horizon_slots=8, time_slot_seconds=1.2,
-            separation_cells=3, minimum_distance_m=0.75)
+            self.grid, horizon_slots=8,
+            time_slot_seconds=MOTION_SAFETY.joint_time_slot_s,
+            separation_cells=3,
+            minimum_distance_m=MOTION_SAFETY.wide_planning_clearance_m)
         self.joint_grid_planner = JointGridPlanner(
-            self.grid, horizon_slots=12, time_slot_seconds=1.2,
-            separation_cells=3, minimum_distance_m=0.70)
+            self.grid, horizon_slots=12,
+            time_slot_seconds=MOTION_SAFETY.joint_time_slot_s,
+            separation_cells=3,
+            minimum_distance_m=MOTION_SAFETY.planning_clearance_m)
         self.joint_grid_planner_short = JointGridPlanner(
-            self.grid, horizon_slots=4, time_slot_seconds=1.2,
-            separation_cells=3, minimum_distance_m=0.70)
+            self.grid, horizon_slots=4,
+            time_slot_seconds=MOTION_SAFETY.joint_time_slot_s,
+            separation_cells=3,
+            minimum_distance_m=MOTION_SAFETY.planning_clearance_m)
         self.joint_grid_planner_soft = JointGridPlanner(
-            self.grid, horizon_slots=8, time_slot_seconds=1.2,
-            separation_cells=2, minimum_distance_m=0.70)
+            self.grid, horizon_slots=8,
+            time_slot_seconds=MOTION_SAFETY.joint_time_slot_s,
+            separation_cells=3,
+            minimum_distance_m=MOTION_SAFETY.planning_clearance_m)
         
         # Grid path-cell reservations: maps robot_id �?set of (col, row) cells
         # currently reserved by that robot's active path. When planning for
@@ -307,60 +318,96 @@ class MotionCoordinator:
         self.joint_grid_candidates_validated = 0
         self.joint_grid_candidates_timed_out = 0
         self.joint_grid_candidates_failed = 0
+        self.joint_grid_candidate_cache_hits = 0
+        self._joint_grid_candidate_cache = OrderedDict()
         self.joint_transactions_attempted = 0
         self.joint_transactions_activated = 0
         self.joint_transactions_aborted = 0
+
+    def _record_joint_tier_wall(self, tier: str, started: float) -> None:
+        metrics = getattr(self, 'metrics', None)
+        if metrics is not None and hasattr(
+                metrics, 'record_joint_planning_tier_wall'):
+            metrics.record_joint_planning_tier_wall(
+                tier, time.perf_counter() - started)
 
     def plan_joint_grid_candidate(
             self, agents: Dict[int, Tuple[Tuple[float, float],
                                           Tuple[float, float]]],
             *, max_seconds: float = 0.20,
-            priority_order: Optional[Tuple[int, ...]] = None
+            priority_order: Optional[Tuple[int, ...]] = None,
+            blocked_cells: Optional[set] = None,
+            blocked_cells_by_slot: Optional[Dict[int, set]] = None
             ) -> Optional[JointGridPlan]:
         """Build and independently validate one all-active space-time plan."""
         self.joint_grid_candidates_attempted += 1
         started = time.perf_counter()
+        cache_key = self._joint_candidate_cache_key(
+            agents, priority_order, blocked_cells, blocked_cells_by_slot)
+        cached = self._joint_grid_candidate_cache.get(cache_key)
+        if cached is not None:
+            self._joint_grid_candidate_cache.move_to_end(cache_key)
+            self.joint_grid_candidate_cache_hits += 1
+            self.joint_grid_candidates_validated += 1
+            return self._clone_joint_candidate(cached, 0.0)
         # Try the wide-envelope tier first.  A 0.75 m centreline plan is
         # still solvable for most rolling windows and absorbs the small
         # pure-pursuit tracking error that otherwise pushes a 0.70 m plan
         # down to about 0.62 m.  If the dense state is temporarily
         # infeasible, keep the legacy 0.70 m tiers as a moving fallback.
         wide_budget = min(max_seconds * 0.55, 0.35)
+        wide_started = time.perf_counter()
         candidate = self.joint_grid_planner_wide.plan(
-            agents, max_seconds=wide_budget, priority_order=priority_order)
+            agents, max_seconds=wide_budget, priority_order=priority_order,
+            blocked_cells=blocked_cells,
+            blocked_cells_by_slot=blocked_cells_by_slot)
+        self._record_joint_tier_wall('wide', wide_started)
         if candidate is not None and self.joint_grid_planner_wide.validate(
                 candidate):
             self.joint_grid_candidates_validated += 1
+            self._remember_joint_candidate(cache_key, candidate)
             return candidate
 
         remaining = max(0.08, max_seconds - (time.perf_counter() - started))
         primary_budget = min(remaining, 0.90)
+        primary_started = time.perf_counter()
         candidate = self.joint_grid_planner.plan(
-            agents, max_seconds=primary_budget, priority_order=priority_order)
+            agents, max_seconds=primary_budget, priority_order=priority_order,
+            blocked_cells=blocked_cells,
+            blocked_cells_by_slot=blocked_cells_by_slot)
+        self._record_joint_tier_wall('primary', primary_started)
         if candidate is not None and self.joint_grid_planner.validate(candidate):
             self.joint_grid_candidates_validated += 1
+            self._remember_joint_candidate(cache_key, candidate)
             return candidate
 
         # Keep a usable shorter-horizon path when the dense primary search
         # times out. This is a temporary throughput degradation, not a stop.
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
+        short_started = time.perf_counter()
         candidate = self.joint_grid_planner_short.plan(
-            agents, max_seconds=remaining, priority_order=priority_order)
+            agents, max_seconds=remaining, priority_order=priority_order,
+            blocked_cells=blocked_cells,
+            blocked_cells_by_slot=blocked_cells_by_slot)
+        self._record_joint_tier_wall('short', short_started)
         if candidate is not None and self.joint_grid_planner_short.validate(candidate):
             self.joint_grid_candidates_validated += 1
+            self._remember_joint_candidate(cache_key, candidate)
             return candidate
 
-        # Dense starts and duplicate business goals can make the strict
-        # 3-cell separation plan unsolvable even though the factory has ample
-        # free space.  Use the softer 2-cell plan as a rolling fallback; the
-        # supervisor's predictive joint speed shield then restores the
-        # physical clearance envelope before any pair can approach.
+        # Final bounded-search fallback. It changes horizon/search budget, not
+        # the physical separation contract; do not label it as a relaxed
+        # safety candidate.
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
+        soft_started = time.perf_counter()
         candidate = self.joint_grid_planner_soft.plan(
-            agents, max_seconds=remaining, priority_order=priority_order)
+            agents, max_seconds=remaining, priority_order=priority_order,
+            blocked_cells=blocked_cells,
+            blocked_cells_by_slot=blocked_cells_by_slot)
+        self._record_joint_tier_wall('soft', soft_started)
         if candidate is not None and self.joint_grid_planner_soft.validate(candidate):
-            candidate.is_relaxed = True
             self.joint_grid_candidates_validated += 1
+            self._remember_joint_candidate(cache_key, candidate)
             return candidate
 
         if self.joint_grid_planner.last_failure_reason == "timeout":
@@ -368,6 +415,37 @@ class MotionCoordinator:
         else:
             self.joint_grid_candidates_failed += 1
         return None
+
+    def _joint_candidate_cache_key(
+            self, agents, priority_order, blocked_cells,
+            blocked_cells_by_slot):
+        grid_agents = tuple(
+            (int(rid), self.grid.world_to_grid(*start),
+             self.grid.world_to_grid(*goal))
+            for rid, (start, goal) in sorted(agents.items()))
+        order = tuple(priority_order or ())
+        static_blocked = tuple(sorted(blocked_cells or ()))
+        timed_blocked = tuple(
+            (int(slot), tuple(sorted(cells)))
+            for slot, cells in sorted((blocked_cells_by_slot or {}).items()))
+        return grid_agents, order, static_blocked, timed_blocked
+
+    @staticmethod
+    def _clone_joint_candidate(candidate, planning_seconds):
+        return JointGridPlan(
+            paths={rid: list(path) for rid, path in candidate.paths.items()},
+            planning_seconds=float(planning_seconds), order=tuple(candidate.order),
+            expanded_nodes=int(candidate.expanded_nodes),
+            time_slot_seconds=float(candidate.time_slot_seconds),
+            score=tuple(candidate.score),
+            orders_evaluated=int(candidate.orders_evaluated))
+
+    def _remember_joint_candidate(self, cache_key, candidate):
+        self._joint_grid_candidate_cache[cache_key] = self._clone_joint_candidate(
+            candidate, candidate.planning_seconds)
+        self._joint_grid_candidate_cache.move_to_end(cache_key)
+        while len(self._joint_grid_candidate_cache) > 128:
+            self._joint_grid_candidate_cache.popitem(last=False)
 
     def set_priorities(self, robot_ids: List[int]):
         """
@@ -384,51 +462,7 @@ class MotionCoordinator:
         by ROBOT_RADIUS). Used to filter start-node candidates so
         the robot doesn't have to drive through an obstacle to
         reach the first waypoint."""
-        # Inflated obstacle list (matches scripts/verify_layout.py)
-        r = ROBOT_RADIUS
-        obstacles = [
-            (-3.0, 0.0, 0.5 + r, 1.0 + r),  # shelf_1
-            (-1.0, 0.0, 0.5 + r, 1.0 + r),  # shelf_2
-            ( 1.0, 0.0, 0.5 + r, 1.0 + r),  # shelf_3
-            ( 3.0, 0.0, 0.5 + r, 1.0 + r),  # shelf_4
-            (-6.0,  5.0, 1.1 + r, 0.85 + r),  # WS1 table
-            ( 0.0,  5.0, 1.1 + r, 0.85 + r),  # WS2 table
-            ( 6.0,  5.0, 1.1 + r, 0.85 + r),  # WS3 table
-            (-6.0, -5.0, 1.1 + r, 0.85 + r),  # WS4 table
-            ( 0.0, -5.0, 1.1 + r, 0.85 + r),  # WS5 table
-            ( 6.0, -5.0, 1.1 + r, 0.85 + r),  # WS6 table
-        ]
-        x1, y1 = p1
-        x2, y2 = p2
-        for cx, cy, hx, hy in obstacles:
-            minx, maxx = cx - hx, cx + hx
-            miny, maxy = cy - hy, cy + hy
-            dx, dy = x2 - x1, y2 - y1
-            t0, t1 = 0.0, 1.0
-            ok = True
-            for p, q in [(-dx, x1 - minx), (dx, maxx - x1),
-                         (-dy, y1 - miny), (dy, maxy - y1)]:
-                if abs(p) < 1e-12:
-                    if q < 0:
-                        ok = False
-                        break
-                else:
-                    r_t = q / p
-                    if p < 0:
-                        if r_t > t1:
-                            ok = False
-                            break
-                        if r_t > t0:
-                            t0 = r_t
-                    else:
-                        if r_t < t0:
-                            ok = False
-                            break
-                        if r_t < t1:
-                            t1 = r_t
-            if ok and t0 < t1:
-                return False
-        return True
+        return not line_intersects_obstacles(p1, p2)
 
     def plan_path_for_robot(self, robot_id: int, 
                              current_position: Tuple[float, float],
@@ -1372,7 +1406,7 @@ class MotionCoordinator:
     def _reserve_ordered_grid_cells(self, robot_id, ordered_cells,
                                     start_delay=0.0):
         """Atomically reserve a grid route at its expected traversal times."""
-        seconds_per_cell = 0.25 / 0.22
+        seconds_per_cell = 0.25 / MOTION_SAFETY.maximum_speed_mps
         turn_seconds = 0.5
         arrivals = [0.0]
         previous_direction = None
@@ -1414,7 +1448,7 @@ class MotionCoordinator:
         initial delay is considered separately and can be represented by the
         supervisor's existing hold command.
         """
-        seconds_per_cell = 0.25 / 0.22
+        seconds_per_cell = 0.25 / MOTION_SAFETY.maximum_speed_mps
         deadline = time.perf_counter() + SPACE_TIME_DETOUR_BUDGET_SECONDS
         expansions = 0
         max_steps = max(8, int(math.ceil(max(1, baseline_cells) * 1.8)))
@@ -2188,6 +2222,8 @@ class MotionCoordinator:
             "joint_grid_candidates_timed_out":
                 self.joint_grid_candidates_timed_out,
             "joint_grid_candidates_failed": self.joint_grid_candidates_failed,
+            "joint_grid_candidate_cache_hits":
+                self.joint_grid_candidate_cache_hits,
             "joint_transactions_attempted": self.joint_transactions_attempted,
             "joint_transactions_activated": self.joint_transactions_activated,
             "joint_transactions_aborted": self.joint_transactions_aborted,

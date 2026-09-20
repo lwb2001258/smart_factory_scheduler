@@ -1,0 +1,59 @@
+{
+  "schema": "collision-workflow-audit-v1",
+  "status": "PASS",
+  "identity": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "seed": 42,
+    "run_mode": "webots"
+  },
+  "motion_safety_fingerprint": "83910fda370535e7f92c9224ed9b399fdf16b6a003e8133ce46acec2e949ee57",
+  "duration": 300.01599999999894,
+  "safety": {
+    "min_pair_distance": 0.6800892532626631,
+    "pair_distance_violations": 0,
+    "nonphysical_recoveries": 0,
+    "unsafe_reasons": []
+  },
+  "replans": {
+    "total": 52,
+    "by_source": {
+      "_command_reverse": 35,
+      "_joint_stall_recovery": 16,
+      "_priority_yield_direct": 1
+    },
+    "by_category": {
+      "escape_triggered": 35,
+      "other": 1,
+      "stall_recovery": 16
+    }
+  },
+  "route_dispatches": {
+    "total": 592,
+    "by_source": {
+      "_command_reverse": 35,
+      "_joint_stall_recovery": 16,
+      "_priority_yield_direct": 1,
+      "joint_grid_transaction": 540
+    },
+    "by_category": {
+      "escape_recovery": 35,
+      "other": 1,
+      "rolling_joint": 540,
+      "stall_recovery": 16
+    },
+    "unauthorized": 0
+  },
+  "physical_escapes": 51,
+  "joint_timing": {
+    "samples": 469,
+    "p99_seconds": 3.328000000000003,
+    "window_gaps": 0,
+    "expired_movements": 0
+  },
+  "webots_performance": {
+    "webots_wall_seconds": 127.8610192000051,
+    "sim_to_wall_ratio": 2.346297580584185,
+    "scheduling_p99_ms": 12.34309998108074
+  }
+}

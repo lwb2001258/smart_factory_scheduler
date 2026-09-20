@@ -16,6 +16,9 @@ from rl_model_registry import audit_checkpoint, registry_snapshot
 from schedulers import ModelValidationError, create_scheduler
 from schedulers import SchedulerResult
 from rl_schedulers import RLSchedulerSafetyWrapper
+from rl_schedulers import DQNScheduler
+from rl_environment import SchedulingEnvironment
+from training_scenarios import factory_scenario
 
 
 AGENTS = {
@@ -49,6 +52,23 @@ def test_benign_empty_feasible_graph_is_not_counted_as_rl_fallback():
     assert result.diagnostics["benign_no_decision"]
     assert wrapper.fallback_decisions == 0
     assert wrapper.consecutive_failures == 0
+
+
+def test_dqn_legal_noop_is_benign_and_does_not_activate_fallback():
+    robots, tasks, context = factory_scenario(23, max_robots=2,
+                                              max_generated_tasks=2)
+    for state in robots.values():
+        state["current_task"] = tasks[0]
+    policy = DQNScheduler.__new__(DQNScheduler)
+    policy.name = "DQN"
+    policy.environment = SchedulingEnvironment(simulation_mode="webots")
+    policy.agent = type("Agent", (), {"select_action": lambda self, *args,
+                         **kwargs: policy.environment.no_op_action})()
+    wrapper = RLSchedulerSafetyWrapper(policy)
+    result = wrapper.assign(tasks, robots, context)
+    assert result.diagnostics["reason"] == "no_feasible_pair"
+    assert result.diagnostics["benign_no_decision"]
+    assert wrapper.fallback_decisions == 0
 
 
 @pytest.mark.parametrize("algorithm", AGENTS)

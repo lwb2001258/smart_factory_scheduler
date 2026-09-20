@@ -29,6 +29,23 @@ def rasterize(coordinator, start, waypoints, spacing=0.10):
 
 
 class MotionCoordinationRegressionTests(unittest.TestCase):
+
+    def test_joint_tiers_share_timing_and_do_not_fake_relaxed_clearance(self):
+        coordinator = MotionCoordinator(num_active_robots=2)
+        planners = (
+            coordinator.joint_grid_planner_wide,
+            coordinator.joint_grid_planner,
+            coordinator.joint_grid_planner_short,
+            coordinator.joint_grid_planner_soft,
+        )
+        from motion_safety import MOTION_SAFETY
+        self.assertTrue(all(
+            planner.time_slot_seconds == MOTION_SAFETY.joint_time_slot_s
+            for planner in planners))
+        self.assertEqual(
+            coordinator.joint_grid_planner_soft.minimum_distance_m,
+            MOTION_SAFETY.planning_clearance_m)
+        self.assertEqual(coordinator.joint_grid_planner_soft.separation_cells, 3)
     def test_joint_grid_validation_rejection_is_counted_as_failure(self):
         coordinator = MotionCoordinator(2)
         agents = {
@@ -65,6 +82,32 @@ class MotionCoordinationRegressionTests(unittest.TestCase):
         statistics = coordinator.get_statistics()
         self.assertEqual(1, statistics["joint_grid_candidates_attempted"])
         self.assertEqual(1, statistics["joint_grid_candidates_validated"])
+
+    def test_joint_candidate_cache_reuses_same_grid_state_as_a_copy(self):
+        coordinator = MotionCoordinator(1)
+        agents = {1: ((-7.01, 3.01), (-6.0, 3.5))}
+        first = coordinator.plan_joint_grid_candidate(
+            agents, max_seconds=1.0, priority_order=(1,))
+        second = coordinator.plan_joint_grid_candidate(
+            {1: ((-7.02, 3.02), (-6.01, 3.49))},
+            max_seconds=1.0, priority_order=(1,))
+        self.assertIsNotNone(first)
+        self.assertIsNotNone(second)
+        self.assertIsNot(first, second)
+        self.assertEqual(first.paths, second.paths)
+        self.assertEqual(0.0, second.planning_seconds)
+        self.assertEqual(1, coordinator.joint_grid_candidate_cache_hits)
+
+    def test_joint_candidate_cache_separates_time_slot_obstacles(self):
+        coordinator = MotionCoordinator(1)
+        agents = {1: ((-7.0, 3.0), (-6.0, 3.5))}
+        coordinator.plan_joint_grid_candidate(
+            agents, max_seconds=1.0, priority_order=(1,),
+            blocked_cells_by_slot={1: {(0, 0)}})
+        coordinator.plan_joint_grid_candidate(
+            agents, max_seconds=1.0, priority_order=(1,),
+            blocked_cells_by_slot={2: {(0, 0)}})
+        self.assertEqual(0, coordinator.joint_grid_candidate_cache_hits)
 
     def test_near_term_spatial_prefix_is_clipped(self):
         points = [(0.0, 0.0), (3.0, 0.0), (6.0, 0.0)]

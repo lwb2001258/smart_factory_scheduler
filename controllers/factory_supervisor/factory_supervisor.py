@@ -64,6 +64,24 @@ from config import (
     INITIAL_BATTERY_MIN, INITIAL_BATTERY_MAX,
     LOG_INTERVAL, LOCATION_TO_NODE, initial_battery_for_robot
 )
+
+PROGRESS_LEASE_SOFT_TIMEOUT = 5.0
+COMMAND_ZERO_RECOVERY_TIMEOUT = 5.25
+COMMAND_ZERO_RECOVERY_RETRY_INTERVAL = 1.50
+TERMINAL_OCCUPANCY_RADIUS = 0.60
+TERMINAL_CLEARANCE_RADIUS = 0.65
+# Keep a narrow post-release priority band so an incoming route cannot cause
+# an immediate priority flip at the 0.65 m capacity boundary.  A wide band
+# made otherwise unrelated rolling conflicts repeatedly replan.
+TERMINAL_EGRESS_PRIORITY_RADIUS = 0.70
+TERMINAL_STAGING_ACTIVATION_RADIUS = 1.50
+TERMINAL_DEPARTURE_RADIUS = 0.85
+RECOVERY_MIN_TARGET_DISPLACEMENT = 0.50
+TERMINAL_COORDINATES = (
+    tuple(ALL_LOCATIONS.items()) + tuple(CHARGING_STATIONS.items()))
+TERMINAL_HANDOFF_ENABLED = os.environ.get(
+    'SMART_FACTORY_TERMINAL_HANDOFF_ENABLED', '1').strip().lower() not in {
+        '0', 'false', 'no', 'off'}
 from task_generator import TaskGenerator, TransportTask
 from motion_coordinator import MotionCoordinator
 from schedulers import (
@@ -75,6 +93,9 @@ from schedulers import (
 from startup_gate import StartupGate
 from metrics_collector import MetricsCollector, SafetyEvent
 from rl_event_ledger import RLEventLedger
+from motion_safety import MOTION_SAFETY
+from collision_safety import RiskLevel, assess_motion_risk
+from rl_environment import SchedulingEnvironment
 from joint_plan_transaction import JointPlanTransaction
 
 
@@ -103,10 +124,72 @@ class RobotInfo:
         self.path_version = 0
         self.controller_path_version = 0
         self.controller_waypoint_index = 0
+        self.controller_reported_target = None
+        self.controller_reported_waypoint_count = 0
         self.controller_active_plan_epoch = 0
+        self._telemetry_plan_epoch = 0
+        self._telemetry_waypoint_index = 0
+        self._telemetry_waypoint_changed_at = 0.0
+        self._physical_waypoint_index = 0
+        self._physical_waypoint_started_at = 0.0
+        self._physical_waypoint_start_position = initial_position
+        self._physical_waypoint_departed_at = None
+        self.active_joint_offsets: Tuple[float, ...] = ()
         self.controller_paused_until = 0.0
         self.controller_joint_wait_until = 0.0
         self.controller_joint_wait_reason = None
+        self.last_joint_endpoint_request_identity = None
+        self.controller_status_seq = 0
+        self.controller_status_session = None
+        self.controller_status_sample_time = 0.0
+        self.controller_status_drops = 0
+        self.controller_left_wheel_speed = 0.0
+        self.controller_right_wheel_speed = 0.0
+        self.controller_measured_left_wheel_speed = None
+        self.controller_measured_right_wheel_speed = None
+        self.controller_linear_speed = 0.0
+        self.controller_angular_speed = 0.0
+        self.controller_local_risk_level = 'unknown'
+        self.advance_grant_seq = 0
+        self.advance_grant_epoch = 0
+        self.advance_grant_waypoint_index = -1
+        self.advance_grant_valid_until = 0.0
+        self.advance_grants = {}
+        self.advance_hold_until = 0.0
+        self.advance_hold_reason = None
+        self.controller_stop_reason = 'unknown'
+        self.progress_lease_generation = 0
+        self.progress_lease_goal = None
+        self.progress_lease_started_at = 0.0
+        self.progress_lease_last_progress_at = 0.0
+        self.progress_lease_start_position = initial_position
+        self.progress_lease_last_position = initial_position
+        self.progress_lease_best_goal_distance = float('inf')
+        self.progress_lease_escalation_stage = 0
+        self.uncommanded_zero_since = None
+        self.uncommanded_zero_recovery_dispatched = False
+        self.uncommanded_zero_next_recovery_at = 0.0
+        self.uncommanded_zero_hard_reported = False
+        self.last_consumed_replan_identity = None
+        # A completed pickup/delivery/charge service keeps physical ownership
+        # of its terminal until fresh poses prove that the robot has cleared
+        # the terminal boundary.  A new task/route must not erase this lease.
+        self.terminal_clearance_location = None
+        self.terminal_egress_location = None
+        self.terminal_egress_priority_active = False
+        self.terminal_departure_location = None
+        self.terminal_clearance_epoch = 0
+        self.terminal_clearance_started_at = 0.0
+        self.terminal_clearance_fresh_samples = 0
+        self.terminal_last_denial = None
+        self.terminal_last_grant = None
+        self.terminal_staging_cache_key = None
+        self.terminal_staging_cache_target = None
+        self.terminal_egress_retry_started_at = None
+        self.terminal_egress_retry_terminal = None
+        self.terminal_egress_retry_at = 0.0
+        self.terminal_egress_retry_count = 0
+        self.terminal_egress_retry_last_reason = None
         self.active_joint_started_at = 0.0
         self.active_joint_wait_deadline = 0.0
         self.pending_waypoints: Optional[List[Tuple[float, float]]] = None
@@ -124,6 +207,13 @@ class RobotInfo:
         self.emergency_braking_since = None
         self.recovery_active = False
         self.recovery_resume_goal = None
+        # A validated physical escape must be allowed to execute; ordinary
+        # rolling epochs and a second watchdog escalation must not replace it
+        # before arrival or this bounded deadline.
+        self.recovery_execution_generation = 0
+        self.recovery_execution_target = None
+        self.recovery_execution_business_goal = None
+        self.recovery_execution_until = 0.0
         self.recovery_session_role = None
         self.recovery_session_until = 0.0
         self.recovery_started_position = None
@@ -151,6 +241,10 @@ class RobotInfo:
         
     def to_dict(self) -> dict:
         """Convert robot state to dictionary for scheduler input."""
+        controller_index = max(0, int(self.controller_waypoint_index))
+        controller_target = (
+            self.waypoints[controller_index]
+            if controller_index < len(self.waypoints) else None)
         return {
             'position': self.position,
             'heading': self.heading,
@@ -185,6 +279,46 @@ class RobotInfo:
                 self.dispatch_not_before, self.hold_until,
                 self.controller_paused_until,
                 self.controller_joint_wait_until),
+            # Low-rate diagnostic snapshot fields.  These are already
+            # received from controller status packets; exposing them here
+            # adds no controller traffic or per-step event logging.
+            'controller_motion_state': (
+                'moving' if abs(self.controller_linear_speed) >= 0.03 else
+                'turning' if abs(self.controller_angular_speed) >= 0.10 else
+                'zero'),
+            'controller_linear_speed': self.controller_linear_speed,
+            'controller_angular_speed': self.controller_angular_speed,
+            'controller_measured_left_wheel_speed': (
+                self.controller_measured_left_wheel_speed),
+            'controller_measured_right_wheel_speed': (
+                self.controller_measured_right_wheel_speed),
+            'controller_stop_reason': self.controller_stop_reason,
+            'controller_local_risk_level': self.controller_local_risk_level,
+            'controller_status_sample_time': self.controller_status_sample_time,
+            'controller_target': controller_target,
+            'controller_target_distance': (
+                math.hypot(controller_target[0] - self.position[0],
+                           controller_target[1] - self.position[1])
+                if controller_target is not None else None),
+            'controller_reported_target': self.controller_reported_target,
+            'controller_reported_target_distance': (
+                math.hypot(self.controller_reported_target[0] - self.position[0],
+                           self.controller_reported_target[1] - self.position[1])
+                if self.controller_reported_target is not None else None),
+            'controller_reported_waypoint_count': (
+                self.controller_reported_waypoint_count),
+            'controller_target_mismatch': bool(
+                controller_target is not None and
+                self.controller_reported_target is not None and
+                math.hypot(controller_target[0] -
+                           self.controller_reported_target[0],
+                           controller_target[1] -
+                           self.controller_reported_target[1]) > 0.02),
+            'controller_paused_until': self.controller_paused_until,
+            'controller_joint_wait_until': self.controller_joint_wait_until,
+            'controller_joint_wait_reason': self.controller_joint_wait_reason,
+            'dispatch_not_before': self.dispatch_not_before,
+            'hold_until': self.hold_until,
         }
     
     def _get_current_goal(self) -> Optional[str]:
@@ -242,6 +376,68 @@ class FactorySupervisor:
             return self._navigation_goal(robot) is not None
         return bool(moving_state and robot.waypoints and
                     robot.current_waypoint_idx < len(robot.waypoints))
+
+    def _update_physical_progress_lease(self, robot: RobotInfo) -> None:
+        """Advance a liveness lease only from a fresh measured pose."""
+        goal = self._navigation_goal(robot)
+        goal_xy = self._goal_coordinates(goal)
+        goal_key = (tuple(goal_xy) if goal_xy is not None else None)
+        if goal_key != robot.progress_lease_goal:
+            robot.progress_lease_generation += 1
+            robot.progress_lease_goal = goal_key
+            robot.progress_lease_started_at = self.sim_time
+            robot.progress_lease_last_progress_at = self.sim_time
+            robot.progress_lease_start_position = robot.position
+            robot.progress_lease_last_position = robot.position
+            robot.progress_lease_best_goal_distance = (
+                math.hypot(robot.position[0] - goal_xy[0],
+                           robot.position[1] - goal_xy[1])
+                if goal_xy is not None else float('inf'))
+            robot.progress_lease_escalation_stage = 0
+            return
+        if goal_xy is None:
+            return
+        displacement = math.hypot(
+            robot.position[0] - robot.progress_lease_last_position[0],
+            robot.position[1] - robot.progress_lease_last_position[1])
+        goal_distance = math.hypot(
+            robot.position[0] - goal_xy[0], robot.position[1] - goal_xy[1])
+        goal_improvement = robot.progress_lease_best_goal_distance - goal_distance
+        if (displacement >= STALL_PROGRESS_DISTANCE or
+                goal_improvement >= STALL_PROGRESS_DISTANCE):
+            robot.progress_lease_last_progress_at = self.sim_time
+            robot.progress_lease_last_position = robot.position
+            robot.progress_lease_best_goal_distance = min(
+                robot.progress_lease_best_goal_distance, goal_distance)
+            robot.progress_lease_escalation_stage = 0
+
+    def _update_uncommanded_zero_lease(self, robot: RobotInfo, status: dict) -> None:
+        """Track controller-authored zero motion independently of pose jitter."""
+        sample_time = robot.controller_status_sample_time
+        navigating = status.get('navigating') is True
+        linear = abs(robot.controller_linear_speed)
+        angular = abs(robot.controller_angular_speed)
+        commanded_motion = linear >= 0.03 or angular >= 0.10
+        validated_wait = bool(
+            status.get('emergency_braking') is True or
+            (robot.controller_joint_wait_reason is not None and
+             robot.controller_joint_wait_until >= sample_time) or
+            robot.controller_paused_until >= sample_time or
+            (getattr(robot, '_safety_shield_level', 'clear') in
+             ('brake', 'emergency') and
+             getattr(robot, '_safety_shield_until', 0.0) >= sample_time))
+        unexplained_zero = (
+            navigating and not commanded_motion and not validated_wait)
+        if unexplained_zero:
+            if robot.uncommanded_zero_since is None:
+                robot.uncommanded_zero_since = sample_time
+            return
+        # Only observed motion, inactive business navigation, or a validated
+        # safety wait ends the continuous command-zero episode.
+        robot.uncommanded_zero_since = None
+        robot.uncommanded_zero_recovery_dispatched = False
+        robot.uncommanded_zero_next_recovery_at = 0.0
+        robot.uncommanded_zero_hard_reported = False
 
     @staticmethod
     def _goal_coordinates(goal):
@@ -361,25 +557,12 @@ class FactorySupervisor:
         plans = {}
         offsets = {}
         partial = {}
-        fallback_log = getattr(self, '_fallback_debug_path', None)
-        if fallback_log is None:
-            fallback_log = r'D:\code\smart_factory_scheduler\results\fallback_debug.log'
-            self._fallback_debug_path = fallback_log
-            with open(fallback_log, 'w', encoding='utf-8') as handle:
-                handle.write('call,rid,event\n')
-        debug_lines = [f'{self.sim_time:.3f},all,start']
         for rid in sorted(planning_agents,
                            key=self._priority_yield_key,
                            reverse=True):
             start, goal_xy = planning_agents[rid]
-            debug_lines.append(
-                f'{self.sim_time:.3f},{rid},plan_start '
-                f'start={start} goal={goal_xy}')
             path = self.motion_coordinator.plan_grid_lifelong(
                 rid, start, goal_xy)
-            debug_lines.append(
-                f'{self.sim_time:.3f},{rid},plan_end '
-                f'len={len(path) if path else 0}')
             if not path:
                 continue
             points = [tuple(point) for point in path]
@@ -400,10 +583,21 @@ class FactorySupervisor:
                            points[-1][1] - true_goal[1]) <=
                 GOAL_TOLERANCE * 2.0)
             plans[rid] = points
-            offsets[rid] = [0.0] * len(points)
+            # ``plan_grid_lifelong`` returns the measured/start cell first in
+            # normal operation.  Keep that anchor and the first future cell
+            # immediately executable, then give every later cell its own
+            # latest-exit slot.  Assigning zero to every point makes the
+            # entire fallback route expire together one slot after activation
+            # and synchronously stops the fleet on any multi-cell route.
+            anchor_count = 1 if math.hypot(
+                points[0][0] - start[0],
+                points[0][1] - start[1]) <= 0.18 else 0
+            offsets[rid] = [
+                max(0, index - anchor_count) *
+                MOTION_SAFETY.joint_time_slot_s
+                for index in range(len(points))
+            ]
             partial[rid] = not is_full_goal
-        with open(fallback_log, 'a', encoding='utf-8') as handle:
-            handle.write('\n'.join(debug_lines) + '\n')
         return plans, offsets, partial
 
     def _retire_joint_transaction(self, txn, reason: str = 'rolling_replan'):
@@ -431,7 +625,15 @@ class FactorySupervisor:
     def _refresh_joint_grid_candidate(self):
         """Build and transactionally dispatch one all-active rolling plan."""
         active_txn = getattr(self, '_joint_plan_transaction', None)
+        requested_component = set(getattr(
+            self, '_pending_joint_plan_robot_ids', set()))
+        self._pending_joint_plan_robot_ids = set()
+        replacement_txn = None
+        ordinary_refresh = False
         if active_txn is not None and active_txn.state == 'activated':
+            new_route_less_component = bool(
+                requested_component and
+                requested_component.isdisjoint(set(active_txn.members)))
             all_complete = all(
                 self._robot_completed_joint_txn(self.robots[rid],
                                                 active_txn)
@@ -441,14 +643,40 @@ class FactorySupervisor:
             # plan keeps running while the next plan is prepared, so no
             # member ever needs to park waiting for the whole group.
             if not all_complete:
-                min_interval = getattr(
-                    self, '_joint_replan_min_interval', 2.0)
-                if self.sim_time < active_txn.activate_at + min_interval:
+                ordinary_refresh = bool(
+                    not getattr(self, '_joint_liveness_needed', False) and
+                    self._joint_transaction_goals_match(active_txn) and
+                    not new_route_less_component)
+                min_interval = self._joint_refresh_interval(active_txn)
+                if (ordinary_refresh and
+                        self.sim_time < active_txn.activate_at + min_interval):
                     return
-            self._retire_joint_transaction(
-                active_txn, reason='rolling_replan')
+                if (self._joint_transaction_has_unstarted_members(active_txn) and
+                        not getattr(self, '_joint_liveness_needed', False) and
+                        not new_route_less_component):
+                    return
+            # Keep the committed prefix executing while its successor is
+            # planned.  The old transaction is retired only immediately
+            # before a validated, materially different successor begins.
+            if (not requested_component or
+                    requested_component == set(active_txn.members)):
+                replacement_txn = active_txn
         agents = {}
+        recovery_blocked_by_slot = {}
         for rid, robot in self.robots.items():
+            if requested_component and rid not in requested_component:
+                if self._has_active_navigation(robot):
+                    for slot, cells in self._recovery_reserved_cells_by_slot(
+                            robot).items():
+                        recovery_blocked_by_slot.setdefault(
+                            slot, set()).update(cells)
+                continue
+            if self._recovery_execution_lease_active(robot):
+                for slot, cells in self._recovery_reserved_cells_by_slot(
+                        robot).items():
+                    recovery_blocked_by_slot.setdefault(slot, set()).update(
+                        cells)
+                continue
             if not self._has_active_navigation(robot):
                 moving_state = robot.state in (
                     RobotState.EN_ROUTE_PICKUP,
@@ -497,8 +725,17 @@ class FactorySupervisor:
         # give every follower a collision-free staging point nearby. Without
         # this, the strict space-time planner sees two robots trying to park
         # in the same terminal cell and returns no_solution.
-        grouped_goals = {}
+        # Terminal handoff arbitration precedes ordinary duplicate-goal
+        # priority. A completed-service owner receives only an egress target;
+        # an incoming robot receives only a staging target until the owner is
+        # physically clear. Their authoritative business goals stay in
+        # ``agents`` and resume in the next rolling window.
+        arbitrated_goals = {}
         for rid, (_start, goal_xy) in agents.items():
+            arbitrated_goals[rid] = self._terminal_arbitrated_goal(
+                rid, goal_xy)
+        grouped_goals = {}
+        for rid, goal_xy in arbitrated_goals.items():
             grouped_goals.setdefault(goal_xy, []).append(rid)
         planning_agents = {}
         for goal_xy, robot_ids in grouped_goals.items():
@@ -524,16 +761,40 @@ class FactorySupervisor:
         budget = min(1.00, 0.25 + failures * 0.05)
         priority_order = tuple(sorted(
             planning_agents, key=self._priority_yield_key, reverse=True))
+        generation = int(getattr(
+            self, '_joint_candidate_generation', 0)) + 1
+        self._joint_candidate_generation = generation
+        candidate_snapshot = self._joint_candidate_snapshot(planning_agents)
+        candidate_kwargs = {
+            'max_seconds': budget,
+            'priority_order': priority_order,
+        }
+        if recovery_blocked_by_slot:
+            candidate_kwargs['blocked_cells_by_slot'] = (
+                recovery_blocked_by_slot)
+        planning_wall_started = real_time.perf_counter()
         candidate = self.motion_coordinator.plan_joint_grid_candidate(
-            planning_agents, max_seconds=budget,
-            priority_order=priority_order)
+            planning_agents, **candidate_kwargs)
+        if getattr(self, 'metrics', None) is not None:
+            self.metrics.record_joint_planning_wall(
+                real_time.perf_counter() - planning_wall_started)
+        if (candidate is not None and
+                candidate_snapshot != self._joint_candidate_snapshot(
+                    planning_agents)):
+            self.motion_coordinator.joint_grid_candidates_failed += 1
+            candidate = None
+            print(f"[JointGrid] generation={generation} discarded: "
+                  "stale robot pose/goal/epoch")
+        elif candidate is not None:
+            candidate.generation = generation
+            candidate.input_snapshot = candidate_snapshot
         self._joint_grid_candidate = candidate
         if candidate is not None:
             self._joint_candidate_failures = 0
             omitted = getattr(candidate, 'omitted_robots', set())
             for rid in omitted:
                 if rid in self.robots:
-                    self._hold_robot(rid, 0.60)
+                    self._hold_only_without_committed_route(rid, 0.60)
             if omitted:
                 self._next_joint_grid_tick = min(
                     getattr(self, '_next_joint_grid_tick', self.sim_time),
@@ -582,11 +843,40 @@ class FactorySupervisor:
             txn = getattr(self, '_joint_plan_transaction', None)
             if (len(plans) >= 1 and
                     (txn is None or txn.state in ('activated', 'aborted'))):
-                self._begin_joint_plan_transaction(
+                if (replacement_txn is not None and
+                        self._joint_candidate_preserves_active_prefix(
+                            replacement_txn, plans)):
+                    metrics = getattr(self, 'metrics', None)
+                    if hasattr(metrics, 'record_joint_refresh_suppressed'):
+                        metrics.record_joint_refresh_suppressed()
+                    return
+                started = self._begin_joint_plan_transaction(
                     plans, waypoint_offsets=offsets,
-                    partial_plans=partial)
+                    partial_plans=partial,
+                    planning_positions={
+                        rid: planning_agents[rid][0] for rid in plans},
+                    replace_transaction=replacement_txn,
+                    replacement_reason='validated_successor')
+                if started and getattr(self, '_joint_liveness_needed', False):
+                    self._joint_liveness_needed = False
         else:
             self._joint_candidate_failures = failures + 1
+            if requested_component:
+                # A component can be infeasible only because a committed
+                # external trajectory occupies its required time-space. One
+                # retry expands ownership to the active fleet so the blocker
+                # and requester are solved together instead of retrying the
+                # same impossible subproblem every 0.5 seconds.
+                expanded = {
+                    rid for rid, robot in self.robots.items()
+                    if (self._has_active_navigation(robot) and
+                        not self._recovery_execution_lease_active(robot))
+                }
+                self._pending_joint_plan_robot_ids.update(
+                    expanded or requested_component)
+            else:
+                self._pending_joint_plan_robot_ids.update(requested_component)
+
             # Preserve the last safe rolling prefix until the progress
             # watchdog confirms an actual liveness failure.  This avoids
             # replacing a still-safe route with an emergency per-robot route
@@ -597,14 +887,23 @@ class FactorySupervisor:
                 txn = getattr(self, '_joint_plan_transaction', None)
                 if (len(fallback_plans) >= 1 and
                         (txn is None or txn.state in ('activated', 'aborted'))):
-                    self._begin_joint_plan_transaction(
+                    started = self._begin_joint_plan_transaction(
                         fallback_plans, waypoint_offsets=fallback_offsets,
-                        partial_plans=fallback_partial)
-                    self._joint_liveness_needed = False
-                    if getattr(self, '_next_joint_grid_log', 0.0) <= self.sim_time:
+                        partial_plans=fallback_partial,
+                        replace_transaction=replacement_txn,
+                        replacement_reason='liveness_successor')
+                    if started:
+                        self._joint_liveness_needed = False
+                    if (started and getattr(
+                            self, '_next_joint_grid_log', 0.0) <= self.sim_time):
                         print(f"[JointGrid] T={self.sim_time:.1f}s fallback "
                               f"liveness plan dispatched for "
                               f"{len(fallback_plans)}/{len(agents)} robots")
+            if (getattr(self, '_joint_liveness_needed', False) or
+                    replacement_txn is None):
+                self._next_joint_grid_tick = min(
+                    getattr(self, '_next_joint_grid_tick', math.inf),
+                    self.sim_time + 0.5)
         if self.sim_time >= getattr(self, '_next_joint_grid_log', 0.0):
             if candidate is None:
                 print(f"[JointGrid] T={self.sim_time:.1f}s no complete "
@@ -616,6 +915,202 @@ class FactorySupervisor:
                       f"{candidate.planning_seconds * 1000:.1f}ms; "
                       f"expanded={candidate.expanded_nodes}")
             self._next_joint_grid_log = self.sim_time + 10.0
+
+    def _hold_only_without_committed_route(self, robot_id, duration) -> bool:
+        """Hold an omitted member only when it has no old route to execute.
+
+        A rolling successor is speculative until committed. Omitting a robot
+        from it must not revoke its active predecessor; repeated partial
+        candidates would otherwise synthesize one permanent stop from a
+        sequence of short supervisor holds.
+        """
+        robot = self.robots[robot_id]
+        has_committed_route = bool(
+            robot.active_plan_source == 'joint_grid_transaction' and
+            robot.active_plan_epoch > 0 and robot.waypoints and
+            robot.controller_waypoint_index < len(robot.waypoints))
+        if has_committed_route:
+            return False
+        self._hold_robot(robot_id, duration)
+        return True
+
+    def _joint_transaction_has_unstarted_members(self, txn) -> bool:
+        """Keep a same-goal route stable until every live member departs."""
+        positions = getattr(txn, 'activation_positions', {})
+        goals = getattr(txn, 'activation_goals', {})
+        if not positions:
+            return False
+        for rid in txn.members:
+            robot = self.robots.get(rid)
+            if robot is None:
+                return False
+            if self._navigation_goal(robot) != goals.get(rid):
+                return False
+        for rid in txn.members:
+            robot = self.robots[rid]
+            if self._robot_completed_joint_txn(robot, txn):
+                continue
+            start = positions.get(rid)
+            if start is None:
+                return False
+            if math.hypot(robot.position[0] - start[0],
+                          robot.position[1] - start[1]) < 0.05:
+                return True
+        return False
+
+    def _consume_joint_planning_event(self) -> None:
+        """Consume one edge-triggered planning event without a fixed tick."""
+        self._next_joint_grid_tick = math.inf
+        self._refresh_joint_grid_candidate()
+
+    def _joint_transaction_goals_match(self, txn) -> bool:
+        goals = getattr(txn, 'activation_goals', {})
+        return bool(goals) and all(
+            rid in self.robots and
+            self._navigation_goal(self.robots[rid]) == goals.get(rid)
+            for rid in txn.members)
+
+    def _joint_candidate_preserves_active_prefix(
+            self, txn, plans, prefix_cells: int = 3,
+            minimum_remaining_seconds: float = 1.5) -> bool:
+        """Return true when an ordinary refresh adds no immediate benefit."""
+        if set(plans) != set(txn.members):
+            return False
+        grid = getattr(self.motion_coordinator, 'grid', None)
+        if grid is None:
+            return False
+        offsets = getattr(txn, 'waypoint_offsets', {}) or {}
+        activate_at = float(getattr(txn, 'activate_at', self.sim_time))
+        planner = getattr(self.motion_coordinator, 'joint_grid_planner', None)
+        slot_seconds = float(getattr(planner, 'time_slot_seconds', 3.0))
+
+        def future_cells(robot, points):
+            cells = []
+            measured = grid.world_to_grid(*robot.position[:2])
+            for point in points:
+                cell = grid.world_to_grid(*point[:2])
+                if cell == measured or (cells and cells[-1] == cell):
+                    continue
+                cells.append(cell)
+                if len(cells) >= prefix_cells:
+                    break
+            return cells
+
+        for rid in txn.members:
+            robot = self.robots.get(rid)
+            if robot is None:
+                return False
+            index = max(0, int(getattr(robot, 'current_waypoint_idx', 0)))
+            old_points = list(getattr(robot, 'waypoints', ()))[index:]
+            old_cells = future_cells(robot, old_points)
+            new_cells = future_cells(robot, plans.get(rid, ()))
+            if not old_cells or old_cells != new_cells[:len(old_cells)]:
+                return False
+            member_offsets = offsets.get(rid, ())
+            if index >= len(member_offsets):
+                return False
+            reservation_end = (activate_at + float(member_offsets[index]) +
+                               slot_seconds)
+            if reservation_end - self.sim_time < minimum_remaining_seconds:
+                return False
+        return True
+
+    @staticmethod
+    def _joint_refresh_interval(txn) -> float:
+        """Refresh near prefix exhaustion, bounded for responsiveness."""
+        offsets = getattr(txn, 'waypoint_offsets', {}) or {}
+        last_offsets = [float(values[-1]) for values in offsets.values()
+                        if values]
+        if not last_offsets:
+            return 2.0
+        return max(2.0, min(6.0, min(last_offsets) - 1.5))
+
+    def _recovery_reserved_cells(self, robot) -> set:
+        """Return the measured and remaining cells owned by an escape leg."""
+        grid = getattr(self.motion_coordinator, 'grid', None)
+        if grid is None:
+            return set()
+        points = [tuple(robot.position[:2])]
+        start_index = max(0, int(getattr(robot, 'current_waypoint_idx', 0)))
+        points.extend(tuple(point) for point in robot.waypoints[start_index:])
+        cells = set()
+        for first, second in zip(points, points[1:]):
+            first_cell = grid.world_to_grid(*first)
+            second_cell = grid.world_to_grid(*second)
+            col, row = first_cell
+            cells.add(first_cell)
+            # Recovery grid routes are cardinal, but interpolate defensively
+            # so a compressed segment cannot leave an unreserved gap.
+            while (col, row) != second_cell:
+                if col != second_cell[0]:
+                    col += 1 if second_cell[0] > col else -1
+                elif row != second_cell[1]:
+                    row += 1 if second_cell[1] > row else -1
+                cells.add((col, row))
+        if points:
+            cells.add(grid.world_to_grid(*points[-1]))
+        return cells
+
+    def _recovery_reserved_cells_by_slot(self, robot) -> dict:
+        """Bound an escape robot's moving occupancy without sealing its route."""
+        grid = getattr(self.motion_coordinator, 'grid', None)
+        if grid is None:
+            return {}
+        cells = list(self._ordered_recovery_route_cells(robot))
+        if not cells:
+            return {}
+        planner = getattr(self.motion_coordinator, 'joint_grid_planner', None)
+        slot_seconds = float(getattr(planner, 'time_slot_seconds', 3.0))
+        horizon_slots = int(getattr(planner, 'horizon_slots', 4))
+        cell_size = 0.25
+        nominal_cells = max(1.0, 0.22 * max(0.4, robot.speed_scale) *
+                            slot_seconds / cell_size)
+        uncertainty = 2
+        result = {}
+        for slot in range(horizon_slots + 1):
+            centre = slot * nominal_cells
+            lower = max(0, int(math.floor(centre)) - uncertainty)
+            upper = min(len(cells) - 1,
+                        int(math.ceil(centre)) + uncertainty)
+            result[slot] = set(cells[lower:upper + 1])
+        return result
+
+    def _ordered_recovery_route_cells(self, robot):
+        """Yield every cardinal grid cell along the remaining recovery route."""
+        grid = getattr(self.motion_coordinator, 'grid', None)
+        if grid is None:
+            return ()
+        points = [tuple(robot.position[:2])]
+        start_index = max(0, int(getattr(robot, 'current_waypoint_idx', 0)))
+        points.extend(tuple(point) for point in robot.waypoints[start_index:])
+        ordered = []
+        for first, second in zip(points, points[1:]):
+            col, row = grid.world_to_grid(*first)
+            target = grid.world_to_grid(*second)
+            if not ordered or ordered[-1] != (col, row):
+                ordered.append((col, row))
+            while (col, row) != target:
+                if col != target[0]:
+                    col += 1 if target[0] > col else -1
+                elif row != target[1]:
+                    row += 1 if target[1] > row else -1
+                if ordered[-1] != (col, row):
+                    ordered.append((col, row))
+        if points and not ordered:
+            ordered.append(grid.world_to_grid(*points[0]))
+        return tuple(ordered)
+
+    def _joint_candidate_snapshot(self, planning_agents):
+        """Immutable identity checked again immediately before transaction."""
+        return tuple(
+            (int(rid),
+             tuple(round(float(value), 4)
+                   for value in self.robots[rid].position[:2]),
+             tuple(round(float(value), 4)
+                   for value in planning_agents[rid][1][:2]),
+             int(self.robots[rid].active_plan_epoch or 0),
+             int(self.robots[rid].path_version))
+            for rid in sorted(planning_agents))
 
     def _navigation_is_activated(self, robot) -> bool:
         """Return whether an active leg is dispatched and not legally held."""
@@ -634,8 +1129,34 @@ class FactorySupervisor:
         return (self._navigation_is_activated(robot) and
                 not robot.emergency_braking)
 
+    def _recovery_execution_lease_active(self, robot) -> bool:
+        """Return whether the installed escape still owns its lifecycle."""
+        return bool(
+            self.sim_time < getattr(robot, 'recovery_execution_until', 0.0) and
+            getattr(robot, 'active_plan_source', None) in (
+                '_command_reverse', '_joint_stall_recovery') and
+            self._navigation_goal(robot) == getattr(
+                robot, 'recovery_execution_business_goal', None))
+
+    def _acquire_recovery_execution_lease(self, robot, target) -> None:
+        """Protect one successfully dispatched physical recovery route."""
+        robot.recovery_execution_generation += 1
+        robot.recovery_execution_target = tuple(target)
+        robot.recovery_execution_business_goal = self._navigation_goal(robot)
+        robot.recovery_execution_until = self.sim_time + 12.0
+        robot.route_write_until = max(
+            robot.route_write_until, robot.recovery_execution_until)
+
+    @staticmethod
+    def _clear_recovery_execution_lease(robot) -> None:
+        robot.recovery_execution_target = None
+        robot.recovery_execution_business_goal = None
+        robot.recovery_execution_until = 0.0
+
     def _robot_requires_recovery_monitoring(self, robot) -> bool:
         """Monitor activated legs even while a safety brake prevents motion."""
+        if self._recovery_execution_lease_active(robot):
+            return False
         if (robot.recovery_session_role is not None and
                 self.sim_time < robot.recovery_session_until):
             return False
@@ -661,7 +1182,14 @@ class FactorySupervisor:
         return self.sim_time - robot._deadlock_stuck_since
 
     def _update_hard_stall_clock(self, robot):
-        """Track actual no-motion time independent of short legal holds."""
+        """Return cross-epoch physical no-progress time when available."""
+        lease_time = float(getattr(
+            robot, 'progress_lease_last_progress_at', 0.0) or 0.0)
+        if (getattr(robot, 'progress_lease_goal', None) is not None and
+                lease_time > 0.0):
+            return max(0.0, self.sim_time - lease_time)
+        # Compatibility fallback for legacy snapshots/test fixtures that do
+        # not yet own a physical-progress lease.
         watch_pos = getattr(robot, '_hard_stall_watch_pos', robot.position)
         moved = math.hypot(robot.position[0] - watch_pos[0],
                             robot.position[1] - watch_pos[1])
@@ -673,6 +1201,78 @@ class FactorySupervisor:
         if getattr(robot, '_hard_stall_since', None) is None:
             robot._hard_stall_since = self.sim_time
         return self.sim_time - robot._hard_stall_since
+
+    def _physical_progress_lease_hard_due(self, robot) -> bool:
+        """Allow physical recovery only after the cross-epoch lease expires."""
+        if getattr(robot, 'progress_lease_goal', None) is None:
+            return False
+        elapsed = self._update_hard_stall_clock(robot)
+        return bool(
+            elapsed is not None and
+            elapsed >= JOINT_STALL_RELOCATION_TIMEOUT and
+            getattr(robot, 'progress_lease_escalation_stage', 0) == 2)
+
+    def _uncommanded_zero_hard_due(self, robot) -> bool:
+        started = getattr(robot, 'uncommanded_zero_since', None)
+        return bool(
+            started is not None and
+            self.sim_time - float(started) >= COMMAND_ZERO_RECOVERY_TIMEOUT and
+            self.sim_time >= getattr(
+                robot, 'uncommanded_zero_next_recovery_at', 0.0))
+
+    def _recovery_hard_due(self, robot) -> bool:
+        return (self._physical_progress_lease_hard_due(robot) or
+                self._uncommanded_zero_hard_due(robot))
+
+    def _validated_runtime_wait(self, robot) -> bool:
+        """Return whether an authoritative bounded wait pauses stall time."""
+        priority_yield_leg = getattr(
+            robot, 'priority_yield_state', None) in (
+                'standoff_enroute', 'waiting_clear')
+        return bool(
+            priority_yield_leg or
+            robot.pending_waypoints is not None or
+            self.sim_time < max(
+                robot.hold_until,
+                robot.controller_paused_until,
+                robot.controller_joint_wait_until,
+                robot.dispatch_not_before,
+            ))
+
+    def _request_joint_endpoint_once(self, robot, reported_epoch: int) -> bool:
+        """Schedule one successor request for each endpoint/epoch edge."""
+        reason = robot.controller_joint_wait_reason
+        if reason not in ('joint_window_endpoint', 'joint_epoch_barrier'):
+            return False
+        identity = (int(reported_epoch), reason)
+        if identity == robot.last_joint_endpoint_request_identity:
+            return False
+        robot.last_joint_endpoint_request_identity = identity
+        if self.sim_time > robot.active_joint_wait_deadline:
+            self.metrics.record_joint_window_gap(
+                self.sim_time, robot.robot_id, int(reported_epoch),
+                robot.active_joint_wait_deadline)
+        txn = getattr(self, '_joint_plan_transaction', None)
+        if (txn is not None and txn.state == 'activated' and
+                int(reported_epoch) == txn.epoch and
+                not all(self._robot_completed_joint_txn(
+                    self.robots[rid], txn) for rid in txn.members)):
+            return False
+        self._next_joint_grid_tick = min(
+            getattr(self, '_next_joint_grid_tick', self.sim_time),
+            self.sim_time + 0.1)
+        self._pending_joint_plan_robot_ids = set(getattr(
+            self, '_pending_joint_plan_robot_ids', set()))
+        self._pending_joint_plan_robot_ids.add(robot.robot_id)
+        return True
+
+    def _mark_physical_recovery_dispatched(self, robot) -> None:
+        """Consume one hard lease until measured physical progress occurs."""
+        robot.progress_lease_escalation_stage = 3
+        if getattr(robot, 'uncommanded_zero_since', None) is not None:
+            robot.uncommanded_zero_recovery_dispatched = True
+            robot.uncommanded_zero_next_recovery_at = (
+                self.sim_time + COMMAND_ZERO_RECOVERY_RETRY_INTERVAL)
 
     def _coordinate_emergency_pair(self) -> bool:
         """Assign one deterministic yielder for a close emergency pair."""
@@ -739,20 +1339,42 @@ class FactorySupervisor:
         if txn is not None and txn.state not in ('activated', 'aborted'):
             txn.abort(reason)
             self._advance_joint_plan_transaction()
-        if txn is not None and txn.state == 'activated':
-            for rid in txn.members:
-                robot = self.robots[rid]
-                if robot.route_write_owner == 'joint_grid_transaction':
-                    robot.route_write_owner = None
-                    robot.route_write_until = 0.0
-            self._joint_plan_transaction = None
+        # An activated transaction remains the authoritative executable
+        # prefix until a validated successor passes transaction preflight.
+        # Releasing it here creates a route-less window on every liveness
+        # request and defeats atomic successor planning.
         self._next_joint_grid_tick = min(
             getattr(self, '_next_joint_grid_tick', now), now)
         self._joint_candidate_failures = 0
+        self._pending_joint_plan_robot_ids = set(getattr(
+            self, '_pending_joint_plan_robot_ids', set()))
+        self._pending_joint_plan_robot_ids.update(int(rid) for rid in robot_ids)
+        request_class = self._joint_plan_request_class(reason)
+        if hasattr(getattr(self, 'metrics', None),
+                   'record_joint_plan_request'):
+            self.metrics.record_joint_plan_request(reason, request_class)
         self._log_replan(
-            f"[JointWatchdog] fresh joint plan requested reason={reason} "
+            f"[JointWatchdog] fresh joint plan requested class={request_class} "
+            f"reason={reason} "
             f"robots={sorted(robot_ids)}")
         return True
+
+    @staticmethod
+    def _joint_plan_request_class(reason: str) -> str:
+        """Map existing request reasons to stable gate classes."""
+        value = str(reason or '').lower()
+        if any(token in value for token in (
+                'collision', 'emergency', 'safety',
+                'yield_direct_failed')):
+            return 'SAFETY'
+        if any(token in value for token in (
+                'stall', 'progress_lease', 'route_less', 'timeout',
+                'watchdog')):
+            return 'LIVENESS'
+        if any(token in value for token in (
+                'task', 'goal', 'member', 'terminal')):
+            return 'BUSINESS'
+        return 'ROLLING'
 
     def _joint_hold_group(self, robot_ids, duration: float) -> None:
         """Coordinated short stop for all members of a conflict component."""
@@ -826,7 +1448,7 @@ class FactorySupervisor:
         be too late.
         """
         now = self.sim_time
-        route_intervention = False
+        fresh_plan_required = False
         if getattr(self, '_shield_debug_enabled', None) is None:
             self._shield_debug_enabled = os.environ.get(
                 'SMART_FACTORY_DEBUG_SHIELD', '0') == '1'
@@ -907,7 +1529,7 @@ class FactorySupervisor:
                     _, yielder = selection
                 if closest < 0.70:
                     if self._joint_try_escape_component(component):
-                        route_intervention = True
+                        fresh_plan_required = True
                         continue
                     # No validated moving standoff exists for an already
                     # critical cluster. A very short coordinated hold keeps
@@ -918,14 +1540,13 @@ class FactorySupervisor:
                     for rid in component:
                         self._set_robot_speed_scale(
                             rid, 0.35 if rid == yielder else 0.65)
-                    route_intervention = True
+                    fresh_plan_required = True
                     continue
                 for rid in component:
                     scale = 0.45 if rid == yielder else 0.75
                     if self._set_robot_speed_scale(rid, scale):
                         self.robots[rid].joint_shield_until = now + 2.0
-                route_intervention = True
-            return route_intervention
+            return fresh_plan_required
 
         conflicts = self._trajectory_conflicts(
             trajectories, minimum_distance)
@@ -1010,7 +1631,13 @@ class FactorySupervisor:
         task_priority = float(
             getattr(getattr(robot, 'current_task', None), 'priority', 0.0)
             or 0.0)
-        return (exempt, task_priority, float(robot_id))
+        wait_started = float(getattr(robot, 'wait_started', 0.0) or 0.0)
+        wait_age = (max(0.0, self.sim_time - wait_started)
+                    if wait_started > 0.0 else 0.0)
+        # Aging prevents starvation, but its capped two-point boost cannot
+        # grow without bound and permanently defeat business priority.
+        aging = min(2.0, wait_age / 30.0)
+        return (exempt, task_priority + aging, float(robot_id))
 
     def _priority_yield_numeric_key(self, robot_id: int) -> float:
         """Scalar version of ``_priority_yield_key`` for profile scoring."""
@@ -1030,6 +1657,15 @@ class FactorySupervisor:
         """
         if robot_a not in self.robots or robot_b not in self.robots:
             return None
+        departure_a = self.robots[robot_a].terminal_departure_location is not None
+        departure_b = self.robots[robot_b].terminal_departure_location is not None
+        if departure_a != departure_b:
+            return ((robot_a, robot_b) if departure_a else (robot_b, robot_a))
+        if not departure_a:
+            a_over_b = self._terminal_egress_precedes(robot_a, robot_b)
+            b_over_a = self._terminal_egress_precedes(robot_b, robot_a)
+            if a_over_b != b_over_a:
+                return ((robot_a, robot_b) if a_over_b else (robot_b, robot_a))
         key_a = self._priority_yield_key(robot_a)
         key_b = self._priority_yield_key(robot_b)
         winner, yielder = (
@@ -1050,11 +1686,333 @@ class FactorySupervisor:
         """
         if winner not in self.robots or yielder not in self.robots:
             return None
+        departure_winner = (
+            self.robots[winner].terminal_departure_location is not None)
+        departure_yielder = (
+            self.robots[yielder].terminal_departure_location is not None)
+        if departure_winner != departure_yielder:
+            return ((winner, yielder) if departure_winner else
+                    (yielder, winner))
+        if not departure_winner:
+            winner_over_yielder = self._terminal_egress_precedes(winner, yielder)
+            yielder_over_winner = self._terminal_egress_precedes(yielder, winner)
+            if winner_over_yielder != yielder_over_winner:
+                return ((winner, yielder) if winner_over_yielder else
+                        (yielder, winner))
         if not self._priority_yield_is_exempt(self.robots[yielder]):
             return winner, yielder
         if not self._priority_yield_is_exempt(self.robots[winner]):
             return yielder, winner
         return None
+
+    @staticmethod
+    def _recovery_target_has_effective_displacement(robot, target) -> bool:
+        return math.hypot(
+            float(target[0]) - float(robot.position[0]),
+            float(target[1]) - float(robot.position[1])) >= (
+                RECOVERY_MIN_TARGET_DISPLACEMENT - 1e-9)
+
+    def _terminal_egress_precedes(self, owner_id, incoming_id) -> bool:
+        """Apply evacuation priority only to the contending inbound peer."""
+        owner = self.robots[owner_id]
+        incoming = self.robots[incoming_id]
+        return bool(
+            owner.terminal_egress_priority_active and
+            owner.terminal_egress_location is not None and
+            self._navigation_goal(incoming) == owner.terminal_egress_location)
+
+    @staticmethod
+    def _is_terminal_name(goal) -> bool:
+        return goal in ALL_LOCATIONS or goal in CHARGING_STATIONS
+
+    def _mark_terminal_service_complete(self, robot, terminal) -> None:
+        """Retain terminal ownership until measured physical evacuation."""
+        if not TERMINAL_HANDOFF_ENABLED:
+            return
+        if not self._is_terminal_name(terminal):
+            return
+        new_lease = robot.terminal_clearance_location != terminal
+        if new_lease:
+            robot.terminal_clearance_epoch += 1
+        robot.terminal_clearance_location = terminal
+        robot.terminal_egress_location = terminal
+        robot.terminal_egress_priority_active = any(
+            peer.robot_id != robot.robot_id and
+            self._navigation_goal(peer) == terminal
+            for peer in self.robots.values())
+        robot.terminal_clearance_started_at = self.sim_time
+        robot.terminal_clearance_fresh_samples = 0
+        robot.terminal_egress_retry_started_at = self.sim_time
+        robot.terminal_egress_retry_terminal = terminal
+        robot.terminal_egress_retry_at = self.sim_time
+        robot.terminal_egress_retry_count = 0
+        robot.terminal_egress_retry_last_reason = None
+        if new_lease and getattr(self, 'metrics', None) is not None:
+            self.metrics.record_terminal_handoff(
+                'service_complete', self.sim_time, robot.robot_id, terminal,
+                robot.terminal_clearance_epoch, owner_id=robot.robot_id)
+
+    def _commit_pickup_service(self, robot: RobotInfo) -> bool:
+        """Commit an observed pickup once, independently of route success."""
+        task = robot.current_task
+        if task is None or task.cargo_state == 'onboard':
+            return False
+        task.status = TaskStatus.IN_PROGRESS
+        task.pickup_time = self.sim_time
+        task.cargo_state = 'onboard'
+        robot.state = RobotState.EN_ROUTE_DELIVERY
+        robot.goal_location = task.delivery_location
+        event = self.rl_event_ledger.append(
+            'pickup_reached', self.sim_time, robot_id=robot.robot_id,
+            task_id=task.task_id)
+        self.metrics.record_rl_event(event.to_dict())
+        return True
+
+    def _update_terminal_departure_contexts(self) -> None:
+        """Cache fresh-pose terminal vicinity departures for pair-local priority."""
+        for robot in self.robots.values():
+            robot.terminal_departure_location = None
+            if self.sim_time - float(robot.sample_time) > 0.25:
+                continue
+            goal = self._navigation_goal(robot)
+            nearest = None
+            nearest_distance = float('inf')
+            for terminal, terminal_xy in TERMINAL_COORDINATES:
+                distance = math.hypot(
+                    robot.position[0] - terminal_xy[0],
+                    robot.position[1] - terminal_xy[1])
+                if (distance <= TERMINAL_DEPARTURE_RADIUS and
+                        distance < nearest_distance):
+                    nearest = terminal
+                    nearest_distance = distance
+            if nearest is not None and (
+                    goal != nearest or robot.terminal_egress_location == nearest):
+                robot.terminal_departure_location = nearest
+                robot.terminal_egress_retry_terminal = nearest
+            elif robot.terminal_egress_location is None:
+                robot.terminal_egress_retry_terminal = None
+                robot.terminal_egress_retry_started_at = None
+                robot.terminal_egress_retry_at = 0.0
+                robot.terminal_egress_retry_count = 0
+                robot.terminal_egress_retry_last_reason = None
+
+    def _update_terminal_clearance(self) -> None:
+        """Release terminal capacity, then evacuation priority, at two boundaries."""
+        terminal_goal_counts = {}
+        for peer in self.robots.values():
+            goal = self._navigation_goal(peer)
+            if self._is_terminal_name(goal):
+                terminal_goal_counts[goal] = terminal_goal_counts.get(goal, 0) + 1
+        for robot in self.robots.values():
+            terminal = (robot.terminal_clearance_location or
+                        robot.terminal_egress_location)
+            if terminal is None:
+                robot.terminal_egress_priority_active = False
+                continue
+            robot.terminal_egress_priority_active = bool(
+                robot.terminal_egress_location is not None and
+                terminal_goal_counts.get(terminal, 0) -
+                (1 if self._navigation_goal(robot) == terminal else 0) > 0)
+            terminal_xy = self._goal_coordinates(terminal)
+            pose_fresh = (
+                terminal_xy is not None and
+                self.sim_time - float(robot.sample_time) <= 0.25)
+            if not pose_fresh:
+                robot.terminal_clearance_fresh_samples = 0
+                continue
+            distance = math.hypot(robot.position[0] - terminal_xy[0],
+                                  robot.position[1] - terminal_xy[1])
+            if robot.terminal_clearance_location is not None:
+                if distance >= TERMINAL_CLEARANCE_RADIUS:
+                    robot.terminal_clearance_fresh_samples += 1
+                else:
+                    robot.terminal_clearance_fresh_samples = 0
+            if (robot.terminal_clearance_location is not None and
+                    robot.terminal_clearance_fresh_samples >= 2):
+                cleared_terminal = terminal
+                cleared_epoch = robot.terminal_clearance_epoch
+                robot.terminal_clearance_location = None
+                robot.terminal_clearance_fresh_samples = 0
+                if getattr(self, 'metrics', None) is not None:
+                    self.metrics.record_terminal_handoff(
+                        'physically_clear', self.sim_time, robot.robot_id,
+                        cleared_terminal, cleared_epoch,
+                        owner_id=robot.robot_id)
+            if (robot.terminal_clearance_location is None and
+                    robot.terminal_egress_location is not None and
+                    distance >= TERMINAL_EGRESS_PRIORITY_RADIUS):
+                robot.terminal_egress_location = None
+                robot.terminal_egress_priority_active = False
+                if robot.terminal_departure_location is None:
+                    robot.terminal_egress_retry_started_at = None
+                    robot.terminal_egress_retry_terminal = None
+                    robot.terminal_egress_retry_at = 0.0
+                    robot.terminal_egress_retry_count = 0
+                    robot.terminal_egress_retry_last_reason = None
+                robot.terminal_staging_cache_key = None
+                robot.terminal_staging_cache_target = None
+
+    def _record_terminal_egress_retry(self, robot, event_type, reason=None):
+        if getattr(self, 'metrics', None) is not None:
+            self.metrics.record_terminal_handoff(
+                event_type, self.sim_time, robot.robot_id,
+                (robot.terminal_egress_location or
+                 robot.terminal_egress_retry_terminal),
+                robot.terminal_clearance_epoch, owner_id=robot.robot_id,
+                reason=reason,
+                attempt=robot.terminal_egress_retry_count)
+        robot.terminal_egress_retry_last_reason = reason
+
+    def _ensure_terminal_egress_retries(self) -> None:
+        """Retry route creation for a serviced terminal without a live route."""
+        for robot in self.robots.values():
+            terminal = (robot.terminal_egress_location or
+                        robot.terminal_egress_retry_terminal)
+            if terminal is None or self._has_active_navigation(robot):
+                continue
+            if self.sim_time < robot.terminal_egress_retry_at:
+                continue
+            terminal_xy = self._goal_coordinates(terminal)
+            pose_fresh = (
+                terminal_xy is not None and
+                self.sim_time - float(robot.sample_time) <= 0.25)
+            if not pose_fresh:
+                reason = 'stale_pose'
+                path = None
+                target = None
+            else:
+                business_goal = self._navigation_goal(robot)
+                if (robot.current_task is not None and
+                        robot.current_task.cargo_state == 'onboard' and
+                        business_goal is not None and business_goal != terminal):
+                    target = business_goal
+                else:
+                    peers = [peer.position for rid, peer in self.robots.items()
+                             if rid != robot.robot_id]
+                    target = self._joint_staging_goal(
+                        terminal_xy, robot.position, peers)
+                    if (target == terminal_xy or math.hypot(
+                            target[0] - terminal_xy[0],
+                            target[1] - terminal_xy[1]) <
+                            TERMINAL_DEPARTURE_RADIUS + 0.10):
+                        target = None
+                path = (self.motion_coordinator.plan_grid_lifelong(
+                    robot.robot_id, robot.position, target)
+                        if target is not None else None)
+                reason = 'no_safe_path' if not path else None
+            if path:
+                old_state = robot.state
+                old_goal = robot.goal_location
+                if robot.current_task is None:
+                    robot.state = RobotState.RETURNING_HOME
+                    robot.goal_location = target
+                if self._install_runtime_plan(
+                        robot.robot_id, path,
+                        source='_terminal_egress_retry'):
+                    robot.terminal_egress_retry_count += 1
+                    self._record_terminal_egress_retry(
+                        robot, 'egress_retry_dispatched')
+                    continue
+                self.motion_coordinator.rollback_robot_plan(robot.robot_id)
+                robot.state = old_state
+                robot.goal_location = old_goal
+                reason = 'dispatch_failed'
+            robot.terminal_egress_retry_count += 1
+            delay = (0.5 if robot.terminal_egress_retry_count == 1 else
+                     1.0 if robot.terminal_egress_retry_count == 2 else 2.0)
+            robot.terminal_egress_retry_at = self.sim_time + delay
+            self._record_terminal_egress_retry(
+                robot, 'egress_retry_failed', reason)
+
+    def _terminal_owner(self, terminal, exclude_robot_id=None):
+        """Return the measured or clearing owner of a capacity-one terminal."""
+        terminal_xy = self._goal_coordinates(terminal)
+        if terminal_xy is None:
+            return None
+        owners = []
+        for rid, robot in self.robots.items():
+            if rid == exclude_robot_id:
+                continue
+            clearing_owner = robot.terminal_clearance_location == terminal
+            fresh_inside = (
+                self.sim_time - float(robot.sample_time) <= 0.25 and
+                math.hypot(robot.position[0] - terminal_xy[0],
+                           robot.position[1] - terminal_xy[1]) <=
+                TERMINAL_OCCUPANCY_RADIUS)
+            if clearing_owner or fresh_inside:
+                owners.append(rid)
+        if not owners:
+            return None
+        clearing = [rid for rid in owners if
+                    self.robots[rid].terminal_clearance_location == terminal]
+        return max(clearing or owners, key=self._priority_yield_key)
+
+    def _terminal_staging_target(self, robot_id, terminal):
+        """Choose a safe point outside a terminal while preserving its goal."""
+        terminal_xy = self._goal_coordinates(terminal)
+        robot = self.robots[robot_id]
+        if terminal_xy is None:
+            return None
+        if math.hypot(robot.position[0] - terminal_xy[0],
+                      robot.position[1] - terminal_xy[1]) > \
+                TERMINAL_STAGING_ACTIVATION_RADIUS:
+            return terminal_xy
+        owner_id = self._terminal_owner(terminal, robot_id)
+        owner_epoch = (self.robots[owner_id].terminal_clearance_epoch
+                       if owner_id is not None else 0)
+        role = ('egress' if robot.terminal_egress_location == terminal
+                else 'incoming')
+        cache_key = (role, terminal, owner_id, owner_epoch,
+                     robot.terminal_clearance_epoch)
+        if robot.terminal_staging_cache_key == cache_key:
+            return robot.terminal_staging_cache_target
+        peers = [peer.position for rid, peer in self.robots.items()
+                 if rid != robot_id]
+        target = self._joint_staging_goal(
+            terminal_xy, robot.position, peers)
+        if (target == terminal_xy or math.hypot(
+                target[0] - terminal_xy[0],
+                target[1] - terminal_xy[1]) < 0.75):
+            robot.terminal_staging_cache_key = cache_key
+            robot.terminal_staging_cache_target = None
+            return None
+        robot.terminal_staging_cache_key = cache_key
+        robot.terminal_staging_cache_target = target
+        return target
+
+    def _terminal_admission_target(self, robot_id, business_goal):
+        """Return a staging target while another robot owns the terminal."""
+        if not self._is_terminal_name(business_goal):
+            return business_goal
+        if self._terminal_owner(business_goal, robot_id) is None:
+            return business_goal
+        terminal_xy = self._goal_coordinates(business_goal)
+        robot = self.robots[robot_id]
+        if math.hypot(robot.position[0] - terminal_xy[0],
+                      robot.position[1] - terminal_xy[1]) > \
+                TERMINAL_STAGING_ACTIVATION_RADIUS:
+            return business_goal
+        return (self._terminal_staging_target(robot_id, business_goal) or
+                robot.position)
+
+    def _terminal_arbitrated_goal(self, robot_id, business_goal_xy):
+        """Clip one rolling-plan goal to egress/staging when required."""
+        robot = self.robots[robot_id]
+        clearing_terminal = robot.terminal_egress_location
+        if clearing_terminal is not None:
+            # Keep the already selected business route intact.  Evacuation
+            # priority remains until the outer egress boundary is crossed,
+            # while every segment remains grant-validated.
+            # Clipping the candidate to a 0.9 m prefix made it complete early
+            # and amplified rolling joint searches without improving safety.
+            return business_goal_xy
+        business_goal = self._navigation_goal(robot)
+        if (self._is_terminal_name(business_goal) and
+                self._terminal_owner(business_goal, robot_id) is not None):
+            staging = self._terminal_staging_target(robot_id, business_goal)
+            return business_goal_xy if staging == business_goal_xy else (
+                staging or robot.position)
+        return business_goal_xy
 
     def _priority_yield_select(self, component, conflicts=None):
         """Choose (winner, yielder) without priority oscillation."""
@@ -1291,7 +2249,8 @@ class FactorySupervisor:
                 return False
         return True
 
-    def _priority_yield_standoff_candidates(self, winner: int, yielder: int):
+    def _priority_yield_standoff_candidates(self, winner: int, yielder: int,
+                                             lateral_only: bool = False):
         """Return validated 90-degree lateral standoff candidates."""
         robot = self.robots[yielder]
         winner_robot = self.robots.get(winner)
@@ -1314,6 +2273,9 @@ class FactorySupervisor:
             for angle in directions:
                 target = (robot.position[0] + distance * math.cos(angle),
                           robot.position[1] + distance * math.sin(angle))
+                if not self._recovery_target_has_effective_displacement(
+                        robot, target):
+                    continue
                 clearance = min(
                     (math.hypot(target[0] - px, target[1] - py)
                      for px, py in peers),
@@ -1347,6 +2309,9 @@ class FactorySupervisor:
             candidates.sort(key=lambda item: item[0], reverse=True)
             return candidates
 
+        if lateral_only:
+            return []
+
         # Fall back to the full 360-degree passable ring when a pure 90-degree
         # lateral standoff is blocked.  This mirrors the existing full-ring
         # escape search and lets the planner use every reachable free cell.
@@ -1355,6 +2320,9 @@ class FactorySupervisor:
                 angle = 2.0 * math.pi * step / 32.0
                 target = (robot.position[0] + distance * math.cos(angle),
                           robot.position[1] + distance * math.sin(angle))
+                if not self._recovery_target_has_effective_displacement(
+                        robot, target):
+                    continue
                 clearance = min(
                     (math.hypot(target[0] - px, target[1] - py)
                      for px, py in peers),
@@ -1386,6 +2354,56 @@ class FactorySupervisor:
                 candidates.append((score, clearance, target))
         candidates.sort(key=lambda item: item[0], reverse=True)
         return candidates
+
+    def _priority_yield_lateral_standoff(self, winner: int, yielder: int,
+                                          component) -> bool:
+        """Move only the yielder onto a validated ±90-degree standoff."""
+        robot = self.robots.get(yielder)
+        if robot is None or getattr(robot, 'recovery_active', False):
+            return False
+        if getattr(robot, 'priority_yield_cooldown_until', 0.0) > self.sim_time:
+            return False
+        original_goal = self._navigation_goal(robot)
+        if original_goal is None:
+            return False
+        candidates = self._priority_yield_standoff_candidates(
+            winner, yielder, lateral_only=True)
+        for _score, clearance, target in candidates:
+            path = self._static_turning_path(robot.position, target)
+            if not path or not self._recovery_path_peer_clear(yielder, path):
+                path = self.motion_coordinator.plan_grid_lifelong(
+                    yielder, robot.position, target)
+            if not path or not self._recovery_path_peer_clear(yielder, path):
+                continue
+            if not self._priority_yield_path_departure_clear(yielder, path):
+                continue
+            if not self._install_runtime_plan(
+                    yielder, path, delay=0.0,
+                    source='_priority_yield_resume'):
+                continue
+            robot.recovery_active = True
+            robot.recovery_resume_goal = original_goal
+            robot.priority_yield_state = 'standoff_enroute'
+            robot.priority_yield_winner = winner
+            robot.priority_yield_standoff = tuple(target)
+            robot.priority_yield_started_at = self.sim_time
+            robot.priority_yield_original_goal = original_goal
+            self._set_robot_speed_scale(yielder, 0.55)
+            for peer_id in component:
+                if peer_id not in (winner, yielder):
+                    self._set_robot_speed_scale(peer_id, 0.60)
+            if getattr(self, 'metrics', None) is not None:
+                self.metrics.record_yield_event(
+                    'yield_start', self.sim_time, yielder, winner)
+                self.metrics.record_yield_event(
+                    'yield_standoff_selected', self.sim_time, yielder,
+                    winner, target)
+            print(f"[PriorityYieldLateral] T={self.sim_time:.1f}s "
+                  f"winner={winner} yielder={yielder} "
+                  f"standoff=({target[0]:.2f},{target[1]:.2f}) "
+                  f"clearance={clearance:.2f}m")
+            return True
+        return False
 
     def _priority_yield_path_departure_clear(self, robot_id: int,
                                               path) -> bool:
@@ -1474,7 +2492,6 @@ class FactorySupervisor:
 
         component = tuple(sorted(component or (winner, yielder)))
         self._set_robot_speed_scale(yielder, 0.70)
-        self._set_robot_speed_scale(winner, 1.0)
         for peer_id in component:
             if peer_id not in (winner, yielder):
                 self._set_robot_speed_scale(peer_id, 0.60)
@@ -1488,7 +2505,10 @@ class FactorySupervisor:
 
     def _priority_yield_dispatch_leg(self, winner: int, yielder: int,
                                      component) -> bool:
-        """Dispatch a direct-to-goal priority yield, never a standoff leg."""
+        """Prefer a validated lateral head-on yield, then existing fallback."""
+        if self._priority_yield_lateral_standoff(
+                winner, yielder, component):
+            return True
         if self._priority_yield_direct_plan(winner, yielder, component):
             return True
 
@@ -1579,6 +2599,25 @@ class FactorySupervisor:
                 robot.priority_yield_winner)
         print(f"[PriorityYield] T={self.sim_time:.1f}s robot={robot_id} "
               "standoff reached; waiting for winner clear")
+
+    @staticmethod
+    def _priority_yield_owns_arrival(robot) -> bool:
+        """Return whether the current arrival belongs to the yield standoff.
+
+        A retained ``waiting_clear`` marker, or an en-route marker whose
+        standoff no longer matches the measured pose, must not consume a later
+        business-goal arrival.  Physical ownership is deliberately required
+        even for forced arrival handling: force may bypass the business-goal
+        sanity check, but it cannot turn a stale yield marker into a standoff.
+        """
+        if getattr(robot, 'priority_yield_state', None) != 'standoff_enroute':
+            return False
+        standoff = getattr(robot, 'priority_yield_standoff', None)
+        if standoff is None:
+            return False
+        return math.hypot(robot.position[0] - standoff[0],
+                          robot.position[1] - standoff[1]) <= (
+                              GOAL_TOLERANCE * 2.5)
 
     def _priority_yield_pair_clear(self, robot_id: int) -> bool:
         """True when the winner stays clear of the yielder for the horizon."""
@@ -1778,15 +2817,7 @@ class FactorySupervisor:
                     acted = True
             elif state == 'standoff_enroute':
                 started = getattr(robot, 'priority_yield_started_at', now)
-                if (now - started >= YIELD_STANDOFF_SETTLE_SECONDS):
-                    # The exact standoff point is a target, not a gate. Once
-                    # the yielder has had a short direct-control window to turn
-                    # away from the winner, start the wait-for-clear timer from
-                    # its measured position. Waiting for exact grid arrival was
-                    # producing repeated 10s standoff timeouts.
-                    self._priority_yield_handle_arrival(rid, force=True)
-                    acted = True
-                elif now - started > YIELD_RESUME_TIMEOUT:
+                if now - started > YIELD_RESUME_TIMEOUT:
                     if getattr(self, 'metrics', None) is not None:
                         self.metrics.record_yield_event(
                             'yield_wait_timeout', now, rid,
@@ -1876,13 +2907,16 @@ class FactorySupervisor:
         if ENABLE_PRIORITY_YIELD_RESUME:
             priority_acted = self._priority_yield_resume_scan(active_robots)
             if priority_acted:
-                return True
+                # The priority state machine owns any route request it needs.
+                # A speed/hold state transition is not itself permission to
+                # synchronously replace every robot's committed route.
+                return False
         acted = self._joint_predictive_speed_shield(active_robots)
         if acted:
             # Speed shaping is a short-horizon emergency response. Schedule
-            # an immediate rolling joint plan from measured positions so the
-            # robots get a route that avoids the predicted conflict instead
-            # of only slowing down on their current paths.
+            # a fresh route only when the shield reports a physical critical
+            # intervention. Ordinary predicted-conflict speed profiles return
+            # false and keep the validated route stable.
             self._joint_liveness_needed = True
             self._next_joint_grid_tick = min(
                 getattr(self, '_next_joint_grid_tick', self.sim_time),
@@ -1909,26 +2943,66 @@ class FactorySupervisor:
             return
 
         hard_motion = []
+        soft_lease_due = []
         for rid, robot in active.items():
+            if self._validated_runtime_wait(robot):
+                # A bounded authoritative wait is not physical stagnation.
+                # Its own stale-wait watchdog below remains responsible for
+                # liveness; restart the continuous no-progress episode only
+                # after the wait actually ends.
+                robot.progress_lease_last_progress_at = now
+                robot.progress_lease_escalation_stage = 0
+                continue
             hard_elapsed = self._update_hard_stall_clock(robot)
             if (hard_elapsed is not None and
-                    hard_elapsed >= JOINT_STALL_RELOCATION_TIMEOUT):
+                    hard_elapsed >= PROGRESS_LEASE_SOFT_TIMEOUT and
+                    robot.progress_lease_escalation_stage < 1):
+                robot.progress_lease_escalation_stage = 1
+                soft_lease_due.append(rid)
+                if getattr(self, 'metrics', None) is not None:
+                    self.metrics.record_progress_lease_event(
+                        now, rid, robot.progress_lease_generation,
+                        'soft_replan', hard_elapsed)
+            if (hard_elapsed is not None and
+                    hard_elapsed >= JOINT_STALL_RELOCATION_TIMEOUT and
+                    robot.progress_lease_escalation_stage < 3):
+                first_hard = robot.progress_lease_escalation_stage < 2
+                robot.progress_lease_escalation_stage = max(
+                    2, robot.progress_lease_escalation_stage)
                 hard_motion.append((rid, hard_elapsed))
+                if first_hard and getattr(self, 'metrics', None) is not None:
+                    self.metrics.record_progress_lease_event(
+                        now, rid, robot.progress_lease_generation,
+                        'hard_escape', hard_elapsed)
+            zero_started = getattr(robot, 'uncommanded_zero_since', None)
+            zero_elapsed = (None if zero_started is None else
+                            max(0.0, now - float(zero_started)))
+            if (zero_elapsed is not None and
+                    zero_elapsed >= COMMAND_ZERO_RECOVERY_TIMEOUT and
+                    now >= robot.uncommanded_zero_next_recovery_at):
+                if not robot.uncommanded_zero_hard_reported:
+                    robot.uncommanded_zero_hard_reported = True
+                    if getattr(self, 'metrics', None) is not None:
+                        self.metrics.record_progress_lease_event(
+                            now, rid, robot.progress_lease_generation,
+                            'hard_zero_escape', zero_elapsed)
+                if not any(item[0] == rid for item in hard_motion):
+                    hard_motion.append((rid, zero_elapsed))
+
+        if soft_lease_due:
+            # This stage is monotonic across rolling epochs. Merely arming a
+            # replacement transaction cannot defer the hard deadline.
+            self._joint_liveness_needed = True
+            self._joint_request_fresh_plan(
+                set(soft_lease_due), 'physical_progress_lease_soft_deadline')
 
         self._joint_collision_scan(active)
-        relocate_due = []
-        for rid, robot in active.items():
-            elapsed = self._update_joint_stall_clock(robot)
-            if (elapsed is not None and
-                    elapsed >= JOINT_STALL_RELOCATION_TIMEOUT):
-                relocate_due.append((rid, elapsed))
-        # Recover the robot that has been stationary the longest.  This is a
-        # liveness backstop, not a right-of-way decision: low-priority
-        # recovery should not be able to starve an equally stuck high-
-        # priority robot, which would otherwise sit for tens of seconds.
-        relocate_due.sort(
-            key=lambda item: (-float(item[1]),
-                              self._priority_yield_key(item[0])))
+        # Only the cross-epoch physical-progress lease may authorize a
+        # recovery route. The shorter local clocks below remain useful replan
+        # signals, but must not bypass the lease after an epoch/route rewrite.
+        relocate_due = list(hard_motion)
+        relocate_due.sort(key=lambda item: (
+            -float(item[1]), self._priority_yield_key(item[0])))
         recovered_rid = None
         for rid, _elapsed in relocate_due:
             robot = self.robots[rid]
@@ -1937,6 +3011,7 @@ class FactorySupervisor:
             recovered = self._joint_stall_recovery(rid)
             if recovered:
                 recovered_rid = rid
+                robot._joint_escape_until = now + 8.0
                 robot._deadlock_stuck_since = None
                 robot._deadlock_watch_pos = robot.position
                 robot._joint_watch_pos = robot.position
@@ -1950,19 +3025,12 @@ class FactorySupervisor:
         emergency = []
         stale_wait = []
         stalled = []
+        route_less_due = []
         for rid, robot in active.items():
             priority_yield_leg = (
                 getattr(robot, 'priority_yield_state', None) in
                 ('standoff_enroute', 'waiting_clear'))
-            legal_wait = bool(
-                priority_yield_leg or
-                robot.pending_waypoints is not None or
-                now < max(
-                    robot.hold_until,
-                    robot.controller_paused_until,
-                    robot.controller_joint_wait_until,
-                    robot.dispatch_not_before,
-                ))
+            legal_wait = self._validated_runtime_wait(robot)
             route_less = self._has_active_navigation(robot) and (
                 not robot.waypoints or
                 robot.current_waypoint_idx >= len(robot.waypoints))
@@ -1971,7 +3039,7 @@ class FactorySupervisor:
                 if route_less_since is None:
                     robot._joint_route_less_since = now
                 elif now - route_less_since >= 3.0:
-                    stalled.append(rid)
+                    route_less_due.append(rid)
             else:
                 robot._joint_route_less_since = None
             if getattr(robot, '_replan_requested', False) or robot.emergency_braking:
@@ -2022,8 +3090,13 @@ class FactorySupervisor:
             if now - robot._joint_watch_since >= 3.0:
                 stalled.append(rid)
 
-        if emergency or stale_wait or stalled or pending_hard_motion:
-            ids = set(emergency + stale_wait + stalled +
+        # ``stalled`` is deliberately not an immediate replan trigger. Its
+        # 3 s local clock is shorter than the cross-epoch 5 s/8 s lease and
+        # used to destroy a healthy prefix every 1.5 s. Route-less and
+        # validated waits still need an immediate route; physical no-progress
+        # is escalated only by the existing monotonic lease above.
+        if emergency or stale_wait or route_less_due or pending_hard_motion:
+            ids = set(emergency + stale_wait + route_less_due +
                       [rid for rid, _elapsed in pending_hard_motion])
             # Mark liveness fallback for the next rolling-planner miss.  The
             # coordinated space-time planner remains preferred; this flag only
@@ -2034,7 +3107,10 @@ class FactorySupervisor:
             # prepared. The atomic transaction swaps the plan only after all
             # controllers have acknowledged the next safe window, so holding
             # here only converts a temporary slowdown into a full stop.
-            self._joint_request_fresh_plan(ids, 'joint_runtime_watchdog')
+            watchdog_reason = self._joint_watchdog_request_reason(
+                emergency, stale_wait, route_less_due,
+                pending_hard_motion)
+            self._joint_request_fresh_plan(ids, watchdog_reason)
             # A replan request is a one-shot controller signal. Once the
             # rolling joint planner has been asked for a replacement route,
             # clear the flag so the same request cannot keep the robot in the
@@ -2083,6 +3159,7 @@ class FactorySupervisor:
             for rid in ids:
                 robot = self.robots[rid]
                 robot._joint_wait_started = None
+
                 robot._joint_any_wait_started = None
                 if rid in stalled:
                     # Keep the continuous no-progress clock running until the
@@ -2092,6 +3169,21 @@ class FactorySupervisor:
                 robot._joint_watch_pos = robot.position
                 robot._joint_watch_since = now
             return
+
+    @staticmethod
+    def _joint_watchdog_request_reason(emergency, stale_wait,
+                                       route_less_due,
+                                       pending_hard_motion) -> str:
+        """Name the highest-severity cause in one coalesced watchdog edge."""
+        if emergency:
+            return 'joint_watchdog_emergency'
+        if pending_hard_motion:
+            return 'joint_watchdog_hard_motion'
+        if route_less_due:
+            return 'joint_watchdog_route_less'
+        if stale_wait:
+            return 'joint_watchdog_stale_wait'
+        return 'joint_runtime_watchdog'
 
     def __init__(self, scenario: str = "C", scheduler_type: str = "FCFS",
                  seed: int = 42, model_path: Optional[str] = None):
@@ -2186,12 +3278,16 @@ class FactorySupervisor:
         provenance["run_mode"] = os.environ.get(
             "SMART_FACTORY_RUN_MODE", "interactive_webots")
         provenance["seed"] = int(seed)
+        provenance["motion_safety_version"] = MOTION_SAFETY.version
+        provenance["motion_safety_fingerprint"] = MOTION_SAFETY.fingerprint()
+        provenance["motion_safety_config"] = MOTION_SAFETY.resolved()
         self.metrics = MetricsCollector(
             scenario_name=scenario,
             scheduler_name=self.scheduler.name,
             num_robots=self.num_robots,
             provenance=provenance,
         )
+        self.motion_coordinator.metrics = self.metrics
         self.rl_event_ledger = RLEventLedger()
         
         # Robot tracking
@@ -2333,7 +3429,24 @@ class FactorySupervisor:
         (sensors / actuators) attached to the *calling* robot node, not for
         looking up other robots in the scene.
         """
+        fault_rid = int(os.environ.get(
+            'SMART_FACTORY_FAULT_POSE_DELAY_ROBOT', '0'))
+        fault_start = float(os.environ.get(
+            'SMART_FACTORY_FAULT_POSE_DELAY_START', '0'))
+        fault_duration = float(os.environ.get(
+            'SMART_FACTORY_FAULT_POSE_DELAY_DURATION', '0'))
+        slow_rid = int(os.environ.get(
+            'SMART_FACTORY_FAULT_CONTROLLER_SLOW_ROBOT', '0'))
+        slow_period = max(1, int(os.environ.get(
+            'SMART_FACTORY_FAULT_CONTROLLER_SLOW_PERIOD', '1')))
         for rid in range(1, self.num_robots + 1):
+            pose_delayed = (rid == fault_rid and fault_duration > 0 and
+                            fault_start <= self.sim_time <
+                            fault_start + fault_duration)
+            slow_frame = (rid == slow_rid and slow_period > 1 and
+                          self.step_count % slow_period != 0)
+            if pose_delayed or slow_frame:
+                continue
             robot_node = self.robot_nodes.get(rid)
             if robot_node is None:
                 continue  # Node was not found at init; skip
@@ -2346,6 +3459,12 @@ class FactorySupervisor:
                     #   x = east, y = north, z = up
                     # We use (x, y) as the 2D ground-plane coordinates.
                     self.robots[rid].position = (pos[0], pos[1])
+                    # Freshness belongs to the physical pose sample.  Never
+                    # advance it from the bookkeeping loop when this read
+                    # fails, otherwise a frozen Webots pose looks current.
+                    self.robots[rid].sample_time = self.sim_time
+                    self.robots[rid].state_seq += 1
+                    self._update_physical_progress_lease(self.robots[rid])
                 
                 rot_field = robot_node.getField("rotation")
                 if rot_field:
@@ -2359,17 +3478,120 @@ class FactorySupervisor:
             except Exception:
                 pass  # Keep last-known position on read failure
 
+    def _apply_dynamic_safety_shield(self) -> None:
+        """Map measured CPA/TTC and pose age to auditable speed commands."""
+        if len(self.robots) < 2:
+            return
+        desired = {rid: 1.0 for rid in self.robots}
+        reasons = {rid: (RiskLevel.CLEAR, None, math.inf, math.inf)
+                   for rid in self.robots}
+
+        # Hold a restrictive action briefly so measurement noise cannot
+        # alternate CAUTION/CLEAR every 16 ms.  A more restrictive new risk
+        # can still override the held action immediately.
+        for rid, robot in self.robots.items():
+            if self.sim_time < getattr(robot, '_safety_shield_until', 0.0):
+                desired[rid] = getattr(robot, '_safety_shield_scale', 1.0)
+                level_name = getattr(robot, '_safety_shield_level', 'clear')
+                reasons[rid] = (RiskLevel(level_name), None,
+                                math.inf, math.inf)
+
+        for rid, robot in self.robots.items():
+            age = max(0.0, self.sim_time - float(robot.sample_time))
+            moving = bool(robot.waypoints and
+                          robot.current_waypoint_idx < len(robot.waypoints))
+            if moving and age > MOTION_SAFETY.stale_stop_age_s:
+                desired[rid] = 0.0
+                reasons[rid] = (RiskLevel.EMERGENCY, None, math.inf, math.inf)
+            elif moving and age > MOTION_SAFETY.stale_caution_age_s:
+                desired[rid] = min(desired[rid], 0.5)
+                reasons[rid] = (RiskLevel.CAUTION, None, math.inf, math.inf)
+
+        robot_ids = sorted(self.robots)
+        for index, rid_a in enumerate(robot_ids):
+            a = self.robots[rid_a]
+            for rid_b in robot_ids[index + 1:]:
+                b = self.robots[rid_b]
+                risk = assess_motion_risk(
+                    a.position, a.velocity, b.position, b.velocity,
+                    speed=max(math.hypot(*a.velocity), math.hypot(*b.velocity)),
+                    deceleration=MOTION_SAFETY.braking_deceleration_mps2,
+                    latency=MOTION_SAFETY.reaction_latency_s,
+                    collision_distance=MOTION_SAFETY.hard_collision_distance_m,
+                    horizon=10.0,
+                    caution_distance=MOTION_SAFETY.prediction_clearance_m)
+                scale = {
+                    RiskLevel.CLEAR: 1.0,
+                    RiskLevel.CAUTION: 0.6,
+                    RiskLevel.BRAKE: 0.0,
+                    RiskLevel.EMERGENCY: 0.0,
+                }[risk.level]
+                for rid, peer in ((rid_a, rid_b), (rid_b, rid_a)):
+                    if scale < desired[rid]:
+                        desired[rid] = scale
+                        reasons[rid] = (risk.level, peer,
+                                        risk.minimum_distance,
+                                        risk.time_to_collision)
+
+        for rid, scale in desired.items():
+            robot = self.robots[rid]
+            level, peer, minimum, ttc = reasons[rid]
+            previous = getattr(robot, '_safety_shield_scale', 1.0)
+            if abs(previous - scale) < 1e-9:
+                continue
+            if previous >= 1.0 and scale < 1.0:
+                robot._safety_shield_base_scale = robot.speed_scale
+            command_scale = (getattr(robot, '_safety_shield_base_scale', 1.0)
+                             if scale >= 1.0 else
+                             min(scale, getattr(
+                                 robot, '_safety_shield_base_scale', 1.0)))
+            if not self._set_robot_speed_scale(rid, command_scale):
+                # A failed safety command cannot be treated as applied.
+                robot._replan_requested = True
+                for affected in self.robots.values():
+                    self._set_robot_speed_scale(affected.robot_id, 0.0)
+                return
+            robot._safety_shield_scale = scale
+            robot._safety_shield_level = level.value
+            if scale < 1.0:
+                robot._safety_shield_until = self.sim_time + 0.5
+            else:
+                robot._safety_shield_until = 0.0
+            if scale >= 1.0:
+                robot._safety_shield_base_scale = command_scale
+            if scale == 0.0:
+                robot._replan_requested = True
+            if getattr(self, 'metrics', None) is not None:
+                self.metrics.record_safety_event(SafetyEvent(
+                    event_id=(f"shield:{rid}:{robot.state_seq}:"
+                              f"{level.value}:{peer}"),
+                    sim_time=self.sim_time,
+                    event_type="dynamic_safety_shield",
+                    robot_id=rid, peer_id=peer,
+                    path_version=robot.path_version,
+                    decision=f"{level.value}:speed_scale={scale:.1f}",
+                    minimum_distance=(None if not math.isfinite(minimum)
+                                      else minimum),
+                    ttc=None if not math.isfinite(ttc) else ttc))
+
     def _send_command_to_robot(self, robot_id: int, command: dict):
         """Send a navigation command to a specific robot via Emitter."""
         if not self.emitter:
             print(f"[Supervisor] Send skipped for robot {robot_id}: emitter unavailable")
             return False
         try:
+            wall_started = real_time.perf_counter()
             msg = json.dumps({
                 'target_robot': robot_id,
                 'command': command
             })
-            self.emitter.send(msg.encode('utf-8'))
+            payload = msg.encode('utf-8')
+            self.emitter.send(payload)
+            if hasattr(getattr(self, 'metrics', None),
+                       'record_communication'):
+                self.metrics.record_communication(
+                    'command', real_time.perf_counter() - wall_started,
+                    messages=1, byte_count=len(payload))
             return True
         except Exception as e:
             print(f"[Supervisor] Send error to robot {robot_id}: {e}")
@@ -2377,10 +3599,15 @@ class FactorySupervisor:
 
     def _begin_joint_plan_transaction(
             self, plans, timeout=0.5, waypoint_offsets=None,
-            partial_plans=None) -> bool:
+            partial_plans=None, planning_positions=None,
+            replace_transaction=None,
+            replacement_reason='validated_successor') -> bool:
         """Prepare every member while all controllers keep their old paths."""
         active = self._joint_plan_transaction
         if active is not None and active.state not in ("activated", "aborted"):
+            return False
+        if (replace_transaction is not None and
+                active is not replace_transaction):
             return False
         epoch = self._next_plan_epoch
         self._next_plan_epoch += 1
@@ -2403,11 +3630,17 @@ class FactorySupervisor:
         # held; the progress watchdog will escalate it to a physical escape
         # if the joint planner repeatedly fails to give it a moving route.
         for rid in omitted_stationary:
-            self._hold_robot(rid, 0.5)
+            self._hold_only_without_committed_route(rid, 0.5)
         if any(not self._route_write_allowed(
                 self.robots[rid], 'joint_grid_transaction')
                 for rid in normalized):
             return False
+        # All local preconditions for prepare have passed. Retire the old
+        # activated lease at the last possible instant, while controllers
+        # continue executing its already committed path.
+        if replace_transaction is not None:
+            self._retire_joint_transaction(
+                replace_transaction, reason=replacement_reason)
         for rid in normalized:
             robot = self.robots[rid]
             robot.route_write_generation += 1
@@ -2424,6 +3657,12 @@ class FactorySupervisor:
         self._joint_plan_transaction = txn
         txn.waypoint_offsets = waypoint_offsets or {}
         txn.partial_plans = partial_plans or {}
+        txn.planning_positions = {
+            int(rid): tuple(position[:2])
+            for rid, position in (planning_positions or {}).items()
+            if rid in normalized}
+        txn.creation_positions = {
+            rid: tuple(self.robots[rid].position[:2]) for rid in normalized}
         txn.writer_generations = {
             rid: self.robots[rid].route_write_generation for rid in normalized}
         self.motion_coordinator.joint_transactions_attempted += 1
@@ -2476,6 +3715,12 @@ class FactorySupervisor:
                 self.sim_time >= txn.activate_at + 0.5):
             txn.abort("activation_ack_timeout")
         if txn.state == "activation_confirmed":
+            txn.activation_positions = {
+                rid: tuple(self.robots[rid].position[:2])
+                for rid in txn.members}
+            txn.activation_goals = {
+                rid: self._navigation_goal(self.robots[rid])
+                for rid in txn.members}
             for rid in txn.members:
                 robot = self.robots[rid]
                 robot.path_version = txn.versions[rid]
@@ -2484,19 +3729,98 @@ class FactorySupervisor:
                 robot.dispatch_not_before = txn.activate_at
                 robot.active_plan_epoch = txn.epoch
                 robot.active_plan_source = 'joint_grid_transaction'
+                # PLAN_ACTIVATED is the controller's acknowledgement that it
+                # installed this epoch from waypoint zero.  Synchronize the
+                # mirrored identity before issuing current/next grants.
+                robot.controller_active_plan_epoch = txn.epoch
+                robot.controller_waypoint_index = 0
+                robot.advance_grant_epoch = 0
+                robot.advance_grant_waypoint_index = -1
+                robot.advance_grant_valid_until = 0.0
+                robot.advance_grants = {}
+                robot.advance_hold_until = 0.0
+                robot.advance_hold_reason = None
                 robot.active_joint_started_at = txn.activate_at
                 robot.recovery_active = False
                 robot.recovery_resume_goal = None
+                robot.recovery_execution_target = None
+                robot.recovery_execution_business_goal = None
+                robot.recovery_execution_until = 0.0
                 txn_offsets = getattr(txn, 'waypoint_offsets', {}).get(
                     rid, ())
+                robot.active_joint_offsets = tuple(float(value)
+                                                   for value in txn_offsets)
+                robot._telemetry_plan_epoch = txn.epoch
+                robot._telemetry_waypoint_index = 0
+                robot._telemetry_waypoint_changed_at = txn.activate_at
+                robot._physical_waypoint_index = 0
+                robot._physical_waypoint_started_at = txn.activate_at
+                robot._physical_waypoint_start_position = robot.position
+                robot._physical_waypoint_departed_at = None
                 last_offset = txn_offsets[-1] if txn_offsets else 0.0
                 robot.active_joint_wait_deadline = (
                     txn.activate_at + last_offset + 10.0)
                 if getattr(self, 'metrics', None) is not None:
+                    first_waypoint = (
+                        tuple(txn.plans[rid][0]) if txn.plans[rid] else None)
+                    planning_position = txn.planning_positions.get(rid)
+                    creation_position = txn.creation_positions.get(rid)
+                    activation_position = tuple(robot.position[:2])
+                    activation_ack = dict(
+                        txn.activation_ack_details.get(rid, {}))
+
+                    def point_matches(first, second):
+                        try:
+                            return bool(
+                                first is not None and second is not None and
+                                len(first) >= 2 and len(second) >= 2 and
+                                math.hypot(float(first[0]) - float(second[0]),
+                                           float(first[1]) - float(second[1]))
+                                <= 1e-6)
+                        except (TypeError, ValueError):
+                            return False
+
+                    def first_distance(position):
+                        return (math.hypot(
+                            first_waypoint[0] - position[0],
+                            first_waypoint[1] - position[1])
+                                if first_waypoint is not None and
+                                position is not None else None)
+
                     self.metrics.record_route_dispatch(
                         rid, robot.path_version, txn.epoch,
                         'joint_grid_transaction', len(txn.plans[rid]),
-                        self.sim_time)
+                        self.sim_time, diagnostics={
+                            'planning_position': planning_position,
+                            'creation_position': creation_position,
+                            'activation_position': activation_position,
+                            'first_waypoint': first_waypoint,
+                            'planning_to_first_m': first_distance(
+                                planning_position),
+                            'creation_to_first_m': first_distance(
+                                creation_position),
+                            'activation_to_first_m': first_distance(
+                                activation_position),
+                            'transaction_age_s': max(
+                                0.0, self.sim_time - txn.created_at),
+                            'activation_ack': activation_ack,
+                            'ack_waypoint_zero_matches': point_matches(
+                                activation_ack.get('waypoint_zero'),
+                                first_waypoint),
+                            'ack_waypoint_count_matches': (
+                                activation_ack.get('waypoint_count') ==
+                                len(txn.plans[rid])),
+                            'ack_offset_count_matches': (
+                                activation_ack.get(
+                                    'waypoint_offset_count') ==
+                                len(txn_offsets)),
+                        })
+            # Controllers have already acknowledged activation.  Issue the
+            # first rolling grants now, after every member's authoritative
+            # route is installed, instead of waiting for the next periodic
+            # status packet and injecting an epoch-boundary stop.
+            for rid in txn.members:
+                self._maybe_issue_advance_grant(self.robots[rid])
             txn.mark_activated()
             max_last_offset = max(
                 (values[-1] if values else 0.0 for values in
@@ -2629,6 +3953,9 @@ class FactorySupervisor:
             # single-robot navigate; the next loop turns the intent into an
             # all-active atomic joint transaction.
             self._last_command_send_ok = True
+            self._pending_joint_plan_robot_ids = set(getattr(
+                self, '_pending_joint_plan_robot_ids', set()))
+            self._pending_joint_plan_robot_ids.add(robot_id)
             self._next_joint_grid_tick = min(
                 getattr(self, '_next_joint_grid_tick', self.sim_time),
                 self.sim_time)
@@ -2855,7 +4182,7 @@ class FactorySupervisor:
     def _broadcast_peer_positions(self):
         """Send all robot positions to each robot for peer conflict avoidance."""
         if not self.emitter:
-            return
+            return 0, 0
         # Build versioned samples while retaining a legacy "positions" field.
         all_positions = {}
         all_samples = {}
@@ -2890,6 +4217,8 @@ class FactorySupervisor:
         }
 
         # Send to each robot (excluding itself from peer list)
+        sent_messages = 0
+        sent_bytes = 0
         for rid in self.robots:
             peer_positions = peer_positions_by_rid.get(rid)
             if not peer_positions:
@@ -2902,11 +4231,16 @@ class FactorySupervisor:
                         'positions': peer_positions,
                         'samples': peer_samples_by_rid.get(rid, {}),
                         'sample_time': self.sim_time,
+                        'broadcast_seq': self.step_count,
                     }
                 }, separators=(',', ':'))
-                self.emitter.send(msg.encode('utf-8'))
+                payload = msg.encode('utf-8')
+                self.emitter.send(payload)
+                sent_messages += 1
+                sent_bytes += len(payload)
             except Exception:
                 pass
+        return sent_messages, sent_bytes
 
     def _receive_messages(self):
         """Process incoming messages from robots."""
@@ -2940,8 +4274,17 @@ class FactorySupervisor:
                     txn = self._joint_plan_transaction
                     if (txn is not None and
                             int(msg.get('plan_epoch', -1)) == txn.epoch):
+                        rid = int(msg.get('robot_id', -1))
+                        txn.activation_ack_details[rid] = {
+                            'waypoint_index': msg.get('waypoint_index'),
+                            'waypoint_count': msg.get('waypoint_count'),
+                            'waypoint_zero': msg.get('waypoint_zero'),
+                            'current_target': msg.get('current_target'),
+                            'waypoint_offset_count': msg.get(
+                                'waypoint_offset_count'),
+                        }
                         txn.acknowledge_activated(
-                            int(msg.get('robot_id', -1)))
+                            rid)
                         self._advance_joint_plan_transaction()
                 elif msg.get('type') == 'PLAN_COMMITTED':
                     txn = self._joint_plan_transaction
@@ -2995,12 +4338,147 @@ class FactorySupervisor:
                         elif not emergency:
                             robot.emergency_braking = False
                             robot.emergency_braking_since = None
+                    accepted_motion_status = False
+                    if 'status_seq' in msg:
+                        robot = self.robots[robot_id]
+                        status_session = str(msg.get(
+                            'status_session', 'legacy'))
+                        if status_session != robot.controller_status_session:
+                            robot.controller_status_session = status_session
+                            robot.controller_status_seq = 0
+                            robot.controller_status_sample_time = 0.0
+                        try:
+                            status_seq = int(msg['status_seq'])
+                            sample_time = float(msg.get(
+                                'status_sample_time', float('nan')))
+                        except (TypeError, ValueError):
+                            status_seq = -1
+                            sample_time = float('nan')
+                        if (status_seq > robot.controller_status_seq and
+                                math.isfinite(sample_time) and
+                                sample_time >= robot.controller_status_sample_time):
+                            if robot.controller_status_seq > 0:
+                                robot.controller_status_drops += max(
+                                    0, status_seq -
+                                    robot.controller_status_seq - 1)
+                            robot.controller_status_seq = status_seq
+                            robot.controller_status_sample_time = sample_time
+                            try:
+                                motion_values = tuple(float(msg.get(
+                                    key, 0.0)) for key in (
+                                        'commanded_left_wheel_speed',
+                                        'commanded_right_wheel_speed',
+                                        'commanded_linear_speed',
+                                        'commanded_angular_speed'))
+                                if not all(math.isfinite(value)
+                                           for value in motion_values):
+                                    raise ValueError(
+                                        'non-finite motion telemetry')
+                            except (TypeError, ValueError):
+                                motion_values = None
+                            if motion_values is not None:
+                                (robot.controller_left_wheel_speed,
+                                 robot.controller_right_wheel_speed,
+                                 robot.controller_linear_speed,
+                                  robot.controller_angular_speed) = motion_values
+                                accepted_motion_status = True
+                            try:
+                                measured_values = tuple(
+                                    None if msg.get(key) is None else
+                                    float(msg[key]) for key in (
+                                        'measured_left_wheel_speed',
+                                        'measured_right_wheel_speed'))
+                                if any(value is not None and
+                                       not math.isfinite(value)
+                                       for value in measured_values):
+                                    raise ValueError(
+                                        'non-finite measured wheel telemetry')
+                            except (KeyError, TypeError, ValueError):
+                                measured_values = (None, None)
+                            (robot.controller_measured_left_wheel_speed,
+                             robot.controller_measured_right_wheel_speed) = (
+                                 measured_values)
+                            robot.controller_local_risk_level = str(
+                                msg.get('local_risk_level', 'unknown'))
+                            robot.controller_stop_reason = str(msg.get(
+                                'control_stop_reason', 'unknown'))
+                            reported_target = msg.get(
+                                'active_waypoint_target')
+                            try:
+                                if reported_target is None:
+                                    parsed_target = None
+                                elif (isinstance(reported_target, (list, tuple)) and
+                                      len(reported_target) >= 2):
+                                    target = (float(reported_target[0]),
+                                              float(reported_target[1]))
+                                    if not all(math.isfinite(value)
+                                               for value in target):
+                                        raise ValueError('non-finite target')
+                                    parsed_target = target
+                                else:
+                                    raise ValueError('malformed target')
+                                count = int(msg.get(
+                                    'active_waypoint_count', 0))
+                                if count < 0:
+                                    raise ValueError('negative waypoint count')
+                                robot.controller_reported_target = parsed_target
+                                robot.controller_reported_waypoint_count = count
+                            except (TypeError, ValueError):
+                                # Preserve the last accepted target when a
+                                # malformed packet is observed.
+                                pass
                     if 'active_path_version' in msg:
                         robot = self.robots[robot_id]
+                        reported_epoch = int(msg.get('active_plan_epoch', 0))
+                        reported_index = int(msg.get('active_waypoint_index', 0))
+                        if reported_epoch != robot._telemetry_plan_epoch:
+                            robot._telemetry_plan_epoch = reported_epoch
+                            robot._telemetry_waypoint_index = reported_index
+                            robot._telemetry_waypoint_changed_at = self.sim_time
+                        elif reported_index > robot._telemetry_waypoint_index:
+                            completed_index = reported_index - 1
+                            advanced_at = float(msg.get(
+                                'waypoint_advanced_at', float('nan')))
+                            valid_advanced_at = (
+                                math.isfinite(advanced_at) and
+                                0.0 <= advanced_at <= self.sim_time + 0.05)
+                            departed_at = float(msg.get(
+                                'segment_departed_at', float('nan')))
+                            departure_index = int(msg.get(
+                                'segment_departure_index', -1))
+                            departure_distance = float(msg.get(
+                                'segment_departure_distance', float('nan')))
+                            arrived_at = float(msg.get(
+                                'segment_arrived_at', float('nan')))
+                            valid_departure = (
+                                departure_index == completed_index and
+                                math.isfinite(departed_at) and
+                                math.isfinite(arrived_at) and
+                                0.0 <= departed_at <= arrived_at <= advanced_at and
+                                math.isfinite(departure_distance) and
+                                departure_distance >= 0.20)
+                            if (reported_epoch == robot.active_plan_epoch and
+                                    0 <= completed_index < len(
+                                        robot.active_joint_offsets)):
+                                deadline = (
+                                    robot.active_joint_started_at +
+                                    robot.active_joint_offsets[completed_index] +
+                                    MOTION_SAFETY.joint_time_slot_s)
+                                if (not valid_advanced_at or
+                                        advanced_at > deadline):
+                                    self.metrics.record_expired_reservation_movement(
+                                        advanced_at if valid_advanced_at else
+                                        self.sim_time,
+                                        robot_id, reported_epoch,
+                                        completed_index, deadline)
+                                if valid_advanced_at and valid_departure:
+                                    self.metrics.record_joint_cell_traversal(
+                                        arrived_at - departed_at)
+                            robot._telemetry_waypoint_index = reported_index
+                            robot._telemetry_waypoint_changed_at = self.sim_time
                         robot.controller_path_version = int(
                             msg['active_path_version'])
-                        robot.controller_waypoint_index = int(
-                            msg.get('active_waypoint_index', 0))
+                        robot.controller_waypoint_index = reported_index
                         robot.controller_paused_until = float(
                             msg.get('paused_until', 0.0))
                         wait_version_matches = int(msg.get(
@@ -3017,8 +4495,49 @@ class FactorySupervisor:
                         else:
                             robot.controller_joint_wait_until = 0.0
                             robot.controller_joint_wait_reason = None
-                        robot.controller_active_plan_epoch = int(
-                            msg.get('active_plan_epoch', 0))
+                        if accepted_motion_status:
+                            self._update_uncommanded_zero_lease(robot, msg)
+                        if getattr(self, 'metrics', None) is not None:
+                            continuity_msg = dict(msg)
+                            wait_reason = robot.controller_joint_wait_reason
+                            try:
+                                controller_sample_time = float(msg.get(
+                                    'status_sample_time', self.sim_time))
+                            except (TypeError, ValueError):
+                                controller_sample_time = self.sim_time
+                            paused = (robot.controller_paused_until >=
+                                      controller_sample_time)
+                            shield_level = getattr(
+                                robot, '_safety_shield_level', 'clear')
+                            shield_wait = (
+                                shield_level in ('brake', 'emergency') and
+                                getattr(robot, '_safety_shield_until', 0.0) >=
+                                controller_sample_time)
+                            if wait_reason is not None or paused or shield_wait:
+                                if wait_reason is not None:
+                                    evidence_reason = wait_reason
+                                elif shield_wait:
+                                    evidence_reason = (
+                                        'dynamic_safety_shield:' +
+                                        shield_level)
+                                else:
+                                    evidence_reason = 'supervisor_hold'
+                                continuity_msg['wait_validator_evidence'] = {
+                                    'validated': True,
+                                    'valid_until': max(
+                                        robot.controller_joint_wait_until,
+                                        robot.controller_paused_until,
+                                        getattr(robot,
+                                                '_safety_shield_until', 0.0)),
+                                    'reason': evidence_reason,
+                                }
+                            self.metrics.record_motion_telemetry(
+                                self.sim_time, robot_id, continuity_msg)
+                        robot.controller_active_plan_epoch = reported_epoch
+                        if (reported_epoch == robot.active_plan_epoch and
+                                robot.active_plan_source ==
+                                'joint_grid_transaction'):
+                            self._maybe_issue_advance_grant(robot)
                         # In full-prefix joint mode, trigger the next rolling
                         # window when this robot is actually waiting at its
                         # committed endpoint, not merely after the first cell.
@@ -3026,10 +4545,8 @@ class FactorySupervisor:
                                 robot.controller_joint_wait_reason in (
                                     'joint_window_endpoint',
                                     'joint_epoch_barrier')):
-                            self._next_joint_grid_tick = min(
-                                getattr(self, '_next_joint_grid_tick',
-                                        self.sim_time),
-                                self.sim_time + 0.1)
+                            self._request_joint_endpoint_once(
+                                robot, reported_epoch)
                     if 'speed_scale' in msg:
                         reported_scale = max(
                             0.4, min(1.0, float(msg['speed_scale'])))
@@ -3054,9 +4571,21 @@ class FactorySupervisor:
                         # rejects far-away stale reports.
                         self._handle_goal_reached(robot_id)
                     if msg.get('replan_requested') is True:
-                        self.robots[robot_id]._replan_requested = True
+                        robot = self.robots[robot_id]
+                        request_identity = (
+                            int(msg.get('path_version',
+                                        robot.controller_path_version)),
+                            int(msg.get('active_plan_epoch',
+                                        robot.controller_active_plan_epoch)
+                                or 0),
+                        )
+                        if request_identity == getattr(
+                                robot, 'last_consumed_replan_identity', None):
+                            self.receiver.nextPacket()
+                            continue
+                        robot.last_consumed_replan_identity = request_identity
+                        robot._replan_requested = True
                         if getattr(self, 'metrics', None) is not None:
-                            robot = self.robots[robot_id]
                             self.metrics.record_replan_request(
                                 self.sim_time, robot_id, robot.path_version,
                                 robot.active_plan_epoch)
@@ -3084,8 +4613,9 @@ class FactorySupervisor:
             return 0.0, None
 
         allowed_reasons = {
-            'joint_slot_deadline', 'joint_epoch_barrier',
-            'joint_window_endpoint',
+            'joint_slot_deadline', 'joint_slot_release',
+            'joint_epoch_barrier',
+            'joint_window_endpoint', 'joint_advance_grant',
         }
         authoritative_deadline = robot.active_joint_wait_deadline
         authoritative_start = robot.active_joint_started_at
@@ -3121,6 +4651,184 @@ class FactorySupervisor:
                 path_version=robot.path_version,
                 decision='rejected'))
         return 0.0, None
+
+    @staticmethod
+    def _point_segment_distance(point, start, end):
+        """Distance from point to a finite 2-D segment."""
+        dx, dy = end[0] - start[0], end[1] - start[1]
+        length_sq = dx * dx + dy * dy
+        if length_sq <= 1e-12:
+            return math.hypot(point[0] - start[0], point[1] - start[1])
+        ratio = max(0.0, min(1.0, (
+            (point[0] - start[0]) * dx +
+            (point[1] - start[1]) * dy) / length_sq))
+        projection = (start[0] + ratio * dx, start[1] + ratio * dy)
+        return math.hypot(point[0] - projection[0],
+                          point[1] - projection[1])
+
+    def _validate_advance_grant(self, robot: RobotInfo, waypoint_index: int):
+        """Revalidate one activated joint segment against measured peers."""
+        current_index = robot.controller_waypoint_index
+        if (robot.active_plan_source != 'joint_grid_transaction' or
+                robot.active_plan_epoch is None or
+                waypoint_index not in (current_index, current_index + 1) or
+                not 0 <= waypoint_index < len(robot.waypoints)):
+            return False, 'inactive_or_index_mismatch', None
+        if self.sim_time - robot.sample_time > MOTION_SAFETY.stale_caution_age_s:
+            return False, 'stale_owner_pose', None
+        start = (robot.position if waypoint_index == current_index else
+                 robot.waypoints[waypoint_index - 1])
+        target = robot.waypoints[waypoint_index]
+        offset = (robot.active_joint_offsets[waypoint_index]
+                  if waypoint_index < len(robot.active_joint_offsets) else 0.0)
+        if (robot.active_joint_started_at + offset +
+                MOTION_SAFETY.joint_time_slot_s <= self.sim_time):
+            return False, 'reservation_deadline_expired', None
+        # A terminal owner must physically clear before an incoming route can
+        # enter its boundary. This gate also rejects stale routes prepared
+        # before a service-complete transition changed terminal ownership.
+        clearing_terminal = robot.terminal_egress_location
+        if clearing_terminal is not None:
+            terminal_xy = self._goal_coordinates(clearing_terminal)
+            start_distance = math.hypot(
+                start[0] - terminal_xy[0], start[1] - terminal_xy[1])
+            target_distance = math.hypot(
+                target[0] - terminal_xy[0], target[1] - terminal_xy[1])
+            if (start_distance < TERMINAL_EGRESS_PRIORITY_RADIUS and
+                    target_distance + 0.02 < start_distance):
+                return (False,
+                        f'terminal_egress_regression:{clearing_terminal}',
+                        None)
+        business_terminal = self._navigation_goal(robot)
+        if (self._is_terminal_name(business_terminal) and
+                business_terminal != clearing_terminal):
+            terminal = business_terminal
+            terminal_xy = self._goal_coordinates(terminal)
+            if self._point_segment_distance(
+                    terminal_xy, start, target) <= TERMINAL_OCCUPANCY_RADIUS:
+                terminal_owner = self._terminal_owner(
+                    terminal, robot.robot_id)
+                if terminal_owner is not None:
+                    denial = (terminal, terminal_owner,
+                              int(robot.active_plan_epoch or 0), waypoint_index)
+                    if robot.terminal_last_denial != denial:
+                        robot.terminal_last_denial = denial
+                        if getattr(self, 'metrics', None) is not None:
+                            owner_epoch = self.robots[
+                                terminal_owner].terminal_clearance_epoch
+                            self.metrics.record_terminal_handoff(
+                                'inbound_denied', self.sim_time,
+                                robot.robot_id, terminal, owner_epoch,
+                                owner_id=terminal_owner)
+                    return (False, f'terminal_occupied:{terminal}',
+                            terminal_owner)
+        clearance = MOTION_SAFETY.planning_clearance_m
+        grant_end = self.sim_time + 0.50
+        for zone_name, zone_position in (
+                self.motion_coordinator.turning_zones().items()):
+            if self._point_segment_distance(
+                    zone_position, start, target) >= clearance:
+                continue
+            zone_owner = self.motion_coordinator.resource_reservations.owner_at(
+                ('zone', zone_name), self.sim_time, grant_end,
+                exclude_owner=robot.robot_id)
+            if zone_owner is not None:
+                return False, f'zone_reserved:{zone_name}', zone_owner
+        for peer_id, peer in self.robots.items():
+            if peer_id == robot.robot_id:
+                continue
+            peer_age = max(0.0, self.sim_time - peer.sample_time)
+            peer_segment_distance = self._point_segment_distance(
+                peer.position, start, target)
+            if peer_age > MOTION_SAFETY.stale_caution_age_s:
+                # A stale pose only blocks this grant if the peer's reachable
+                # uncertainty disk can touch this segment's swept tube.
+                uncertainty = MOTION_SAFETY.maximum_speed_mps * peer_age
+                if peer_segment_distance > clearance + uncertainty:
+                    continue
+                return False, f'stale_relevant_peer:{peer_id}', peer_id
+            # The footprint swept while turning and translating is contained
+            # by this conservative clearance tube around the full segment.
+            if peer_segment_distance < clearance:
+                return False, f'swept_occupancy:{peer_id}', peer_id
+            if (peer.active_plan_source == 'joint_grid_transaction' and
+                    0 <= peer.controller_waypoint_index < len(peer.waypoints)):
+                peer_target = peer.waypoints[peer.controller_waypoint_index]
+                reverse_edge = (
+                    math.hypot(target[0] - peer.position[0],
+                               target[1] - peer.position[1]) < clearance and
+                    math.hypot(peer_target[0] - start[0],
+                               peer_target[1] - start[1]) < clearance)
+                if reverse_edge:
+                    return False, f'reverse_edge:{peer_id}', peer_id
+        return True, 'vertex_edge_swept_clear', None
+
+    def _maybe_issue_advance_grant(self, robot: RobotInfo):
+        """Issue at most one signed identity per epoch/index validation."""
+        epoch = int(robot.active_plan_epoch or 0)
+        current = robot.controller_waypoint_index
+        for index in (current, current + 1):
+            if index >= len(robot.waypoints):
+                continue
+            existing_until = robot.advance_grants.get((epoch, index), 0.0)
+            if existing_until > self.sim_time:
+                continue
+            valid, evidence, peer_id = self._validate_advance_grant(
+                robot, index)
+            if not valid:
+                if (index == current and
+                        (robot.advance_hold_reason != evidence or
+                         robot.advance_hold_until <= self.sim_time)):
+                    hold_until = self.sim_time + 0.25
+                    if self._send_command_to_robot(robot.robot_id, {
+                            'type': 'advance_hold', 'plan_epoch': epoch,
+                            'waypoint_index': index,
+                            'valid_until': hold_until,
+                            'validator_evidence': evidence,
+                            'peer_id': peer_id}):
+                        robot.advance_hold_until = hold_until
+                        robot.advance_hold_reason = evidence
+                continue
+            offset = (robot.active_joint_offsets[index]
+                      if index < len(robot.active_joint_offsets) else 0.0)
+            original_deadline = (
+                robot.active_joint_started_at + offset +
+                MOTION_SAFETY.joint_time_slot_s)
+            valid_until = original_deadline
+            next_seq = robot.advance_grant_seq + 1
+            command = {
+                'type': 'advance_grant', 'plan_epoch': epoch,
+                'waypoint_index': int(index), 'grant_seq': next_seq,
+                'valid_until': valid_until,
+                'validator_evidence': evidence, 'peer_id': peer_id,
+                'terminal_epoch': int(robot.terminal_clearance_epoch),
+            }
+            if self._send_command_to_robot(robot.robot_id, command):
+                robot.advance_grant_seq = next_seq
+                robot.advance_grant_epoch = epoch
+                robot.advance_grant_waypoint_index = int(index)
+                robot.advance_grant_valid_until = valid_until
+                robot.advance_grants[(epoch, index)] = valid_until
+                target = robot.waypoints[index]
+                business_goal = self._navigation_goal(robot)
+                goal_xy = self._goal_coordinates(business_goal)
+                if (self._is_terminal_name(business_goal) and
+                        goal_xy is not None and
+                        math.hypot(target[0] - goal_xy[0],
+                                   target[1] - goal_xy[1]) <=
+                        TERMINAL_OCCUPANCY_RADIUS):
+                    task_id = getattr(robot.current_task, 'task_id', None)
+                    grant_key = (business_goal, task_id)
+                    if robot.terminal_last_grant != grant_key:
+                        robot.terminal_last_grant = grant_key
+                        if getattr(self, 'metrics', None) is not None:
+                            self.metrics.record_terminal_handoff(
+                                'inbound_granted', self.sim_time,
+                                robot.robot_id, business_goal,
+                                robot.terminal_clearance_epoch)
+                if index == current:
+                    robot.advance_hold_until = 0.0
+                    robot.advance_hold_reason = None
 
     def _on_robot_ready(self, payload):
         """Validate a robot handshake against the current scenario set."""
@@ -3247,7 +4955,8 @@ class FactorySupervisor:
         return self._predict_trajectory(
             robot.position,
             robot.waypoints[robot.current_waypoint_idx:],
-            0.22 * scale, horizon, dt, start_delay=start_delay)
+            MOTION_SAFETY.maximum_speed_mps * scale, horizon, dt,
+            start_delay=start_delay)
 
     def _find_joint_speed_profile(self, component, base_trajectories,
                                   minimum_distance=0.85):
@@ -4310,7 +6019,7 @@ class FactorySupervisor:
                 target = grid.grid_to_world(*cell)
                 origin_distance = math.hypot(target[0] - origin[0],
                                             target[1] - origin[1])
-                if origin_distance < MIN_NAV_DISPLACEMENT:
+                if origin_distance < RECOVERY_MIN_TARGET_DISPLACEMENT:
                     continue
                 peer_clearance = min(
                     (math.hypot(target[0] - px, target[1] - py)
@@ -4428,6 +6137,8 @@ class FactorySupervisor:
         robot = self.robots.get(rid)
         if robot is None:
             return False
+        if not self._recovery_hard_due(robot):
+            return False
         now = self.sim_time
         if getattr(robot, '_joint_stall_recovery_until', 0.0) > now:
             return False
@@ -4491,6 +6202,7 @@ class FactorySupervisor:
                 if getattr(self, 'metrics', None) is not None:
                     self.metrics.record_escape(
                         now, rid, '_joint_stall_recovery', target)
+                self._mark_physical_recovery_dispatched(robot)
                 print(f"[JointStallRecovery] T={now:.1f}s robot={rid} "
                       f"stuck; routed to ({target[0]:.2f},{target[1]:.2f}) "
                       f"route_dist={route_distance:.2f} "
@@ -4507,12 +6219,15 @@ class FactorySupervisor:
                 source='_joint_stall_recovery'):
             self._clear_joint_stall_state(robot)
             self._set_robot_speed_scale(rid, 1.0)
+            self._mark_physical_recovery_dispatched(robot)
             return True
         if self._command_reverse(rid, 0.3):
             self._clear_joint_stall_state(robot)
+            self._mark_physical_recovery_dispatched(robot)
             return True
         if ENABLE_NONPHYSICAL_RECOVERY and self._teleport_stalled_group([rid]):
             self._clear_joint_stall_state(robot)
+            self._mark_physical_recovery_dispatched(robot)
             return True
         return False
 
@@ -4898,6 +6613,9 @@ class FactorySupervisor:
                 angle = 2.0 * math.pi * step / 32.0
                 target = (robot.position[0] + distance * math.cos(angle),
                           robot.position[1] + distance * math.sin(angle))
+                if not self._recovery_target_has_effective_displacement(
+                        robot, target):
+                    continue
                 clearance = min((math.hypot(target[0] - px, target[1] - py)
                                  for px, py in peers), default=math.inf)
                 if clearance < min_peer_clearance:
@@ -5082,6 +6800,8 @@ class FactorySupervisor:
             robot = self.robots.get(rid)
             if robot is None:
                 continue
+            if not self._recovery_hard_due(robot):
+                continue
             # Emergency-braking and low-battery robots still need physical
             # recovery when they are the hard-stalled liveness target.
             # Exempting them here leaves the fleet blocked indefinitely.
@@ -5100,7 +6820,8 @@ class FactorySupervisor:
             robot.controller_joint_wait_until = 0.0
             robot.controller_joint_wait_reason = None
             if self._joint_escape_robot(rid):
-                robot._joint_escape_until = now + 2.0
+                self._mark_physical_recovery_dispatched(robot)
+                robot._joint_escape_until = now + 8.0
                 self._joint_liveness_needed = True
                 self._next_joint_grid_tick = min(
                     getattr(self, '_next_joint_grid_tick', now + 2.0),
@@ -5108,7 +6829,8 @@ class FactorySupervisor:
                 return True
             if ENABLE_NONPHYSICAL_RECOVERY and self._teleport_stalled_group([rid]):
                 self._clear_joint_stall_state(robot)
-                robot._joint_escape_until = now + 2.0
+                self._mark_physical_recovery_dispatched(robot)
+                robot._joint_escape_until = now + 8.0
                 self._joint_liveness_needed = True
                 self._next_joint_grid_tick = min(
                     getattr(self, '_next_joint_grid_tick', now + 2.0),
@@ -5139,6 +6861,9 @@ class FactorySupervisor:
                 angle = heading + offset
                 target = (robot.position[0] + distance * math.cos(angle),
                           robot.position[1] + distance * math.sin(angle))
+                if not self._recovery_target_has_effective_displacement(
+                        robot, target):
+                    continue
                 clearance = min((math.hypot(target[0] - px,
                                             target[1] - py)
                                  for px, py in peers), default=math.inf)
@@ -5158,6 +6883,9 @@ class FactorySupervisor:
 
         for _score, clearance, target in candidates:
             if clearance < 0.80:
+                continue
+            if not self._recovery_target_has_effective_displacement(
+                    robot, target):
                 continue
             grid = getattr(self.motion_coordinator, 'grid', None)
             if grid is not None:
@@ -5201,6 +6929,43 @@ class FactorySupervisor:
                     rid, pending, delay=0.0, source=source,
                     is_runtime_replan=is_runtime)
     
+    def _record_joint_physical_progress(self, robot) -> None:
+        """Record first measured arrival at each joint waypoint."""
+        if (robot.active_plan_source != 'joint_grid_transaction' or
+                robot.active_plan_epoch is None or not robot.waypoints):
+            return
+        physical_index = robot._physical_waypoint_index
+        if physical_index >= len(robot.waypoints):
+            return
+        waypoint = robot.waypoints[physical_index]
+        start_position = robot._physical_waypoint_start_position
+        distance_from_start = math.hypot(
+            robot.position[0] - start_position[0],
+            robot.position[1] - start_position[1])
+        if (robot._physical_waypoint_departed_at is None and
+                distance_from_start >= 0.02):
+            robot._physical_waypoint_departed_at = self.sim_time
+        if math.hypot(robot.position[0] - waypoint[0],
+                      robot.position[1] - waypoint[1]) > 0.03:
+            return
+        segment_start = (robot._physical_waypoint_departed_at
+                         if robot._physical_waypoint_departed_at is not None
+                         else self.sim_time)
+        elapsed = max(0.0, self.sim_time - segment_start)
+        segment_distance = math.hypot(
+            waypoint[0] - start_position[0],
+            waypoint[1] - start_position[1])
+        # Joint plans may prepend a short connector from the live pose to the
+        # grid.  It is not a full grid-cell traversal and would distort the
+        # slot calibration distribution.
+        if (segment_distance >= 0.20 and
+                elapsed >= self.timestep / 1000.0):
+            self.metrics.record_joint_cell_traversal(elapsed)
+        robot._physical_waypoint_index += 1
+        robot._physical_waypoint_started_at = self.sim_time
+        robot._physical_waypoint_start_position = waypoint
+        robot._physical_waypoint_departed_at = None
+
     def _update_robot_states(self, dt: float):
         """Update robot states including battery and distance tracking."""
         self._recover_emergency_braking()
@@ -5214,8 +6979,6 @@ class FactorySupervisor:
             robot.last_position = robot.position
             if dt > 0:
                 robot.velocity = (dx / dt, dz / dt)
-            robot.sample_time = self.sim_time
-            robot.state_seq += 1
             if robot.hold_until and self.sim_time >= robot.hold_until:
                 robot.hold_until = 0.0
                 robot.wait_started = 0.0
@@ -5250,6 +7013,8 @@ class FactorySupervisor:
                 })
                 robot.battery_swap_ready_at = None
                 robot.charging_started_at = None
+                self._mark_terminal_service_complete(
+                    robot, robot.goal_location)
                 if robot.current_task is not None:
                     robot.current_task.status = TaskStatus.PENDING
                     robot.current_task.assigned_robot = None
@@ -5321,6 +7086,10 @@ class FactorySupervisor:
         """
         robot = self.robots[robot_id]
 
+        if getattr(robot, 'active_plan_source', None) in (
+                '_command_reverse', '_joint_stall_recovery'):
+            self._clear_recovery_execution_lease(robot)
+
         # Joint execution progress is controller-authored and epoch-versioned.
         # Applying the legacy 0.40 m inference to a 0.25 m joint grid consumes
         # cells without motion and can remove robots from the next all-active
@@ -5369,8 +7138,13 @@ class FactorySupervisor:
         # The new deterministic yield protocol owns the arrival at its
         # standoff; it must not be treated as a business-goal transition.
         if getattr(robot, 'priority_yield_state', None) is not None:
-            self._priority_yield_handle_arrival(robot_id, force=force)
-            return
+            if self._priority_yield_owns_arrival(robot):
+                self._priority_yield_handle_arrival(robot_id, force=force)
+                return
+            # A yield marker can outlive the active-set scan after its route is
+            # exhausted.  Retire that stale ownership before allowing the
+            # independently verified business arrival to proceed.
+            self._priority_yield_clear_state(robot)
 
         # An escape waypoint is a temporary motion leg, never a business
         # pickup/delivery/home arrival. Resume the authoritative goal through
@@ -5379,6 +7153,7 @@ class FactorySupervisor:
             resume_goal = robot.recovery_resume_goal
             robot.recovery_active = False
             robot.recovery_resume_goal = None
+            self._clear_recovery_execution_lease(robot)
             # The escape leg has completed, so its emergency writer lease
             # must not block the validated successor route.  Limit this
             # hand-off to the active recovery owner; never clear an unrelated
@@ -5450,13 +7225,22 @@ class FactorySupervisor:
             # Arrived at pickup location
             # Read fresh robot position before planning the delivery leg.
             self._get_robot_positions_from_webots()
+            self._mark_terminal_service_complete(
+                robot, robot.current_task.pickup_location)
+
+            # Pickup is a measured business fact and must not be rolled back
+            # merely because the first delivery-route attempt has no path.
+            # Commit the successor state first so every retry targets the
+            # delivery terminal instead of the pickup terminal already reached.
+            self._commit_pickup_service(robot)
 
             # Plan delivery path via lifelong (avoids other robots'
             # reservations); fall back to A*.
+            delivery_target = self._terminal_admission_target(
+                robot_id, robot.current_task.delivery_location)
             delivery_path = self.motion_coordinator.plan_grid_lifelong(
-                robot_id, robot.position,
-                robot.current_task.delivery_location)
-            if delivery_path is None:
+                robot_id, robot.position, delivery_target)
+            if delivery_path is None and isinstance(delivery_target, str):
                 # The pickup leg is physically complete. Drop its retained
                 # grid reservation before using the legacy fallback planner;
                 # otherwise peers would avoid a path the robot has left.
@@ -5465,8 +7249,7 @@ class FactorySupervisor:
                     self.motion_coordinator.robot_priorities[robot_id] = -float(
                         getattr(robot.current_task, 'priority', 0.0) or 0.0)
                 delivery_path = self.motion_coordinator.plan_path_for_robot(
-                    robot_id, robot.position,
-                    robot.current_task.delivery_location)
+                    robot_id, robot.position, delivery_target)
             if delivery_path:
                 if not self._dispatch_plan(
                         robot_id, delivery_path,
@@ -5475,18 +7258,8 @@ class FactorySupervisor:
                     robot._replan_requested = True
                     robot._last_replan_time = self.sim_time - 3.0
                     return
-                robot.state = RobotState.CARRYING
-                robot.current_task.status = TaskStatus.IN_PROGRESS
-                robot.current_task.pickup_time = self.sim_time
-                robot.current_task.cargo_state = "onboard"
-                event = self.rl_event_ledger.append(
-                    "pickup_reached", self.sim_time, robot_id=robot_id,
-                    task_id=robot.current_task.task_id)
-                self.metrics.record_rl_event(event.to_dict())
-                robot.goal_location = robot.current_task.delivery_location
                 robot.waypoints = delivery_path
                 robot.current_waypoint_idx = 0
-                robot.state = RobotState.EN_ROUTE_DELIVERY
             else:
                 robot._replan_requested = True
                 robot._last_replan_time = self.sim_time - 3.0
@@ -5497,6 +7270,8 @@ class FactorySupervisor:
         
         elif robot.state == RobotState.EN_ROUTE_DELIVERY and robot.current_task:
             # Arrived at delivery location - task complete!
+            self._mark_terminal_service_complete(
+                robot, robot.current_task.delivery_location)
             robot.current_task.status = TaskStatus.COMPLETED
             robot.current_task.completion_time = self.sim_time
             robot.current_task.cargo_state = "delivered"
@@ -5918,7 +7693,8 @@ class FactorySupervisor:
         from training_scenarios import FactoryAStarCostOracle
         oracle = getattr(self, "_scheduler_path_cost_oracle", None)
         if oracle is None:
-            oracle = FactoryAStarCostOracle(robot_states, self.num_robots)
+            oracle = FactoryAStarCostOracle(
+                robot_states, self.num_robots, bounded_cache_misses=True)
             self._scheduler_path_cost_oracle = oracle
         else:
             oracle.bind_robot_states(robot_states)
@@ -6007,6 +7783,24 @@ class FactorySupervisor:
                 failed_pairs=frozenset(self._failed_assignment_pairs),
                 configuration={"runtime_geometry": "factory-grid-astar-v3"},
             )
+            collection_snapshot = None
+            if os.environ.get("WEBOTS_RL_COLLECT", "0").strip().lower() in {
+                    "1", "true", "yes", "on"}:
+                try:
+                    collection_env = SchedulingEnvironment(
+                        simulation_mode="webots")
+                    state = collection_env.set_snapshot(
+                        robot_states, pending, context)
+                    collection_snapshot = {
+                        "state": state.tolist(),
+                        "action_mask": collection_env.get_action_mask().tolist(),
+                        "robot_slots": list(collection_env._robot_slots),
+                        "task_slots": [task.task_id
+                                       for task in collection_env._task_slots],
+                        "contract": collection_env.contract_metadata(),
+                    }
+                except Exception as exc:
+                    print(f"[RL Collection] Snapshot rejected: {exc}")
             queued_assignment = bool(assignment_batch)
             try:
                 if queued_assignment:
@@ -6096,13 +7890,15 @@ class FactorySupervisor:
 
             # Plan path via lifelong CBS (avoids other robots' reservations);
             # fall back to per-robot A* if no conflict-free plan exists.
+            pickup_target = self._terminal_admission_target(
+                robot_id, task.pickup_location)
             pickup_path = self.motion_coordinator.plan_grid_lifelong(
-                robot_id, robot.position, task.pickup_location)
-            if pickup_path is None:
+                robot_id, robot.position, pickup_target)
+            if pickup_path is None and isinstance(pickup_target, str):
                 self.motion_coordinator.robot_priorities[robot_id] = -float(
                     getattr(task, 'priority', 0.0) or 0.0)
                 pickup_path = self.motion_coordinator.plan_path_for_robot(
-                    robot_id, robot.position, task.pickup_location)
+                    robot_id, robot.position, pickup_target)
             
             if pickup_path:
                 # Commit task and robot state only after a usable plan exists.
@@ -6153,6 +7949,33 @@ class FactorySupervisor:
                     "batch_id", batch_id)
                 task.rl_decision_id = event.values["decision_id"]
                 self.metrics.record_rl_event(event.to_dict())
+                if collection_snapshot is not None:
+                    try:
+                        robot_slot = collection_snapshot["robot_slots"].index(
+                            robot_id)
+                        task_slot = collection_snapshot["task_slots"].index(
+                            task.task_id)
+                        action = (robot_slot * int(
+                            collection_snapshot["contract"]["max_tasks"])
+                                  + task_slot)
+                        if not collection_snapshot["action_mask"][action]:
+                            raise ValueError("committed action was masked")
+                        self.metrics.record_rl_decision({
+                            "schema_version": "webots-decision-v1",
+                            "decision_id": event.values["decision_id"],
+                            "sim_time": float(self.sim_time),
+                            "state": collection_snapshot["state"],
+                            "action": action,
+                            "action_mask": collection_snapshot["action_mask"],
+                            "robot_id": robot_id,
+                            "task_id": task.task_id,
+                            "algorithm": decision.algorithm_name or
+                            active_scheduler.name,
+                            "contract": collection_snapshot["contract"],
+                        })
+                    except ValueError as exc:
+                        print(f"[RL Collection] Committed action not encodable: "
+                              f"{exc}")
                 self.metrics.record_scheduler_commit(
                     decision.algorithm_name or active_scheduler.name,
                     native=(active_scheduler is self.scheduler and
@@ -6200,6 +8023,25 @@ class FactorySupervisor:
             self.metrics.record_deadlock(cycle, self.sim_time)
     def run(self):
         """Main simulation loop."""
+        diagnostic_recording = os.environ.get(
+            'SMART_FACTORY_DIAGNOSTIC_RECORDING', '0').strip().lower() in {
+                '1', 'true', 'yes', 'on'}
+        recording_started = False
+        recording_path = None
+        if (diagnostic_recording and
+                hasattr(self.supervisor, 'animationStartRecording')):
+            stamp = real_time.strftime('%Y%m%d_%H%M%S')
+            recording_path = os.path.join(
+                self.metrics.output_dir,
+                f'webots_diagnostic_{self.scenario_name}_'
+                f'{self.scheduler.name}_{stamp}.html')
+            try:
+                recording_started = bool(
+                    self.supervisor.animationStartRecording(recording_path))
+                print(f"[DiagnosticRecording] start={recording_started} "
+                      f"path={recording_path}")
+            except Exception as exc:
+                print(f"[DiagnosticRecording] start failed: {exc}")
         self.motion_coordinator.lifelong_reset()
         # Register each robot's initial position as its home spot in CBS
         # so peers don't try to route through these nodes from t=0.
@@ -6213,6 +8055,8 @@ class FactorySupervisor:
                           if AUTO_STOP_SIMULATION else
                           "interactive/unlimited (stop from Webots GUI)")
         print(f"Duration: {duration_label} | Robots: {self.num_robots}")
+        print("Motion safety: " + json.dumps(
+            MOTION_SAFETY.resolved(), sort_keys=True, separators=(",", ":")))
         print(f"Collision avoidance: 10 s trajectory prediction + path-segment braking + deadlock recovery")
         print(f"Scan interval: 1 s | Prediction: 10 s sampled every 0.5 s | Collision radius: 0.5 m")
         print(f"{'='*60}")
@@ -6234,7 +8078,11 @@ class FactorySupervisor:
         
         completed_normally = False
         while self.running:
+            step_wall_started = real_time.perf_counter()
+            webots_step_started = real_time.perf_counter()
             step_status = self.supervisor.step(self.timestep)
+            self.metrics.record_supervisor_webots_step_wall(
+                real_time.perf_counter() - webots_step_started)
             if step_status == -1:
                 break
             self.sim_time += dt
@@ -6248,24 +8096,63 @@ class FactorySupervisor:
                 break
             
             # 1. Get robot positions from Webots
+            pose_read_started = real_time.perf_counter()
             self._get_robot_positions_from_webots()
+            self.metrics.record_phase_wall(
+                'pose_read', real_time.perf_counter() - pose_read_started)
             
             # 1.5 Broadcast all robot positions for peer conflict avoidance
             # EVERY STEP �?peer avoidance is safety-critical, no delays allowed.
             # At 32ms timestep, peer positions must be as fresh as possible
             # to give robots maximum reaction time before collision.
-            self._broadcast_peer_positions()
+            broadcast_wall_started = real_time.perf_counter()
+            broadcast_result = self._broadcast_peer_positions()
+            if (isinstance(broadcast_result, tuple) and
+                    len(broadcast_result) == 2):
+                broadcast_messages, broadcast_bytes = broadcast_result
+            else:
+                broadcast_messages, broadcast_bytes = 0, 0
+            broadcast_elapsed = real_time.perf_counter() - broadcast_wall_started
+            if hasattr(getattr(self, 'metrics', None),
+                       'record_communication'):
+                self.metrics.record_communication(
+                    'peer_broadcast',
+                    broadcast_elapsed,
+                    messages=broadcast_messages, byte_count=broadcast_bytes)
+            self.metrics.record_phase_wall('broadcast', broadcast_elapsed)
             
             # 2. Receive messages from robots
+            receive_wall_started = real_time.perf_counter()
             self._receive_messages()
+            receive_elapsed = real_time.perf_counter() - receive_wall_started
+            if hasattr(getattr(self, 'metrics', None),
+                       'record_communication'):
+                self.metrics.record_communication(
+                    'receive', receive_elapsed)
+            self.metrics.record_phase_wall('receive', receive_elapsed)
             self._check_startup_timeout()
             
             # 2.5 Dispatch delayed robots (temporal conflict resolution)
+            dispatch_started = real_time.perf_counter()
             self._dispatch_delayed_robots()
+            self.metrics.record_phase_wall(
+                'dispatch_delayed_robots',
+                real_time.perf_counter() - dispatch_started)
             
             # 3. Update robot states (incl. battery, movement tracking)
+            robot_state_started = real_time.perf_counter()
             self._update_robot_states(dt)
+            self.metrics.record_phase_wall(
+                'robot_state_update',
+                real_time.perf_counter() - robot_state_started)
+            self._update_terminal_departure_contexts()
+            self._update_terminal_clearance()
             self._check_joint_business_arrivals()
+            safety_shield_started = real_time.perf_counter()
+            self._apply_dynamic_safety_shield()
+            self.metrics.record_phase_wall(
+                'dynamic_safety_shield',
+                real_time.perf_counter() - safety_shield_started)
 
             if (self._debug_state_enabled and
                     self.step_count % self._debug_state_interval == 0):
@@ -6303,7 +8190,11 @@ class FactorySupervisor:
                 self._next_joint_watchdog_tick = self.sim_time
             if (ENABLE_JOINT_RUNTIME and
                     self.sim_time >= self._next_joint_watchdog_tick):
+                joint_watchdog_started = real_time.perf_counter()
                 self._joint_runtime_watchdog()
+                self.metrics.record_phase_wall(
+                    'joint_runtime_watchdog',
+                    real_time.perf_counter() - joint_watchdog_started)
                 self._next_joint_watchdog_tick += JOINT_WATCHDOG_INTERVAL
 
             # 3.5 Advance lifelong planner clock once per ~1.5 s of
@@ -6321,6 +8212,7 @@ class FactorySupervisor:
             if not hasattr(self, '_next_reservation_refresh'):
                 self._next_reservation_refresh = self.sim_time
             if self.sim_time >= self._next_reservation_refresh:
+                reservation_started = real_time.perf_counter()
                 for rid, robot in self.robots.items():
                     if (robot.waypoints and
                             robot.current_waypoint_idx < len(robot.waypoints)):
@@ -6332,6 +8224,9 @@ class FactorySupervisor:
                             rid, robot.position,
                             robot.waypoints[robot.current_waypoint_idx:],
                             not_before=not_before)
+                self.metrics.record_phase_wall(
+                    'reservation_refresh',
+                    real_time.perf_counter() - reservation_started)
                 self._next_reservation_refresh += RESERVATION_REFRESH_INTERVAL
             
             # 3.6 Lazy relocation �?IDLE robots not at a rest node
@@ -6353,9 +8248,14 @@ class FactorySupervisor:
             if not hasattr(self, '_next_joint_grid_tick'):
                 self._next_joint_grid_tick = 2.0
             if self.sim_time >= self._next_joint_grid_tick:
+                joint_planning_phase_started = real_time.perf_counter()
                 if ENABLE_JOINT_RUNTIME:
-                    self._refresh_joint_grid_candidate()
-                self._next_joint_grid_tick += 2.0
+                    self._consume_joint_planning_event()
+                else:
+                    self._next_joint_grid_tick = math.inf
+                self.metrics.record_phase_wall(
+                    'joint_planning_phase',
+                    real_time.perf_counter() - joint_planning_phase_started)
             if (os.environ.get('SMART_FACTORY_TXN_SMOKE', '0') == '1' and
                     not getattr(self, '_joint_txn_smoke_attempted', False) and
                     self.sim_time >= 5.0):
@@ -6442,7 +8342,14 @@ class FactorySupervisor:
                 self.metrics.record_task_arrival(new_task, self.sim_time)
             
             # 5. Assign tasks to robots
+            task_assignment_started = real_time.perf_counter()
             self._assign_tasks()
+            self.metrics.record_phase_wall(
+                'task_assignment',
+                real_time.perf_counter() - task_assignment_started)
+            # A completed terminal service must still produce physical egress
+            # when assignment or its first route attempt could not do so.
+            self._ensure_terminal_egress_retries()
             
             # 6. Check for deadlocks (every 5 seconds)
             if (not ENABLE_JOINT_RUNTIME and
@@ -6451,6 +8358,7 @@ class FactorySupervisor:
             
             # 7. Record metrics
             if self.step_count % LOG_INTERVAL == 0:
+                metrics_record_started = real_time.perf_counter()
                 self._log_status()
                 self.metrics.record_step(
                     self.sim_time,
@@ -6458,6 +8366,11 @@ class FactorySupervisor:
                     self.task_generator.get_statistics(),
                     self.motion_coordinator.get_statistics()
                 )
+                self.metrics.record_phase_wall(
+                    'metrics_record',
+                    real_time.perf_counter() - metrics_record_started)
+            self.metrics.record_supervisor_step_wall(
+                real_time.perf_counter() - step_wall_started)
         
         if not completed_normally:
             # Webots returned -1 before the requested horizon (for example a
@@ -6469,6 +8382,14 @@ class FactorySupervisor:
             return
 
         # Simulation complete
+        if (recording_started and
+                hasattr(self.supervisor, 'animationStopRecording')):
+            try:
+                saved = self.supervisor.animationStopRecording()
+                print(f"[DiagnosticRecording] saved={bool(saved)} "
+                      f"path={recording_path}")
+            except Exception as exc:
+                print(f"[DiagnosticRecording] stop failed: {exc}")
         self._finalize()
         # In batch mode the other robot controllers keep Webots alive after
         # the supervisor returns. Explicitly terminate the simulation once

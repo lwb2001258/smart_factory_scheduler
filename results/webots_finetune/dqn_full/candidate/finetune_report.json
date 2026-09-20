@@ -1,0 +1,18 @@
+{
+  "status": "candidate_requires_webots_validation",
+  "algorithm": "DQN",
+  "base_checkpoint": "D:\\code\\smart_factory_scheduler\\results\\models\\v8\\dqn\\best_validation.pkl",
+  "base_sha256": "798d596becff02b6e4186151e9d03f2a434a18a4db801ba7a52a467338c26a49",
+  "candidate": "D:\\code\\smart_factory_scheduler\\results\\webots_finetune\\dqn_full\\candidate\\candidate.pkl",
+  "candidate_sha256": "d81c96940e7965feafb8f49d36c2ab3770c4018da197346640da509f75b8f58e",
+  "transitions": 315,
+  "updates_requested": 100,
+  "updates_applied": 100,
+  "mean_loss": 53.83712186129764,
+  "learning_rate": 1e-05,
+  "proximal": 0.001,
+  "adaptation_method": "native_offline_update",
+  "dataset_sha256": "cee15d6e793cd979b8a165823984b54abd552bef6fce04fc2e4359cce9989cbd",
+  "dataset_version": "webots-transition-v2-current-mask",
+  "contract_fingerprint": "ee45d3c33be1550a85dd1f62a6548cf8abba641e9f81eefef24936d6a5c775c6"
+}

@@ -84,7 +84,15 @@ def cpa_ttc(position_a: Tuple[float, float], velocity_a: Tuple[float, float],
 def assess_motion_risk(position_a, velocity_a, position_b, velocity_b,
                        speed: float, deceleration: float = 0.6,
                        latency: float = 0.2, collision_distance: float = 0.5,
-                       horizon: float = 10.0) -> MotionRisk:
+                       horizon: float = 10.0,
+                       caution_distance: float | None = None) -> MotionRisk:
+    values = (*position_a, *velocity_a, *position_b, *velocity_b,
+              speed, deceleration, latency, collision_distance, horizon,
+              collision_distance if caution_distance is None
+              else caution_distance)
+    if any(not math.isfinite(float(value)) for value in values):
+        # Sensor corruption is an emergency condition, not a CLEAR result.
+        return MotionRisk(0.0, 0.0, 0.0, math.inf, RiskLevel.EMERGENCY)
     minimum, t_cpa, ttc = cpa_ttc(
         position_a, velocity_a, position_b, velocity_b,
         collision_distance, horizon)
@@ -93,7 +101,8 @@ def assess_motion_risk(position_a, velocity_a, position_b, velocity_b,
         level = RiskLevel.EMERGENCY
     elif math.isfinite(ttc) and ttc <= 2.0:
         level = RiskLevel.BRAKE
-    elif minimum < collision_distance + d_stop:
+    elif minimum < (collision_distance + d_stop if caution_distance is None
+                    else caution_distance):
         level = RiskLevel.CAUTION
     else:
         level = RiskLevel.CLEAR

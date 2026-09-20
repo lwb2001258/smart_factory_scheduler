@@ -1,0 +1,63 @@
+{
+  "step": "step_p_direction_continuity_20260920",
+  "metrics": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "seed": 44,
+    "duration": 600.0,
+    "recorded_sim_duration": 600.0000000000529,
+    "tasks_completed": 11,
+    "tasks_generated": 66,
+    "throughput_per_minute": 1.099999999999903,
+    "longest_completion_plateau_seconds": 166.27199999999488,
+    "final_completion_plateau_seconds": 50.19199999988302,
+    "robots_without_completed_tasks": 1,
+    "reservation_deadline_stop_episodes": 6,
+    "active_zero_speed_ratio": 0.08771929824561403,
+    "mean_active_linear_speed_mps": 0.1233434002841812,
+    "motion_state_transitions": 103.0,
+    "motion_state_transitions_per_robot_minute": 1.9507575757571523,
+    "shield_speed_changes_per_robot_minute": 67.74999999999403,
+    "total_distance_all_robots": 385.71569484847674,
+    "route_dispatches": 896,
+    "rapid_route_overrides": 96,
+    "audited_replans": 29,
+    "unplanned_task_stops": 1,
+    "min_pair_distance": 0.5544349070122977,
+    "pair_distance_violations": 0,
+    "clear_motion_duty_cycle": 0.9884823346418783,
+    "unexplained_active_intervals": 112,
+    "abnormal_mass_stop_seconds": 34.176,
+    "rotating_in_place_intervals": 87,
+    "sim_to_wall_ratio": 1.619729775055658,
+    "webots_wall_seconds": 370.43216049997136,
+    "supervisor_step_wall_p99_ms": 37.280899996403605,
+    "joint_planning_wall_p99_ms": 349.0948000107892,
+    "performance_source": "recording_run",
+    "artifacts": {
+      "html": "webots_diagnostic_C_FCFS_20260920_115719.html",
+      "json": "webots_diagnostic_C_FCFS_20260920_115719.json",
+      "x3d": "webots_diagnostic_C_FCFS_20260920_115719.x3d",
+      "css": "webots_diagnostic_C_FCFS_20260920_115719.css"
+    }
+  },
+  "gate": {
+    "passed": false,
+    "checks": {
+      "recording_exists": true,
+      "pair_distance_violations_zero": true,
+      "sim_to_wall_ratio": true,
+      "recording_duration_5_to_10_minutes": true,
+      "recording_reached_requested_duration": true,
+      "throughput_absolute_minimum": true,
+      "longest_completion_plateau_bounded": false,
+      "final_completion_plateau_bounded": true,
+      "fleet_task_participation": true,
+      "reservation_deadline_stops_bounded": false,
+      "active_zero_speed_ratio_bounded": true,
+      "motion_stop_start_churn_bounded": true,
+      "shield_speed_churn_bounded": false
+    },
+    "material_improvements": {}
+  }
+}

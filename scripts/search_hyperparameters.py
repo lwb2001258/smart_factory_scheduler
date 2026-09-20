@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SUPERVISOR = ROOT / "controllers" / "factory_supervisor"
 sys.path.insert(0, str(SUPERVISOR))
 
+from evaluation_objective import SelectionMetrics, algorithm_selection_score
 from rl_environment import SchedulingEnvironment
 from schedulers import (GeneticScheduler, GreedyScheduler,
                         HungarianScheduler, NearestNeighbourScheduler,
@@ -109,9 +110,12 @@ def score_metaheuristic(algorithm, config, seeds):
     p95_latency = float(np.percentile(latencies, 95)) if latencies else 1e6
     # Safety/completion dominate; waiting, travel, latency and native failures
     # break ties among configurations that complete the same online workload.
-    score = (10000.0 * mean_completion - mean_wait
-             - 0.1 * mean_distance - 0.02 * p95_latency
-             - 1000.0 * failures)
+    score = algorithm_selection_score(SelectionMetrics(
+        completion_rate=mean_completion,
+        mean_waiting_time=mean_wait,
+        mean_distance=mean_distance,
+        native_failures=failures,
+        p95_latency_ms=p95_latency))
     return {"score": score, "completion_rate": mean_completion,
             "mean_waiting_time": mean_wait,
             "mean_distance": mean_distance,

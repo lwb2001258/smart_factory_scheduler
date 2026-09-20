@@ -1,0 +1,12 @@
+﻿{
+  "step": "Step0_baseline",
+  "created_at": "2026-09-15T16:25:00+08:00",
+  "webots_exe": "C:\\Program Files\\Webots\\msys64\\mingw64\\bin\\webots.exe",
+  "scenario": "C",
+  "scheduler": "FCFS",
+  "seed": 44,
+  "sim_duration": 180,
+  "auto_stop": true,
+  "diagnostic_recording": true,
+  "run_mode": "fast-no-rendering"
+}

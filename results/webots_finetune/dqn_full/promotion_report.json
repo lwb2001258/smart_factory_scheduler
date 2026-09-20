@@ -1,0 +1,40 @@
+{
+  "promote": false,
+  "paired_seeds": [
+    310001,
+    310002,
+    310003,
+    310004,
+    310005
+  ],
+  "base_mean": {
+    "completion_rate": 0.209288964272691,
+    "throughput": 1.686666666664071,
+    "completion_time": 763.5463253231658,
+    "weighted_tardiness": 28473.436800021707,
+    "hard_breaches": 193.4,
+    "pair_violations": 0.2,
+    "fallbacks": 0.0,
+    "invalid": 0.0,
+    "unauthorized": 0.0,
+    "score": 1331.0888011090794
+  },
+  "candidate_mean": {
+    "completion_rate": 0.2047558970840171,
+    "throughput": 1.6399999999974764,
+    "completion_time": 648.469759849202,
+    "weighted_tardiness": 21461.936000012072,
+    "hard_breaches": 190.8,
+    "pair_violations": 0.0,
+    "fallbacks": 0.0,
+    "invalid": 0.0,
+    "unauthorized": 0.0,
+    "score": 1368.6925569499379
+  },
+  "throughput_gain": -0.02766798418972327,
+  "completion_time_gain": 0.15071327260367395,
+  "failures": [
+    "seed 310004: completion rate regressed",
+    "seed 310005: completion rate regressed"
+  ]
+}

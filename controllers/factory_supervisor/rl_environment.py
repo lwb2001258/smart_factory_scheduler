@@ -18,12 +18,10 @@ from schedulers import (
 )
 from task_generator import TransportTask
 from time_discount import elapsed_bootstrap_discount
+from webots_behavior_proxy import WebotsBehaviorProxy
 
 
 ENVIRONMENT_VERSION = RL_ENVIRONMENT_VERSION
-ABSTRACT_LINEAR_SPEED = 0.22  # robot_controller's executable speed limit
-
-
 @dataclass(frozen=True)
 class RLEnvironmentConfig:
     max_robots: int = MAX_ROBOTS
@@ -113,6 +111,7 @@ class SchedulingEnvironment:
         self.last_elapsed_seconds = 0.0
         self.last_bootstrap_discount = 1.0
         self._terminal_settled = False
+        self.behavior_proxy = WebotsBehaviorProxy()
 
     def contract_metadata(self) -> dict:
         """Return immutable model-interface metadata for audit/provenance."""
@@ -436,21 +435,27 @@ class SchedulingEnvironment:
         robot["has_task"] = True
         robot["goal_location"] = task.pickup_location
 
-        pickup_distance = max(0.0, float(
-            assignment.empty_distance if assignment.empty_distance is not None
-            else self._pickup_leg_distance(assignment)))
-        loaded_distance = max(0.0, float(assignment.loaded_distance or 0.0))
-        travel_distance = pickup_distance + loaded_distance
-        travel_seconds = (travel_distance / ABSTRACT_LINEAR_SPEED
+        start = tuple(robot["position"])
+        pickup_path = self._execution_path(start, task.pickup_position)
+        delivery_path = self._execution_path(
+            task.pickup_position, task.delivery_position)
+        full_motion = self.behavior_proxy.estimate_path(
+            start, list(pickup_path) + list(delivery_path),
+            float(robot.get("heading", 0.0)))
+        pickup_motion = self.behavior_proxy.estimate_path(
+            start, pickup_path, float(robot.get("heading", 0.0)))
+        travel_distance = full_motion.path_distance
+        travel_seconds = (full_motion.total_seconds
                           + task.pickup_service_time
                           + task.delivery_service_time)
-        pickup_seconds = pickup_distance / ABSTRACT_LINEAR_SPEED
+        pickup_seconds = pickup_motion.total_seconds + task.pickup_service_time
         robot["_abstract_execution"] = {
             "kind": "task",
             "task": task,
             "pickup_time": self._context.current_time + pickup_seconds,
             "completion_time": self._context.current_time + travel_seconds,
             "distance": travel_distance,
+            "battery_used": full_motion.battery_used,
             "decision_id": assignment_event.values["decision_id"],
         }
         self._cost_matrix = None
@@ -516,11 +521,12 @@ class SchedulingEnvironment:
                 robot["position"] = tuple(execution["position"])
                 robot["battery"] = max(
                     0.0, float(robot["battery"])
-                    - BATTERY_DRAIN_RATE * journey_seconds)
+                    - float(execution.get(
+                        "battery_used", BATTERY_DRAIN_RATE * journey_seconds)))
                 robot["total_distance"] = (
                     float(robot.get("total_distance", 0.0)) + distance)
-                robot["battery"] = float(self.rng.uniform(
-                    FULL_BATTERY_THRESHOLD, BATTERY_CAPACITY))
+                robot["battery"] = float(execution.get(
+                    "charged_battery", FULL_BATTERY_THRESHOLD))
                 robot["state"] = RobotState.IDLE
                 robot["goal_location"] = None
                 robot.pop("_abstract_execution", None)
@@ -535,10 +541,12 @@ class SchedulingEnvironment:
             task.cargo_state = "delivered"
             robot["position"] = tuple(task.delivery_position)
             travel_distance = float(execution["distance"])
-            travel_seconds = max(0.0, event_time - float(task.assignment_time))
             robot["battery"] = max(
                 0.0, float(robot.get("battery", BATTERY_CAPACITY))
-                - BATTERY_DRAIN_RATE * travel_seconds)
+                - float(execution.get(
+                    "battery_used",
+                    BATTERY_DRAIN_RATE * max(
+                        0.0, event_time-float(task.assignment_time)))))
             robot["total_distance"] = (
                 float(robot.get("total_distance", 0.0)) + travel_distance)
             robot["tasks_completed"] = int(
@@ -596,6 +604,15 @@ class SchedulingEnvironment:
         goal = assignment.task.pickup_position
         return math.hypot(goal[0] - start[0], goal[1] - start[1])
 
+    def _execution_path(self, start, goal):
+        provider = self._context.path_cost_provider
+        path = getattr(provider, "path", None)
+        if callable(path):
+            result = path(start, goal)
+            if result:
+                return [tuple(point) for point in result]
+        return [tuple(goal)]
+
     def _schedule_charge_if_required(self, robot_id: int,
                                      current_time: float) -> bool:
         robot = self._robots[robot_id]
@@ -616,14 +633,24 @@ class SchedulingEnvironment:
                     position[1] - robot["position"][1])
                 candidates.append((distance, name, position))
         distance, station, position = min(candidates, key=lambda item: item[0])
-        journey_seconds = distance / ABSTRACT_LINEAR_SPEED
+        route = self._execution_path(robot["position"], position)
+        motion = self.behavior_proxy.estimate_path(
+            tuple(robot["position"]), route,
+            float(robot.get("heading", 0.0)))
+        arrival_battery = max(
+            0.0, float(robot.get("battery", BATTERY_CAPACITY))
+            - motion.battery_used)
+        charge_seconds = self.behavior_proxy.charging_seconds(
+            arrival_battery, FULL_BATTERY_THRESHOLD)
         robot["state"] = RobotState.RETURNING_TO_CHARGE
         robot["goal_location"] = station
         robot["_abstract_execution"] = {
             "kind": "charge",
-            "completion_time": current_time + journey_seconds + 5.0,
-            "journey_seconds": journey_seconds,
-            "distance": distance,
+            "completion_time": current_time + motion.total_seconds + charge_seconds,
+            "journey_seconds": motion.total_seconds,
+            "distance": motion.path_distance,
+            "battery_used": motion.battery_used,
+            "charged_battery": FULL_BATTERY_THRESHOLD,
             "station": station,
             "position": tuple(position),
         }

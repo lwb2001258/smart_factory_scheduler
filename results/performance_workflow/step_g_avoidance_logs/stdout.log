@@ -1,0 +1,88 @@
+
+============================================================
+Running: Scenario C | Scheduler: FCFS | Seed: 44
+============================================================
+Launching Webots simulation (wall timeout: 600s)...
+e/active: 0/8 | Conflicts: 0
+INFO: HTML5 animation successfully exported in 'D:/code/smart_factory_scheduler/results/webots_diagnostic_C_FCFS_20260919_205710.html'
+
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: factory_supervisor: Terminating.
+
+
+============================================================
+Running: Scenario C | Scheduler: FCFS | Seed: 44
+============================================================
+Launching Webots simulation (wall timeout: 600s)...
+=179.588, members=[1, 2, 3, 4, 5, 6, 7, 8]
+[Nav 4] ¡ú Waypoint 2/8 (1.25,3.00)
+[T=180.0s] Tasks: 1/18 completed | Pending: 9 | Robots idle/active: 0/8 | Conflicts: 0
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: factory_supervisor: Terminating.
+
+{
+  "step": "step_g_avoidance_20260919",
+  "metrics": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "seed": 44,
+    "duration": 180.0,
+    "tasks_completed": 0,
+    "route_dispatches": 292,
+    "audited_replans": 9,
+    "unplanned_task_stops": 0,
+    "min_pair_distance": 0.5957390239810413,
+    "pair_distance_violations": 0,
+    "clear_motion_duty_cycle": 0.9337712830138091,
+    "unexplained_active_intervals": 37,
+    "abnormal_mass_stop_seconds": 3.392,
+    "rotating_in_place_intervals": 24,
+    "sim_to_wall_ratio": 1.4815189096488866,
+    "webots_wall_seconds": 121.49693049996858,
+    "supervisor_step_wall_p99_ms": 61.40519998734817,
+    "joint_planning_wall_p99_ms": 266.8734999606386,
+    "artifacts": {
+      "html": "webots_diagnostic_C_FCFS_20260919_205710.html",
+      "json": "webots_diagnostic_C_FCFS_20260919_205710.json",
+      "x3d": "webots_diagnostic_C_FCFS_20260919_205710.x3d",
+      "css": "webots_diagnostic_C_FCFS_20260919_205710.css"
+    }
+  },
+  "gate": {
+    "passed": false,
+    "checks": {
+      "recording_exists": true,
+      "pair_distance_violations_zero": true,
+      "sim_to_wall_ratio": true,
+      "abnormal_mass_stop_seconds_within_noise": true,
+      "unexplained_active_intervals_within_noise": true,
+      "rotating_in_place_intervals_within_noise": true,
+      "unplanned_task_stops_not_worse": true,
+      "clear_motion_duty_cycle_within_noise": false,
+      "tasks_completed_not_worse": false,
+      "minimum_pair_distance_absolute": true,
+      "material_robot_efficiency_improvement": true
+    },
+    "material_improvements": {
+      "tasks": false,
+      "abnormal_mass_stop": true,
+      "unexplained_active": false,
+      "rotating_in_place": true,
+      "motion_duty": false
+    }
+  }
+}

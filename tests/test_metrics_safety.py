@@ -13,6 +13,116 @@ from config import RobotState
 
 
 class MetricsSafetyTests(unittest.TestCase):
+
+    def test_motion_continuity_classifies_final_commands(self):
+        metrics = MetricsCollector("test", "test", 1)
+        base = {
+            'navigating': True, 'emergency_braking': False,
+            'commanded_linear_speed': 0.0,
+            'commanded_angular_speed': 0.0,
+        }
+        for seq, sample_time in enumerate((0.0, 0.16, 0.32, 0.48, 0.64), 1):
+            metrics.record_motion_telemetry(
+                sample_time, 1,
+                dict(base, status_seq=seq, status_sample_time=sample_time))
+        metrics.record_motion_telemetry(0.80, 1, dict(
+            base, status_seq=6, status_sample_time=0.80,
+            commanded_linear_speed=0.10))
+        state = metrics.motion_continuity_by_robot[1]
+        self.assertAlmostEqual(0.80, state['eligible_seconds'])
+        self.assertAlmostEqual(0.16, state['moving_seconds'])
+        self.assertAlmostEqual(0.64,
+                               state['unblocked_zero_speed_seconds'])
+        self.assertEqual(1, state['unblocked_stop_episodes'])
+
+    def test_motion_continuity_does_not_bridge_missing_samples(self):
+        metrics = MetricsCollector("test", "test", 1)
+        def sample(seq, when, linear=0.0):
+            return {
+                'status_seq': seq, 'status_sample_time': when,
+                'navigating': True, 'emergency_braking': False,
+                'commanded_linear_speed': linear,
+                'commanded_angular_speed': 0.0,
+            }
+        metrics.record_motion_telemetry(0.0, 1, sample(1, 0.0))
+        metrics.record_motion_telemetry(0.16, 1, sample(2, 0.16))
+        metrics.record_motion_telemetry(0.64, 1, sample(4, 0.64))
+        metrics.record_motion_telemetry(0.80, 1, sample(5, 0.80, 0.1))
+        state = metrics.motion_continuity_by_robot[1]
+        self.assertEqual(1, state['status_drops'])
+        self.assertEqual(0, state['unblocked_stop_episodes'])
+        self.assertAlmostEqual(0.32, state['eligible_seconds'])
+
+    def test_validated_wait_cuts_zero_episode_with_unchanged_motor_state(self):
+        metrics = MetricsCollector("test", "test", 1)
+        def sample(seq, when, wait=False, moving=False):
+            status = {
+                'status_seq': seq, 'status_sample_time': when,
+                'navigating': True, 'emergency_braking': False,
+                'commanded_linear_speed': 0.1 if moving else 0.0,
+                'commanded_angular_speed': 0.0,
+                'command_motion_changed_at': 0.0 if not moving else when,
+            }
+            if wait:
+                status['wait_validator_evidence'] = {
+                    'validated': True, 'valid_until': when + 1.0}
+            return status
+        metrics.record_motion_telemetry(0.0, 1, sample(1, 0.0))
+        metrics.record_motion_telemetry(0.16, 1, sample(2, 0.16))
+        metrics.record_motion_telemetry(0.32, 1, sample(3, 0.32, wait=True))
+        for seq, when in enumerate((0.48, 0.64, 0.80, 0.96, 1.12), 4):
+            metrics.record_motion_telemetry(when, 1, sample(seq, when))
+        metrics.record_motion_telemetry(1.28, 1, sample(9, 1.28, moving=True))
+        event = metrics.motion_continuity_events[-1]
+        self.assertAlmostEqual(0.32, event['started_at'])
+        self.assertAlmostEqual(0.96, event['duration'])
+
+    def test_motion_continuity_rejects_malformed_wait_evidence(self):
+        metrics = MetricsCollector("test", "test", 1)
+        base = {
+            'navigating': True, 'emergency_braking': False,
+            'commanded_linear_speed': 0.0,
+            'commanded_angular_speed': 0.0,
+            'wait_validator_evidence': {
+                'validated': True, 'valid_until': 'not-a-time'},
+        }
+        metrics.record_motion_telemetry(
+            0.0, 1, dict(base, status_seq=1, status_sample_time=0.0))
+        metrics.record_motion_telemetry(
+            0.16, 1, dict(base, status_seq=2, status_sample_time=0.16))
+        state = metrics.motion_continuity_by_robot[1]
+        self.assertEqual(0.0, state['valid_wait_seconds'])
+        self.assertAlmostEqual(0.16,
+                               state['unblocked_zero_speed_seconds'])
+
+    def test_progress_lease_events_have_independent_summary_counts(self):
+        metrics = MetricsCollector("test", "test", 1)
+        metrics.record_progress_lease_event(3.0, 1, 4, 'soft_replan', 3.0)
+        metrics.record_progress_lease_event(8.0, 1, 4, 'hard_escape', 8.0)
+        metrics.record_progress_lease_event(
+            9.0, 2, 5, 'hard_zero_escape', 8.0)
+
+        class Robot:
+            idle_time = 0.0
+            total_distance = 0.0
+            tasks_completed = 0
+
+        summary = metrics.compute_final_metrics(
+            {1: Robot()}, {'completed': 0}, {}, 10.0)
+        self.assertEqual(1, summary['progress_lease_soft_deadlines'])
+        self.assertEqual(2, summary['progress_lease_hard_deadlines'])
+        self.assertEqual(0, metrics.safety_event_count)
+
+    def test_joint_timing_metrics_are_auditable_and_gap_is_deduplicated(self):
+        metrics = MetricsCollector("test", "test", 1)
+        metrics.record_joint_cell_traversal(2.5)
+        metrics.record_joint_cell_traversal(3.5)
+        metrics.record_joint_window_gap(10.0, 1, 7, 9.0)
+        metrics.record_joint_window_gap(11.0, 1, 7, 9.0)
+        metrics.record_expired_reservation_movement(12.0, 1, 7, 2, 11.0)
+        self.assertEqual(metrics.joint_cell_traversal_seconds, [2.5, 3.5])
+        self.assertEqual(len(metrics.joint_window_gap_events), 1)
+        self.assertEqual(len(metrics.reservation_expired_movement_events), 1)
     def test_task_motion_without_progress_is_audited_after_ten_seconds(self):
         metrics = MetricsCollector("test", "test", 1)
         state = {1: {
@@ -123,6 +233,52 @@ class MetricsSafetyTests(unittest.TestCase):
             allow_nan=False)
         self.assertIsNone(json.loads(payload)[0]["min_pair_distance"])
 
+    def test_step_snapshot_preserves_low_rate_controller_diagnostics(self):
+        metrics = MetricsCollector("test", "test", 1)
+        metrics.record_step(4.0, {1: {
+            "state": RobotState.EN_ROUTE_PICKUP,
+            "position": (0.0, 0.0),
+            "controller_motion_state": "zero",
+            "controller_linear_speed": 0.0,
+            "controller_angular_speed": 0.0,
+            "controller_measured_left_wheel_speed": 1.25,
+            "controller_measured_right_wheel_speed": -0.75,
+            "controller_stop_reason": "emergency",
+            "controller_local_risk_level": "emergency",
+            "controller_status_sample_time": 3.99,
+            "heading": 1.25,
+            "controller_target": (0.5, 0.25),
+            "controller_target_distance": 0.559,
+            "controller_reported_target": (0.75, 0.25),
+            "controller_reported_target_distance": 0.791,
+            "controller_reported_waypoint_count": 6,
+            "controller_target_mismatch": True,
+            "controller_paused_until": 4.5,
+            "controller_joint_wait_until": 5.0,
+            "controller_joint_wait_reason": "joint_window_endpoint",
+            "dispatch_not_before": 5.5,
+            "hold_until": 6.0,
+        }}, {}, {})
+        state = metrics.step_records[0].robot_task_states["1"]
+        self.assertEqual("zero", state["controller_motion_state"])
+        self.assertEqual("emergency", state["controller_stop_reason"])
+        self.assertEqual(3.99, state["controller_status_sample_time"])
+        self.assertEqual(1.25, state["controller_measured_left_wheel_speed"])
+        self.assertEqual(-0.75, state["controller_measured_right_wheel_speed"])
+        self.assertEqual([0.5, 0.25], state["controller_target"])
+        self.assertEqual([0.75, 0.25], state["controller_reported_target"])
+        self.assertEqual(0.791,
+                         state["controller_reported_target_distance"])
+        self.assertEqual(6, state["controller_reported_waypoint_count"])
+        self.assertTrue(state["controller_target_mismatch"])
+        self.assertEqual(1.25, state["heading"])
+        self.assertEqual(4.5, state["controller_paused_until"])
+        self.assertEqual(5.0, state["controller_joint_wait_until"])
+        self.assertEqual("joint_window_endpoint",
+                         state["controller_joint_wait_reason"])
+        self.assertEqual(5.5, state["dispatch_not_before"])
+        self.assertEqual(6.0, state["hold_until"])
+
     def test_replan_and_escape_have_independent_cumulative_audit(self):
         metrics = MetricsCollector("test", "test", 1)
         metrics.record_replan(
@@ -141,6 +297,20 @@ class MetricsSafetyTests(unittest.TestCase):
         self.assertEqual(1, len(metrics.route_override_events))
         self.assertEqual("assignment",
                          metrics.route_override_events[0]["previous_source"])
+
+    def test_route_dispatch_preserves_activation_diagnostics(self):
+        metrics = MetricsCollector("test", "test", 1)
+        diagnostics = {
+            'planning_position': (0.0, 0.0),
+            'first_waypoint': (0.25, 0.0),
+            'activation_to_first_m': 0.3,
+        }
+        metrics.record_route_dispatch(
+            1, 2, 3, 'joint_grid_transaction', 4, 5.0,
+            diagnostics=diagnostics)
+        self.assertEqual(
+            diagnostics,
+            metrics.route_dispatch_events[-1]['diagnostics'])
 
     def test_unauthorized_route_write_has_independent_audit(self):
         metrics = MetricsCollector("test", "test", 1)
@@ -225,3 +395,87 @@ class MetricsSafetyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+def test_terminal_handoff_events_are_auditable_in_summary():
+    metrics = MetricsCollector("test", "FCFS", 2)
+    metrics.record_terminal_handoff(
+        "service_complete", 1.0, 1, "WS1", 3, owner_id=1)
+    metrics.record_terminal_handoff(
+        "inbound_denied", 1.1, 2, "WS1", 3, owner_id=1)
+    metrics.record_terminal_handoff(
+        "physically_clear", 2.0, 1, "WS1", 3, owner_id=1)
+    metrics.record_terminal_handoff(
+        "inbound_granted", 2.1, 2, "WS1", 0)
+    summary = metrics.compute_final_metrics({}, {}, {}, 10.0)
+    assert summary["terminal_service_complete"] == 1
+    assert summary["terminal_physically_clear"] == 1
+    assert summary["terminal_inbound_denied"] == 1
+    assert summary["terminal_inbound_granted"] == 1
+    assert len(metrics.terminal_handoff_events) == 4
+
+
+def test_terminal_egress_retry_events_preserve_reason_and_attempt():
+    metrics = MetricsCollector('C', 'FCFS', 1)
+    metrics.record_terminal_handoff(
+        'egress_retry_failed', 10.0, 1, 'WS1', 3,
+        owner_id=1, reason='no_safe_path', attempt=2)
+    metrics.record_terminal_handoff(
+        'egress_retry_dispatched', 11.0, 1, 'WS1', 3,
+        owner_id=1, attempt=3)
+    summary = metrics.compute_final_metrics({}, {}, {}, 12.0)
+    assert summary['terminal_egress_retry_failed'] == 1
+    assert summary['terminal_egress_retry_dispatched'] == 1
+    assert metrics.terminal_handoff_events[0]['reason'] == 'no_safe_path'
+    assert metrics.terminal_handoff_events[0]['attempt'] == 2
+
+
+def test_runtime_wall_metrics_report_percentiles_and_samples():
+    metrics = MetricsCollector('C', 'FCFS', 1)
+    for seconds in (0.001, 0.002, 0.003, 0.004):
+        metrics.record_supervisor_step_wall(seconds)
+    for seconds in (0.010, 0.020, 0.030):
+        metrics.record_joint_planning_wall(seconds)
+    summary = metrics.compute_final_metrics({}, {}, {}, 10.0)
+    assert summary['supervisor_step_samples'] == 4
+    assert summary['supervisor_step_wall_p50_ms'] == 2.0
+    assert summary['supervisor_step_wall_p99_ms'] == 4.0
+    assert summary['joint_planning_samples'] == 3
+    assert summary['joint_planning_wall_p95_ms'] == 30.0
+
+
+def test_route_sources_and_override_transitions_reconcile():
+    metrics = MetricsCollector('C', 'FCFS', 1)
+    metrics.record_route_dispatch(1, 1, 1, 'joint', 2, 1.0)
+    metrics.record_route_dispatch(1, 2, 2, 'egress', 1, 1.5)
+    metrics.record_route_dispatch(1, 3, 3, 'joint', 2, 3.0)
+    summary = metrics.compute_final_metrics({}, {}, {}, 10.0)
+    assert summary['route_dispatches'] == 3
+    assert summary['route_dispatches_by_source'] == {
+        'joint': 2, 'egress': 1}
+    assert summary['rapid_route_overrides'] == 1
+    assert summary['route_overrides_by_transition'] == {
+        'joint->egress': 1}
+
+
+def test_communication_metrics_reconcile_counts_bytes_and_latency():
+    metrics = MetricsCollector('C', 'FCFS', 1)
+    metrics.record_communication('peer', 0.001, messages=8, byte_count=800)
+    metrics.record_communication('peer', 0.003, messages=8, byte_count=900)
+    summary = metrics.compute_final_metrics({}, {}, {}, 10.0)
+    peer = summary['communication_metrics']['peer']
+    assert peer['samples'] == 2
+    assert peer['messages'] == 16
+    assert peer['bytes'] == 1700
+    assert peer['wall_p50_ms'] == 1.0
+    assert peer['wall_p99_ms'] == 3.0
+
+
+def test_joint_plan_request_provenance_reconciles():
+    metrics = MetricsCollector('C', 'FCFS', 1)
+    metrics.record_joint_plan_request('joint_runtime_watchdog', 'LIVENESS')
+    metrics.record_joint_plan_request('joint_runtime_watchdog', 'LIVENESS')
+    metrics.record_joint_plan_request('predicted_collision', 'SAFETY')
+    summary = metrics.compute_final_metrics({}, {}, {}, 10.0)
+    assert summary['joint_plan_requests_by_reason'] == {
+        'joint_runtime_watchdog': 2, 'predicted_collision': 1}
+    assert summary['joint_plan_requests_by_class'] == {
+        'LIVENESS': 2, 'SAFETY': 1}

@@ -15,6 +15,9 @@ sys.path.insert(0, str(SUPERVISOR))
 from advanced_rl_agents import (A2CAgent, DiscreteSACAgent, QRDQNAgent,
                                 RainbowConfig, RainbowDQNAgent,
                                 SarsaLambdaAgent)
+from evaluation_objective import (SelectionMetrics,
+                                  algorithm_selection_score,
+                                  objective_metadata)
 from rl_environment import RLEnvironmentConfig, SchedulingEnvironment
 from training_scenarios import manifest_scenario
 
@@ -79,8 +82,40 @@ def run_episode(agent, algorithm, env, seed, batch_size, training=True):
         state, total = next_state, total+reward
         if done: break
     if training and algorithm == "SARSA_LAMBDA": agent.end_episode()
+    completed = [task for task in env._tasks
+                 if task.completion_time is not None]
+    assignments = [event for event in env.event_ledger.events
+                   if event.event_type == "assignment_committed"]
+    invalid = sum(event.event_type == "invalid_action"
+                  for event in env.event_ledger.events)
+    completion_times = [float(task.completion_time-task.arrival_time)
+                        for task in completed]
+    metrics = SelectionMetrics(
+        completion_rate=len(completed)/max(len(env._tasks), 1),
+        mean_completion_time=float(np.mean(completion_times))
+        if completion_times else 0.0,
+        mean_waiting_time=float(np.mean([
+            event.values.get("waiting_seconds", 0.0)
+            for event in assignments])) if assignments else 0.0,
+        mean_makespan=float(env._context.current_time),
+        mean_distance=float(sum(float(robot.get("total_distance", 0.0))
+                                for robot in env._robots.values())),
+        invalid_actions=invalid, mean_reward=total)
     return {"reward": total, "updates": len(updates),
-            "mean_update": float(np.mean(updates)) if updates else None}
+            "mean_update": float(np.mean(updates)) if updates else None,
+            "selection_metrics": metrics.__dict__,
+            "selection_score": algorithm_selection_score(metrics)}
+
+
+def evaluate_agent(agent, algorithm, env, seeds, batch_size):
+    rows = [run_episode(agent, algorithm, env, seed, batch_size,
+                        training=False) for seed in seeds]
+    averaged = {key: float(np.mean([
+        row["selection_metrics"][key] for row in rows]))
+        for key in SelectionMetrics.__dataclass_fields__}
+    metrics = SelectionMetrics(**averaged)
+    return {"score": algorithm_selection_score(metrics),
+            "metrics": averaged, "seeds": list(seeds), "episodes": rows}
 
 
 def main():
@@ -92,23 +127,49 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--checkpoint-dir", required=True)
+    parser.add_argument("--validation-interval", type=int, default=10)
+    parser.add_argument("--validation-seeds", nargs="+", type=int)
     args = parser.parse_args()
     env = SchedulingEnvironment(RLEnvironmentConfig(max_steps_per_episode=64),
                                 simulation_mode="abstract")
     agent = build_agent(args.algorithm, env, args.seed, args.batch_size)
-    history = [run_episode(agent, args.algorithm, env,
-                           args.seed*100000+episode, args.batch_size)
-               for episode in range(args.episodes)]
     output = Path(args.checkpoint_dir); output.mkdir(parents=True, exist_ok=True)
     checkpoint = output / ("model.json" if args.algorithm == "SARSA_LAMBDA"
                            else "model.npz")
-    agent.save(checkpoint)
-    validation = run_episode(agent, args.algorithm, env,
-                             200000+args.seed, args.batch_size, training=False)
+    if args.validation_interval < 1:
+        parser.error("--validation-interval must be positive")
+    validation_seeds = (args.validation_seeds or
+                        list(range(200000+args.seed*100,
+                                   200005+args.seed*100)))
+    history, validations, best_score = [], [], -float("inf")
+    for episode in range(args.episodes):
+        history.append(run_episode(
+            agent, args.algorithm, env, args.seed*100000+episode,
+            args.batch_size))
+        if ((episode+1) % args.validation_interval == 0
+                or episode+1 == args.episodes):
+            validation = evaluate_agent(
+                agent, args.algorithm, env, validation_seeds,
+                args.batch_size)
+            validation["after_episode"] = episode+1
+            validations.append(validation)
+            if validation["score"] > best_score:
+                best_score = validation["score"]
+                agent.save(checkpoint)
+    if not validations:
+        raise RuntimeError("advanced RL training produced no validation")
+    # Reload the selected checkpoint so the final report describes exactly
+    # what deployment will consume, not the last training state.
+    agent.load(checkpoint)
+    validation = evaluate_agent(agent, args.algorithm, env,
+                                validation_seeds, args.batch_size)
     report = {"algorithm": args.algorithm, "seed": args.seed,
               "episodes": args.episodes, "checkpoint": str(checkpoint),
               "environment_mode": "abstract", "manifest_scenario": "A",
-              "validation": validation, "history": history,
+              "validation": validation, "validation_history": validations,
+              "best_validation_score": best_score,
+              "selection_objective": objective_metadata(),
+              "history": history,
               "test_not_used_for_selection": True}
     (output / "training_metrics.json").write_text(
         json.dumps(report, indent=2), encoding="utf-8")

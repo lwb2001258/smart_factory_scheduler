@@ -44,6 +44,9 @@ from training_scenarios import factory_free_positions
 from training_scenarios import factory_scenario, manifest_scenario
 from rl_environment import (RLEnvironmentConfig, RewardConfig,
                             SchedulingEnvironment)
+from evaluation_objective import (SelectionMetrics,
+                                  algorithm_selection_score,
+                                  objective_metadata)
 
 
 class PPOBuffer:
@@ -670,13 +673,14 @@ class PPOTrainer:
         # Completion remains the safety gate, while time and distance break
         # ties between the many finite-workload policies that all reach 100%.
         # Coefficients put the terms on comparable validation-scale ranges.
-        score = (1000.0 * completion_rate
-                 - 0.50 * mean_completion_time
-                 - 0.25 * mean_waiting
-                 - 0.10 * mean_makespan
-                 - 0.05 * mean_distance
-                 - 100.0 * invalid_actions
-                 + 0.01 * mean_reward)
+        score = algorithm_selection_score(SelectionMetrics(
+            completion_rate=completion_rate,
+            mean_completion_time=mean_completion_time,
+            mean_waiting_time=mean_waiting,
+            mean_makespan=mean_makespan,
+            mean_distance=mean_distance,
+            invalid_actions=invalid_actions,
+            mean_reward=mean_reward))
         return {
             'score': score, 'mean_reward': mean_reward,
             'completion_rate': completion_rate,
@@ -942,6 +946,7 @@ class PPOTrainer:
                 'action_dim': self.action_dim,
                 'action_semantics': 'robot_slot_x_task_slot_plus_no_op',
                 'reward_config': self.reward_config.__dict__,
+                'selection_objective': objective_metadata(),
             }, f)
         print(f"Training history saved: {history_path}")
         

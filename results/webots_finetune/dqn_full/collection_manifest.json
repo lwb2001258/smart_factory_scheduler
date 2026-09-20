@@ -1,0 +1,76 @@
+{
+  "version": "webots-finetune-resume-v1",
+  "algorithm": "DQN",
+  "base_checkpoint": "D:\\code\\smart_factory_scheduler\\results\\models\\v8\\dqn\\best_validation.pkl",
+  "base_sha256": "798d596becff02b6e4186151e9d03f2a434a18a4db801ba7a52a467338c26a49",
+  "dataset": "D:\\code\\smart_factory_scheduler\\results\\webots_finetune\\dqn_full\\webots_train.jsonl",
+  "dataset_sha256": "cee15d6e793cd979b8a165823984b54abd552bef6fce04fc2e4359cce9989cbd",
+  "dataset_version": "webots-transition-v2-current-mask",
+  "contract_fingerprint": "ee45d3c33be1550a85dd1f62a6548cf8abba641e9f81eefef24936d6a5c775c6",
+  "scenario": "C",
+  "duration": 1800.0,
+  "collection_seeds": [
+    300001,
+    300002,
+    300003,
+    300004,
+    300005
+  ],
+  "collections": [
+    {
+      "scenario": "C",
+      "seed": 300001,
+      "run_mode": "webots",
+      "checkpoint_sha256": "798d596becff02b6e4186151e9d03f2a434a18a4db801ba7a52a467338c26a49",
+      "sim_duration": 1800.0000000027699,
+      "manifest_fingerprint": "e3bfa70ad523a9eef2eb2135418002fe32bf52911ddc8dd69ed9f62ce6d1a67d",
+      "rl_fallback_decisions": 0,
+      "fallback_scheduler_commits": 0,
+      "rl_decisions": 62
+    },
+    {
+      "scenario": "C",
+      "seed": 300002,
+      "run_mode": "webots",
+      "checkpoint_sha256": "798d596becff02b6e4186151e9d03f2a434a18a4db801ba7a52a467338c26a49",
+      "sim_duration": 1800.0000000027699,
+      "manifest_fingerprint": "2d82a79ff4aaa43e8f90dfe666d1d588d2e888cc86049b2ada2dc8d9aeb48237",
+      "rl_fallback_decisions": 0,
+      "fallback_scheduler_commits": 0,
+      "rl_decisions": 63
+    },
+    {
+      "scenario": "C",
+      "seed": 300003,
+      "run_mode": "webots",
+      "checkpoint_sha256": "798d596becff02b6e4186151e9d03f2a434a18a4db801ba7a52a467338c26a49",
+      "sim_duration": 1800.0000000027699,
+      "manifest_fingerprint": "36f4938b9985442bfc0c03590fc6a31f2966f8a13e745ea510ba627e67ad3f92",
+      "rl_fallback_decisions": 0,
+      "fallback_scheduler_commits": 0,
+      "rl_decisions": 69
+    },
+    {
+      "scenario": "C",
+      "seed": 300004,
+      "run_mode": "webots",
+      "checkpoint_sha256": "798d596becff02b6e4186151e9d03f2a434a18a4db801ba7a52a467338c26a49",
+      "sim_duration": 1800.0000000027699,
+      "manifest_fingerprint": "423a9154c9cdd9278103bbe8c66a489d69d13a1497cc5400d4324403ed7a623e",
+      "rl_fallback_decisions": 0,
+      "fallback_scheduler_commits": 0,
+      "rl_decisions": 59
+    },
+    {
+      "scenario": "C",
+      "seed": 300005,
+      "run_mode": "webots",
+      "checkpoint_sha256": "798d596becff02b6e4186151e9d03f2a434a18a4db801ba7a52a467338c26a49",
+      "sim_duration": 1800.0000000027699,
+      "manifest_fingerprint": "1a9cd279407d4094608a46ed5acb8e7b0f1f8f64df73447f69fa21a18a0c89e3",
+      "rl_fallback_decisions": 0,
+      "fallback_scheduler_commits": 0,
+      "rl_decisions": 62
+    }
+  ]
+}

@@ -22,7 +22,7 @@ COLORS = {
 
 
 def measured_results():
-    rows = {}
+    candidates = {}
     for path in (ROOT / "results").glob("experiment_?_*.json"):
         try:
             data = json.loads(path.read_text(encoding="utf-8-sig"))
@@ -36,17 +36,47 @@ def measured_results():
         scene, algorithm = info.get("scenario"), info.get("scheduler")
         if scene not in "ABC" or algorithm not in ALGORITHMS:
             continue
-        completed = metrics.get("total_tasks_completed", 0)
-        previous = rows.get((scene, algorithm))
-        if previous is None or completed > previous["completed"]:
-            rows[(scene, algorithm)] = {
+        provenance = info.get("provenance", {}) or {}
+        if provenance.get("run_mode") != "webots":
+            continue
+        seed = provenance.get("seed")
+        manifest = provenance.get("manifest_fingerprint")
+        duration = info.get("sim_duration")
+        if seed is None or not manifest or duration is None:
+            continue
+        key = (scene, algorithm, int(seed))
+        previous = candidates.get(key)
+        timestamp = str(info.get("timestamp", ""))
+        if previous is None or timestamp > previous[0]:
+            candidates[key] = (timestamp, manifest, float(duration), {
                 "throughput": metrics.get("throughput_per_minute", 0.0),
-                "completed": completed,
+                "completed": metrics.get("total_tasks_completed", 0),
                 "generated": metrics.get("total_tasks_generated", 0),
                 "completion_time": metrics.get("avg_task_completion_time", 0.0),
                 "latency": metrics.get("scheduling_latency_p95_ms", 0.0),
                 "violations": metrics.get("pair_distance_violations", 0),
-            }
+            })
+    rows = {}
+    for scene in "ABC":
+        seed_sets = [{seed for s, algorithm, seed in candidates
+                      if s == scene and algorithm == name}
+                     for name in ALGORITHMS]
+        paired = set.intersection(*seed_sets) if seed_sets else set()
+        if not paired:
+            continue
+        for seed in paired:
+            identities = {(candidates[(scene, name, seed)][1],
+                           candidates[(scene, name, seed)][2])
+                          for name in ALGORITHMS}
+            if len(identities) != 1:
+                raise RuntimeError(
+                    f"Unpaired Webots provenance for scene {scene}, seed {seed}")
+        for algorithm in ALGORITHMS:
+            samples = [candidates[(scene, algorithm, seed)][3]
+                       for seed in sorted(paired)]
+            rows[(scene, algorithm)] = {
+                key: float(np.mean([sample[key] for sample in samples]))
+                for key in samples[0]}
     return rows
 
 

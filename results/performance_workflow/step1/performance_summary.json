@@ -1,0 +1,202 @@
+{
+  "step": "Step1_observability",
+  "result_file": "experiment_C_FCFS_20260915_164234.json",
+  "run_mode": "fast-no-rendering + animation recording",
+  "wall_seconds_derived": 130.7,
+  "sim_to_wall_ratio_derived": 1.3772,
+  "tasks_completed": 1,
+  "tasks_generated": 18,
+  "route_dispatches": 330,
+  "rapid_route_overrides": 42,
+  "audited_replans": 34,
+  "unplanned_task_stops": 5,
+  "min_pair_distance": 0.5477145111028323,
+  "pair_distance_violations": 0,
+  "supervisor_step_wall_p50_ms": 5.099500000142143,
+  "supervisor_step_wall_p95_ms": 10.768999999527296,
+  "supervisor_step_wall_p99_ms": 314.18220000068686,
+  "supervisor_step_wall_max_ms": 1606.9268999999622,
+  "supervisor_webots_step_wall_p50_ms": 3.3910000001924345,
+  "supervisor_webots_step_wall_p95_ms": 5.100700000184588,
+  "supervisor_webots_step_wall_p99_ms": 6.210999999893829,
+  "supervisor_webots_step_wall_max_ms": 60.95129999994242,
+  "joint_planning_wall_p50_ms": 102.48779999983526,
+  "joint_planning_wall_p95_ms": 177.926600000319,
+  "joint_planning_wall_p99_ms": 195.3590000002805,
+  "joint_planning_wall_max_ms": 220.03249999943364,
+  "joint_planning_samples": 251,
+  "supervisor_phase_metrics": {
+    "pose_read": {
+      "samples": 11250,
+      "mean_ms": 1.4228570844489796,
+      "p50_ms": 1.0154999999940628,
+      "p95_ms": 4.418600000462902,
+      "p99_ms": 6.676900000456953,
+      "max_ms": 12.437600000339444
+    },
+    "broadcast": {
+      "samples": 11250,
+      "mean_ms": 0.3070815555525769,
+      "p50_ms": 0.2919999997175182,
+      "p95_ms": 0.3896999996868544,
+      "p99_ms": 0.5394999998316052,
+      "max_ms": 1.5880000000834116
+    },
+    "receive": {
+      "samples": 11250,
+      "mean_ms": 0.06362405333630805,
+      "p50_ms": 0.0033000005714711733,
+      "p95_ms": 0.4415000003064051,
+      "p99_ms": 1.0518999997657374,
+      "max_ms": 15.959199999997509
+    },
+    "dispatch_delayed_robots": {
+      "samples": 11250,
+      "mean_ms": 0.0021189333330969224,
+      "p50_ms": 0.002100000529026147,
+      "p95_ms": 0.0026999996407539584,
+      "p99_ms": 0.0034000004234258085,
+      "max_ms": 0.09649999992689118
+    },
+    "robot_state_update": {
+      "samples": 11250,
+      "mean_ms": 0.01581697778278289,
+      "p50_ms": 0.014899999769113492,
+      "p95_ms": 0.022599999283556826,
+      "p99_ms": 0.028700000257231295,
+      "max_ms": 0.29089999952702783
+    },
+    "dynamic_safety_shield": {
+      "samples": 11250,
+      "mean_ms": 0.13467620444733056,
+      "p50_ms": 0.12570000035339035,
+      "p95_ms": 0.17919999936566455,
+      "p99_ms": 0.2365000000281725,
+      "max_ms": 0.5120999994687736
+    },
+    "joint_runtime_watchdog": {
+      "samples": 360,
+      "mean_ms": 7.920454722243954,
+      "p50_ms": 0.2116999994541402,
+      "p95_ms": 18.327099999623897,
+      "p99_ms": 127.588299999843,
+      "max_ms": 1170.669000000089
+    },
+    "reservation_refresh": {
+      "samples": 180,
+      "mean_ms": 31.031238888853196,
+      "p50_ms": 19.965200000115146,
+      "p95_ms": 72.10369999938848,
+      "p99_ms": 86.86649999981455,
+      "max_ms": 88.80180000051041
+    },
+    "task_assignment": {
+      "samples": 11250,
+      "mean_ms": 0.059940648896331876,
+      "p50_ms": 0.05909999981668079,
+      "p95_ms": 0.08159999924828298,
+      "p99_ms": 0.113999999484804,
+      "max_ms": 37.01269999965007
+    },
+    "joint_planning_phase": {
+      "samples": 252,
+      "mean_ms": 205.79666944444585,
+      "p50_ms": 262.01889999993,
+      "p95_ms": 417.6606000000902,
+      "p99_ms": 505.4132000004756,
+      "max_ms": 809.5769000001383
+    },
+    "metrics_record": {
+      "samples": 45,
+      "mean_ms": 0.13457111112479148,
+      "p50_ms": 0.12719999995169928,
+      "p95_ms": 0.16400000004068715,
+      "p99_ms": 0.2474999992045923,
+      "max_ms": 0.2474999992045923
+    }
+  },
+  "joint_planning_tier_metrics": {
+    "wide": {
+      "samples": 245,
+      "mean_ms": 24.086508163273553,
+      "p50_ms": 26.297100000192586,
+      "p95_ms": 51.822599999468366,
+      "p99_ms": 61.84639999992214,
+      "max_ms": 70.377400000325
+    },
+    "primary": {
+      "samples": 183,
+      "mean_ms": 43.86564808745555,
+      "p50_ms": 45.778799999425246,
+      "p95_ms": 76.6817000003357,
+      "p99_ms": 107.75190000003931,
+      "max_ms": 118.27240000002348
+    },
+    "short": {
+      "samples": 162,
+      "mean_ms": 14.20807469130635,
+      "p50_ms": 14.979099999436585,
+      "p95_ms": 20.89479999995092,
+      "p99_ms": 23.422000000209664,
+      "max_ms": 25.284199999987322
+    },
+    "soft": {
+      "samples": 161,
+      "mean_ms": 30.710456521728986,
+      "p50_ms": 31.70030000001134,
+      "p95_ms": 45.62420000002021,
+      "p99_ms": 56.16730000019743,
+      "max_ms": 65.12970000039786
+    }
+  },
+  "robot_dwa_metrics": {
+    "samples": 0,
+    "mean_ms": 0.0,
+    "p50_ms": 0.0,
+    "p95_ms": 0.0,
+    "p99_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "communication_metrics": {
+    "peer_broadcast": {
+      "samples": 11250,
+      "messages": 90000,
+      "bytes": 146772577,
+      "wall_p50_ms": 0.2919999997175182,
+      "wall_p95_ms": 0.3896999996868544,
+      "wall_p99_ms": 0.5394999998316052,
+      "wall_max_ms": 1.5880000000834116
+    },
+    "receive": {
+      "samples": 11250,
+      "messages": 0,
+      "bytes": 0,
+      "wall_p50_ms": 0.0033000005714711733,
+      "wall_p95_ms": 0.4415000003064051,
+      "wall_p99_ms": 1.0518999997657374,
+      "wall_max_ms": 15.959199999997509
+    },
+    "command": {
+      "samples": 5312,
+      "messages": 5312,
+      "bytes": 783090,
+      "wall_p50_ms": 0.0068999997893115506,
+      "wall_p95_ms": 0.014299999747890979,
+      "wall_p99_ms": 0.040299999454873614,
+      "wall_max_ms": 0.11189999986527255
+    }
+  },
+  "stop_analysis_summary": {
+    "stop_intervals": 95,
+    "active_stop_intervals": 89,
+    "unexplained_active_intervals": 61,
+    "max_concurrent_motion_expected_stops": 8,
+    "mass_stop_threshold": 3,
+    "mass_stop_seconds": 48.352,
+    "max_concurrent_abnormal_stops": 7,
+    "abnormal_mass_stop_seconds": 40.128,
+    "rotating_in_place_intervals": 46,
+    "max_concurrent_pose_stationary_abnormal_stops": 0,
+    "pose_stationary_abnormal_mass_stop_seconds": 0
+  }
+}

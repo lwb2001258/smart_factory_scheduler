@@ -54,9 +54,12 @@ class SarsaScheduler(_AgentScheduler):
             mask = self.environment.get_action_mask()
             action = self.agent.select_action(
                 self.agent.discretize(state), mask, training=False)
-            assignment = self.environment.assignment_for_action(action)
-            valid, reason = validate_assignment(
-                assignment, pending_tasks, robot_states, context)
+            if action == self.environment.no_op_action:
+                assignment, valid, reason = None, False, "no_feasible_pair"
+            else:
+                assignment = self.environment.assignment_for_action(action)
+                valid, reason = validate_assignment(
+                    assignment, pending_tasks, robot_states, context)
         except Exception as exc:
             assignment, valid = None, False
             reason = f"sarsa_inference_error:{type(exc).__name__}"
@@ -88,9 +91,12 @@ class DQNScheduler(_AgentScheduler):
                 robot_states, pending_tasks, context)
             mask = self.environment.get_action_mask()
             action = self.agent.select_action(state, mask, training=False)
-            assignment = self.environment.assignment_for_action(action)
-            valid, reason = validate_assignment(
-                assignment, pending_tasks, robot_states, context)
+            if action == self.environment.no_op_action:
+                assignment, valid, reason = None, False, "no_feasible_pair"
+            else:
+                assignment = self.environment.assignment_for_action(action)
+                valid, reason = validate_assignment(
+                    assignment, pending_tasks, robot_states, context)
         except Exception as exc:
             assignment, valid = None, False
             reason = f"dqn_inference_error:{type(exc).__name__}"
@@ -126,9 +132,12 @@ class AdvancedRLScheduler(_AgentScheduler):
             policy_state = (self.agent.discretize(state)
                             if self.name == "SARSA_LAMBDA" else state)
             action = self.agent.select_action(policy_state, mask, training=False)
-            assignment = self.environment.assignment_for_action(action)
-            valid, reason = validate_assignment(assignment, pending_tasks,
-                                                robot_states, context)
+            if action == self.environment.no_op_action:
+                assignment, valid, reason = None, False, "no_feasible_pair"
+            else:
+                assignment = self.environment.assignment_for_action(action)
+                valid, reason = validate_assignment(assignment, pending_tasks,
+                                                    robot_states, context)
         except Exception as exc:
             assignment, valid = None, False
             reason = f"{self.name.lower()}_inference_error:{type(exc).__name__}"
@@ -184,9 +193,12 @@ class PairwisePPOScheduler(_AgentScheduler):
             probabilities, _ = self.network.forward(state)
             masked = self._masked(probabilities, mask)
             action = int(np.argmax(masked))
-            assignment = self.environment.assignment_for_action(action)
-            valid, reason = validate_assignment(
-                assignment, pending_tasks, robot_states, context)
+            if action == self.environment.no_op_action:
+                assignment, valid, reason = None, False, "no_feasible_pair"
+            else:
+                assignment = self.environment.assignment_for_action(action)
+                valid, reason = validate_assignment(
+                    assignment, pending_tasks, robot_states, context)
         except Exception as exc:
             assignment, valid = None, False
             reason = f"ppo_inference_error:{type(exc).__name__}"

@@ -35,6 +35,7 @@ Key features
 
 import math
 import heapq
+from collections import deque
 from typing import List, Tuple, Optional, Set
 from dataclasses import dataclass, field
 
@@ -44,6 +45,7 @@ from config import (
     ROBOT_RADIUS, WORKSTATIONS, STORAGE_AREAS, CHARGING_STATIONS,
     ALL_LOCATIONS,
 )
+from motion_safety import MOTION_SAFETY
 
 
 # Factory bounds (in metres)
@@ -55,7 +57,7 @@ FACTORY_Y_MAX =  5.5
 # Grid resolution (smaller = more accurate, slower planning)
 GRID_RES = 0.25
 # Safety margin beyond ROBOT_RADIUS for inflation
-SAFETY_MARGIN = 0.55   # increased from 0.32 — keeps path ≥1 grid cell  # Increased from 0.05 — robot edge stays ≥0.32m from raw obstacle
+SAFETY_MARGIN = MOTION_SAFETY.static_margin_m
 
 # Cell labels
 CELL_FREE      = 0
@@ -266,6 +268,39 @@ class GridAStar:
     
     def __init__(self, grid: OccupancyGrid):
         self.grid = grid
+
+    def _endpoint_connector(self, center: Tuple[int, int],
+                            max_radius: int) -> List[Tuple[int, int]]:
+        """Return a shortest cardinal chain of INFLATED cells to free space.
+
+        Real obstacles are never relaxed. Returning only the chain avoids the
+        former square relaxation, which could open unrelated cells around a
+        dock for the duration of a search.
+        """
+        if not self.grid.in_bounds(*center):
+            return []
+        label = self.grid.cells[center[1]][center[0]]
+        if label in (CELL_FREE, CELL_AVOID):
+            return []
+        if label == CELL_OBSTACLE:
+            return []
+        queue = deque([(center, (center,))])
+        visited = {center}
+        while queue:
+            cell, path = queue.popleft()
+            if len(path) - 1 >= max_radius:
+                continue
+            for dc, dr in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nxt = (cell[0] + dc, cell[1] + dr)
+                if nxt in visited or not self.grid.in_bounds(*nxt):
+                    continue
+                visited.add(nxt)
+                next_label = self.grid.cells[nxt[1]][nxt[0]]
+                if next_label in (CELL_FREE, CELL_AVOID):
+                    return list(path)
+                if next_label == CELL_INFLATED:
+                    queue.append((nxt, path + (nxt,)))
+        return []
     
     def _octile(self, a: Tuple[int, int], b: Tuple[int, int]) -> float:
         dx = abs(a[0] - b[0])
@@ -334,16 +369,11 @@ class GridAStar:
                                endpoint_xy[1] - station[1]) <= GRID_RES
                     for station in CHARGING_STATIONS.values())
                 relax_radius = 4 if is_charging_endpoint else 2
-                for dc in range(-relax_radius, relax_radius + 1):
-                    for dr in range(-relax_radius, relax_radius + 1):
-                        nc, nr = c0 + dc, r0 + dr
-                        if not self.grid.in_bounds(nc, nr):
-                            continue
-                        # Only relax INFLATED — never relax actual OBSTACLE
-                        if self.grid.cells[nr][nc] == CELL_INFLATED:
-                            relaxed_cells.append(
-                                (nc, nr, self.grid.cells[nr][nc]))
-                            self.grid.cells[nr][nc] = CELL_FREE
+                for nc, nr in self._endpoint_connector(
+                        (c0, r0), relax_radius):
+                    # Connector construction admits only INFLATED cells.
+                    relaxed_cells.append((nc, nr, self.grid.cells[nr][nc]))
+                    self.grid.cells[nr][nc] = CELL_FREE
         
         # Now do the snap (after relaxation, dock cells should already be free)
         start = self._snap_to_free(*start_cell_orig)

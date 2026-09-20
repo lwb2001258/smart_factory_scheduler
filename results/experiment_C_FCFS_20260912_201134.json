@@ -1,0 +1,3265 @@
+{
+  "experiment_info": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "num_robots": 8,
+    "sim_duration": 30.015999999998467,
+    "timestamp": "2026-09-12 20:12:15",
+    "provenance": {
+      "manifest_fingerprint": "7c1122c1ac6063c0ab9bf66dad7aff67f468b422cca23b8bc4ca6c7fc4fde83f",
+      "manifest_version": "factory-manifest-v2-deadline",
+      "run_mode": "webots",
+      "seed": 42,
+      "motion_safety_version": "motion-safety-v3",
+      "motion_safety_fingerprint": "83910fda370535e7f92c9224ed9b399fdf16b6a003e8133ce46acec2e949ee57",
+      "motion_safety_config": {
+        "version": "motion-safety-v3",
+        "robot_radius_m": 0.18,
+        "payload_overhang_m": 0.0,
+        "maximum_speed_mps": 0.22,
+        "joint_turn_rate_rad_s": 1.988,
+        "braking_deceleration_mps2": 0.5,
+        "reaction_latency_s": 0.2,
+        "joint_time_slot_s": 4.75,
+        "hard_collision_distance_m": 0.5,
+        "coordinated_stop_distance_m": 0.55,
+        "planning_clearance_m": 0.7,
+        "wide_planning_clearance_m": 0.75,
+        "peer_radial_stop_distance_m": 0.8,
+        "prediction_clearance_m": 0.85,
+        "static_margin_m": 0.55,
+        "lidar_hard_stop_m": 0.25,
+        "dwa_critical_distance_m": 0.4,
+        "stale_caution_age_s": 0.1,
+        "stale_stop_age_s": 0.3,
+        "stopping_distance_m": 0.09240000000000001,
+        "footprint_radius_m": 0.18,
+        "worst_case_cardinal_slot_s": 2.9166416311271144,
+        "fingerprint": "83910fda370535e7f92c9224ed9b399fdf16b6a003e8133ce46acec2e949ee57"
+      }
+    }
+  },
+  "summary_metrics": {
+    "throughput_per_minute": 0.0,
+    "total_tasks_completed": 0,
+    "total_tasks_generated": 7,
+    "avg_task_completion_time": 0.0,
+    "avg_waiting_time": 0.0,
+    "deadline_tasks_arrived": 7,
+    "deadline_tasks_completed": 0,
+    "on_time_completed": 0,
+    "on_time_rate_all_arrivals": 0.0,
+    "hard_deadline_breaches": 0,
+    "overdue_unfinished_tasks": 0,
+    "total_tardiness_seconds": 0,
+    "weighted_tardiness": 0,
+    "max_tardiness_seconds": 0.0,
+    "avg_robot_idle_pct": 46.255330490405925,
+    "total_distance_all_robots": 15.045158558200692,
+    "total_conflicts_resolved": 0,
+    "predicted_conflicts": 0,
+    "route_dispatches": 40,
+    "rapid_route_overrides": 0,
+    "unauthorized_route_writes": 0,
+    "audited_replans": 0,
+    "replan_requests": 0,
+    "physical_escapes": 0,
+    "nonphysical_recoveries": 0,
+    "yield_start": 0,
+    "yield_standoff_selected": 0,
+    "yield_wait_start": 0,
+    "yield_wait_cleared": 0,
+    "yield_wait_timeout": 0,
+    "yield_resume_proposed": 0,
+    "yield_resume_rejected": 0,
+    "yield_resume_committed": 0,
+    "yield_resume_rollback": 0,
+    "safety_event_count": 113,
+    "unplanned_task_stops": 0,
+    "planned_wait_episodes": 0,
+    "planned_wait_total_seconds": 0.0,
+    "total_deadlocks": 0,
+    "min_pair_distance": 1.894314992490028,
+    "pair_distance_violations": 0,
+    "max_completion_time": 0,
+    "min_completion_time": 0,
+    "workload_balance_cv": 0.0,
+    "tasks_per_robot": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "robot_idle_percentages": [
+      0.10660980810235085,
+      4.104477611940511,
+      4.957356076759319,
+      32.94243070362644,
+      77.13219616204826,
+      85.8208955223889,
+      78.30490405117399,
+      86.67377398720761
+    ],
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "longest_completion_plateau_seconds": 30.015999999998467,
+    "final_completion_plateau_seconds": 30.015999999998467,
+    "robots_without_completed_tasks": 8,
+    "scheduling_latency_mean_ms": 0.06030000319393972,
+    "scheduling_latency_p50_ms": 0.0549999822396785,
+    "scheduling_latency_p95_ms": 0.09830002090893686,
+    "scheduling_latency_p99_ms": 0.09830002090893686,
+    "scheduling_latency_max_ms": 0.09830002090893686,
+    "invalid_scheduler_outputs": 0,
+    "scheduler_fallbacks": 0,
+    "native_scheduler_commits": 6,
+    "fallback_scheduler_commits": 0,
+    "scheduler_commits_by_algorithm": {
+      "FCFS": 6
+    },
+    "rl_policy_decisions": 0,
+    "rl_fallback_decisions": 0,
+    "rl_fallback_rate": 0.0,
+    "rl_timeout_count": 0,
+    "rl_inference_mean_ms": 0.0,
+    "rl_inference_p95_ms": 0.0,
+    "rl_inference_max_ms": 0.0,
+    "joint_cell_traversal_p50_seconds": 1.2320000000000029,
+    "joint_cell_traversal_p95_seconds": 2.304000000000002,
+    "joint_cell_traversal_p99_seconds": 2.816,
+    "joint_cell_traversal_samples": 65,
+    "joint_window_gaps": 0,
+    "reservation_expired_movements": 0,
+    "motion_continuity": {
+      "eligible_seconds": 112.32,
+      "moving_seconds": 93.92000000000002,
+      "turning_seconds": 14.399999999999993,
+      "valid_wait_seconds": 4.000000000000002,
+      "unblocked_zero_speed_seconds": 0.0,
+      "unblocked_stop_episodes": 0,
+      "status_samples": 1496,
+      "status_drops": 0,
+      "clear_eligible_seconds": 108.32,
+      "clear_motion_duty_cycle": 1.0000000000000002,
+      "unblocked_zero_speed_ratio": 0.0
+    },
+    "motion_continuity_by_robot": {
+      "1": {
+        "eligible_seconds": 29.44,
+        "moving_seconds": 21.76,
+        "turning_seconds": 6.719999999999999,
+        "valid_wait_seconds": 0.9600000000000007,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 28.48,
+        "clear_motion_duty_cycle": 1.0,
+        "unblocked_zero_speed_ratio": 0.0
+      },
+      "2": {
+        "eligible_seconds": 25.92,
+        "moving_seconds": 21.919999999999998,
+        "turning_seconds": 3.04,
+        "valid_wait_seconds": 0.9600000000000009,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 24.96,
+        "clear_motion_duty_cycle": 0.9999999999999999,
+        "unblocked_zero_speed_ratio": 0.0
+      },
+      "3": {
+        "eligible_seconds": 25.92,
+        "moving_seconds": 24.8,
+        "turning_seconds": 0.0,
+        "valid_wait_seconds": 1.1199999999999992,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 24.800000000000004,
+        "clear_motion_duty_cycle": 0.9999999999999999,
+        "unblocked_zero_speed_ratio": 0.0
+      },
+      "4": {
+        "eligible_seconds": 17.6,
+        "moving_seconds": 14.720000000000004,
+        "turning_seconds": 2.2399999999999967,
+        "valid_wait_seconds": 0.6400000000000006,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 16.96,
+        "clear_motion_duty_cycle": 1.0,
+        "unblocked_zero_speed_ratio": 0.0
+      },
+      "5": {
+        "eligible_seconds": 3.84,
+        "moving_seconds": 2.5600000000000023,
+        "turning_seconds": 1.1199999999999974,
+        "valid_wait_seconds": 0.16000000000000014,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 3.6799999999999997,
+        "clear_motion_duty_cycle": 1.0,
+        "unblocked_zero_speed_ratio": 0.0
+      },
+      "6": {
+        "eligible_seconds": 2.8800000000000026,
+        "moving_seconds": 1.6000000000000014,
+        "turning_seconds": 1.2800000000000011,
+        "valid_wait_seconds": 0.0,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 2.8800000000000026,
+        "clear_motion_duty_cycle": 1.0,
+        "unblocked_zero_speed_ratio": 0.0
+      },
+      "7": {
+        "eligible_seconds": 3.84,
+        "moving_seconds": 3.6799999999999997,
+        "turning_seconds": 0.0,
+        "valid_wait_seconds": 0.16000000000000014,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 3.6799999999999997,
+        "clear_motion_duty_cycle": 1.0,
+        "unblocked_zero_speed_ratio": 0.0
+      },
+      "8": {
+        "eligible_seconds": 2.8800000000000026,
+        "moving_seconds": 2.8800000000000026,
+        "turning_seconds": 0.0,
+        "valid_wait_seconds": 0.0,
+        "unblocked_zero_speed_seconds": 0.0,
+        "unblocked_stop_episodes": 0,
+        "status_samples": 187,
+        "status_drops": 0,
+        "clear_eligible_seconds": 2.8800000000000026,
+        "clear_motion_duty_cycle": 1.0,
+        "unblocked_zero_speed_ratio": 0.0
+      }
+    },
+    "unknown_stop_episodes": 0,
+    "progress_lease_soft_deadlines": 0,
+    "progress_lease_hard_deadlines": 0,
+    "terminal_service_complete": 1,
+    "terminal_physically_clear": 1,
+    "terminal_inbound_denied": 0,
+    "terminal_inbound_granted": 2
+  },
+  "task_stats": {
+    "total_generated": 7,
+    "pending": 1,
+    "active": 6,
+    "completed": 0,
+    "failed": 0,
+    "avg_completion_time": 0,
+    "max_completion_time": 0,
+    "avg_waiting_time": 0,
+    "throughput": 0
+  },
+  "coordination_stats": {
+    "conflicts_detected": 0,
+    "conflicts_resolved": 0,
+    "deadlocks_detected": 0,
+    "total_replans": 0,
+    "joint_plans_attempted": 0,
+    "joint_plans_accepted": 0,
+    "joint_plan_rollbacks": 0,
+    "joint_grid_candidates_attempted": 12,
+    "joint_grid_candidates_validated": 12,
+    "joint_grid_candidates_timed_out": 0,
+    "joint_grid_candidates_failed": 0,
+    "joint_transactions_attempted": 10,
+    "joint_transactions_activated": 10,
+    "joint_transactions_aborted": 0
+  },
+  "task_completions": [],
+  "rl_event_ledger": [
+    {
+      "event_type": "assignment_committed",
+      "sim_time": 0.032,
+      "robot_id": 1,
+      "task_id": 1,
+      "values": {
+        "priority_rank": 200,
+        "waiting_seconds": 0.016,
+        "empty_distance": 0.0,
+        "estimated_cost": 0.0,
+        "decision_id": "batch-32-r1-t1",
+        "algorithm": "FCFS",
+        "event_sequence": 1,
+        "batch_id": "batch-32"
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "assignment_committed",
+      "sim_time": 1.2320000000000009,
+      "robot_id": 2,
+      "task_id": 2,
+      "values": {
+        "priority_rank": 200,
+        "waiting_seconds": 0.0,
+        "empty_distance": 0.0,
+        "estimated_cost": 0.0,
+        "decision_id": "batch-1232-r2-t2",
+        "algorithm": "FCFS",
+        "event_sequence": 2,
+        "batch_id": "batch-1232"
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 1.2480000000000009,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 0.016000000000000014,
+        "elapsed_seconds": 0.0,
+        "event_sequence": 3
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "assignment_committed",
+      "sim_time": 1.488000000000001,
+      "robot_id": 3,
+      "task_id": 3,
+      "values": {
+        "priority_rank": 200,
+        "waiting_seconds": 0.0,
+        "empty_distance": 0.0,
+        "estimated_cost": 0.0,
+        "decision_id": "batch-1488-r3-t3",
+        "algorithm": "FCFS",
+        "event_sequence": 4,
+        "batch_id": "batch-1488"
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 1.5040000000000011,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 0.016000000000000014,
+        "elapsed_seconds": 0.2560000000000002,
+        "event_sequence": 5
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 9.888000000000007,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 0.016000000000000014,
+        "elapsed_seconds": 8.384000000000006,
+        "event_sequence": 6
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "assignment_committed",
+      "sim_time": 9.888000000000007,
+      "robot_id": 4,
+      "task_id": 4,
+      "values": {
+        "priority_rank": 200,
+        "waiting_seconds": 0.0,
+        "empty_distance": 0.0,
+        "estimated_cost": 0.0,
+        "decision_id": "batch-9888-r4-t4",
+        "algorithm": "FCFS",
+        "event_sequence": 7,
+        "batch_id": "batch-9888"
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "pickup_reached",
+      "sim_time": 14.512000000000011,
+      "robot_id": 1,
+      "task_id": 1,
+      "values": {
+        "event_sequence": 8
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 23.151999999999223,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 0.015999999999998238,
+        "elapsed_seconds": 13.263999999999216,
+        "event_sequence": 9
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "assignment_committed",
+      "sim_time": 23.151999999999223,
+      "robot_id": 5,
+      "task_id": 5,
+      "values": {
+        "priority_rank": 200,
+        "waiting_seconds": 0.0,
+        "empty_distance": 0.0,
+        "estimated_cost": 0.0,
+        "decision_id": "batch-23151-r5-t5",
+        "algorithm": "FCFS",
+        "event_sequence": 10,
+        "batch_id": "batch-23151"
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 25.759999999998936,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 0.015999999999998238,
+        "elapsed_seconds": 2.6079999999997128,
+        "event_sequence": 11
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "assignment_committed",
+      "sim_time": 25.759999999998936,
+      "robot_id": 6,
+      "task_id": 6,
+      "values": {
+        "priority_rank": 300,
+        "waiting_seconds": 0.0,
+        "empty_distance": 0.0,
+        "estimated_cost": 0.0,
+        "decision_id": "batch-25759-r6-t6",
+        "algorithm": "FCFS",
+        "event_sequence": 12,
+        "batch_id": "batch-25759"
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 26.767999999998825,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 0.2079999999999771,
+        "elapsed_seconds": 1.007999999999889,
+        "event_sequence": 13
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 27.775999999998714,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 1.007999999999889,
+        "elapsed_seconds": 1.007999999999889,
+        "event_sequence": 14
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 28.783999999998603,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 1.007999999999889,
+        "elapsed_seconds": 1.007999999999889,
+        "event_sequence": 15
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    },
+    {
+      "event_type": "queue_wait_advanced",
+      "sim_time": 29.79199999999849,
+      "robot_id": 0,
+      "task_id": 0,
+      "values": {
+        "pending_wait_increment": 1.007999999999889,
+        "elapsed_seconds": 1.007999999999889,
+        "event_sequence": 16
+      },
+      "ledger_version": "rl-event-ledger-v2-deadline"
+    }
+  ],
+  "rl_decisions": [],
+  "conflict_events": [],
+  "route_dispatch_events": [
+    {
+      "sim_time": 0.6400000000000005,
+      "robot_id": 1,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 1,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 4.080000000000003,
+      "robot_id": 1,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 4.080000000000003,
+      "robot_id": 2,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 4.080000000000003,
+      "robot_id": 3,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 2,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 5.120000000000004,
+      "robot_id": 1,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 8
+    },
+    {
+      "sim_time": 5.120000000000004,
+      "robot_id": 2,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 5.120000000000004,
+      "robot_id": 3,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 3,
+      "waypoint_count": 8
+    },
+    {
+      "sim_time": 9.120000000000006,
+      "robot_id": 1,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 7
+    },
+    {
+      "sim_time": 9.120000000000006,
+      "robot_id": 2,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 8
+    },
+    {
+      "sim_time": 9.120000000000006,
+      "robot_id": 3,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 4,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 12.48000000000001,
+      "robot_id": 1,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 6
+    },
+    {
+      "sim_time": 12.48000000000001,
+      "robot_id": 2,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 12.48000000000001,
+      "robot_id": 3,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 12.48000000000001,
+      "robot_id": 4,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 5,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 15.104000000000012,
+      "robot_id": 1,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 15.104000000000012,
+      "robot_id": 2,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 15.104000000000012,
+      "robot_id": 3,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 8
+    },
+    {
+      "sim_time": 15.104000000000012,
+      "robot_id": 4,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 6,
+      "waypoint_count": 8
+    },
+    {
+      "sim_time": 19.119999999999667,
+      "robot_id": 1,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 19.119999999999667,
+      "robot_id": 2,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 19.119999999999667,
+      "robot_id": 3,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 19.119999999999667,
+      "robot_id": 4,
+      "path_version": 3,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 7,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 23.119999999999227,
+      "robot_id": 1,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 23.119999999999227,
+      "robot_id": 2,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 23.119999999999227,
+      "robot_id": 3,
+      "path_version": 7,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 23.119999999999227,
+      "robot_id": 4,
+      "path_version": 4,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 8,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 26.111999999998897,
+      "robot_id": 1,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 26.111999999998897,
+      "robot_id": 2,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 26.111999999998897,
+      "robot_id": 3,
+      "path_version": 8,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 26.111999999998897,
+      "robot_id": 4,
+      "path_version": 5,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 26.111999999998897,
+      "robot_id": 5,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 26.111999999998897,
+      "robot_id": 7,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 9,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 1,
+      "path_version": 10,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 2,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 3,
+      "path_version": 9,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 4,
+      "path_version": 6,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 5,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 6,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 7,
+      "path_version": 2,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    },
+    {
+      "sim_time": 27.119999999998786,
+      "robot_id": 8,
+      "path_version": 1,
+      "source": "joint_grid_transaction",
+      "plan_epoch": 10,
+      "waypoint_count": 9
+    }
+  ],
+  "route_override_events": [],
+  "unauthorized_route_write_events": [],
+  "replan_events": [],
+  "replan_request_events": [],
+  "escape_events": [],
+  "yield_resume_events": [],
+  "nonphysical_recovery_events": [],
+  "unplanned_stop_events": [],
+  "planned_wait_events": [],
+  "deadlock_events": [],
+  "safety_events": [
+    {
+      "event_id": "shield:1:1058:caution:2",
+      "sim_time": 16.83199999999992,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 2,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.5699437684535822,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1058:caution:1",
+      "sim_time": 16.83199999999992,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 5,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.5699437684535822,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1090:clear:None",
+      "sim_time": 17.343999999999863,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1090:clear:None",
+      "sim_time": 17.343999999999863,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 5,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1138:caution:3",
+      "sim_time": 18.111999999999778,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.6010378468163439,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1138:caution:1",
+      "sim_time": 18.111999999999778,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 5,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.6010378468163439,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1170:clear:None",
+      "sim_time": 18.62399999999972,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1170:clear:None",
+      "sim_time": 18.62399999999972,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 5,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1178:caution:3",
+      "sim_time": 18.751999999999708,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.48234115837910435,
+      "ttc": 9.963144396458674
+    },
+    {
+      "event_id": "shield:3:1178:caution:1",
+      "sim_time": 18.751999999999708,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 5,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.48234115837910435,
+      "ttc": 9.963144396458674
+    },
+    {
+      "event_id": "shield:1:1210:clear:None",
+      "sim_time": 19.26399999999965,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1210:clear:None",
+      "sim_time": 19.26399999999965,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1218:caution:3",
+      "sim_time": 19.391999999999637,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.3204992622585857,
+      "ttc": 9.528432149429367
+    },
+    {
+      "event_id": "shield:3:1218:caution:1",
+      "sim_time": 19.391999999999637,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.3204992622585857,
+      "ttc": 9.528432149429367
+    },
+    {
+      "event_id": "shield:2:1228:caution:1",
+      "sim_time": 19.55199999999962,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7322788822094787,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1250:clear:None",
+      "sim_time": 19.90399999999958,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1250:clear:None",
+      "sim_time": 19.90399999999958,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1258:caution:3",
+      "sim_time": 20.031999999999567,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.2888817681090584,
+      "ttc": 9.442386643516784
+    },
+    {
+      "event_id": "shield:3:1258:caution:1",
+      "sim_time": 20.031999999999567,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.2888817681090584,
+      "ttc": 9.442386643516784
+    },
+    {
+      "event_id": "shield:2:1260:clear:None",
+      "sim_time": 20.063999999999563,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1290:clear:None",
+      "sim_time": 20.54399999999951,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1290:clear:None",
+      "sim_time": 20.54399999999951,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1298:caution:3",
+      "sim_time": 20.671999999999496,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.29549255107776884,
+      "ttc": 9.525544134656657
+    },
+    {
+      "event_id": "shield:3:1298:caution:1",
+      "sim_time": 20.671999999999496,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.29549255107776884,
+      "ttc": 9.525544134656657
+    },
+    {
+      "event_id": "shield:2:1308:caution:1",
+      "sim_time": 20.83199999999948,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.5175164736979154,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1330:clear:None",
+      "sim_time": 21.18399999999944,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1330:clear:None",
+      "sim_time": 21.18399999999944,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1338:caution:3",
+      "sim_time": 21.311999999999426,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.28834245799896835,
+      "ttc": 9.563133092731972
+    },
+    {
+      "event_id": "shield:3:1338:caution:1",
+      "sim_time": 21.311999999999426,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.28834245799896835,
+      "ttc": 9.563133092731972
+    },
+    {
+      "event_id": "shield:2:1340:clear:None",
+      "sim_time": 21.343999999999422,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1348:caution:1",
+      "sim_time": 21.471999999999408,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.4611265741189768,
+      "ttc": 9.85175351939799
+    },
+    {
+      "event_id": "shield:1:1370:clear:None",
+      "sim_time": 21.82399999999937,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1370:clear:None",
+      "sim_time": 21.82399999999937,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1378:caution:3",
+      "sim_time": 21.951999999999355,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.22055010268266076,
+      "ttc": 8.67976113910215
+    },
+    {
+      "event_id": "shield:3:1378:caution:1",
+      "sim_time": 21.951999999999355,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.22055010268266076,
+      "ttc": 8.67976113910215
+    },
+    {
+      "event_id": "shield:2:1380:clear:None",
+      "sim_time": 21.98399999999935,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1410:clear:None",
+      "sim_time": 22.4639999999993,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1410:clear:None",
+      "sim_time": 22.4639999999993,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1418:caution:3",
+      "sim_time": 22.591999999999285,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.20782224742393005,
+      "ttc": 8.67137360873524
+    },
+    {
+      "event_id": "shield:3:1418:caution:1",
+      "sim_time": 22.591999999999285,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.20782224742393005,
+      "ttc": 8.67137360873524
+    },
+    {
+      "event_id": "shield:2:1428:caution:1",
+      "sim_time": 22.751999999999267,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 6,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.668899460492714,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1450:clear:None",
+      "sim_time": 23.10399999999923,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1450:clear:None",
+      "sim_time": 23.10399999999923,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 6,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1459:caution:3",
+      "sim_time": 23.231999999999214,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 8,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.19056728027174127,
+      "ttc": 8.769380142063524
+    },
+    {
+      "event_id": "shield:3:1459:caution:1",
+      "sim_time": 23.231999999999214,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.19056728027174127,
+      "ttc": 8.769380142063524
+    },
+    {
+      "event_id": "shield:2:1461:clear:None",
+      "sim_time": 23.26399999999921,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1469:caution:1",
+      "sim_time": 23.391999999999197,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7048476638439864,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1491:clear:None",
+      "sim_time": 23.743999999999158,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 8,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1491:clear:None",
+      "sim_time": 23.743999999999158,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1499:caution:3",
+      "sim_time": 23.871999999999144,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 8,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.17649502839586287,
+      "ttc": 8.816414808846899
+    },
+    {
+      "event_id": "shield:3:1499:caution:1",
+      "sim_time": 23.871999999999144,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.17649502839586287,
+      "ttc": 8.816414808846899
+    },
+    {
+      "event_id": "shield:2:1501:clear:None",
+      "sim_time": 23.90399999999914,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1509:caution:1",
+      "sim_time": 24.031999999999126,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7640043526994166,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1531:clear:None",
+      "sim_time": 24.383999999999087,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 8,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1531:clear:None",
+      "sim_time": 24.383999999999087,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1539:caution:3",
+      "sim_time": 24.511999999999073,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 8,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.12120105785093276,
+      "ttc": 7.6611908676406975
+    },
+    {
+      "event_id": "shield:3:1539:caution:1",
+      "sim_time": 24.511999999999073,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.12120105785093276,
+      "ttc": 7.6611908676406975
+    },
+    {
+      "event_id": "shield:2:1541:clear:None",
+      "sim_time": 24.54399999999907,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1571:clear:None",
+      "sim_time": 25.023999999999017,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 8,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1571:clear:None",
+      "sim_time": 25.023999999999017,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1579:caution:3",
+      "sim_time": 25.151999999999003,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 8,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.14403502856749287,
+      "ttc": 7.724148176870593
+    },
+    {
+      "event_id": "shield:3:1579:caution:1",
+      "sim_time": 25.151999999999003,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.14403502856749287,
+      "ttc": 7.724148176870593
+    },
+    {
+      "event_id": "shield:2:1589:caution:1",
+      "sim_time": 25.311999999998985,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7516248138922617,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1611:clear:None",
+      "sim_time": 25.663999999998946,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 8,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1611:clear:None",
+      "sim_time": 25.663999999998946,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1620:caution:3",
+      "sim_time": 25.791999999998932,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 3,
+      "path_version": 8,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.1437284925467542,
+      "ttc": 7.760712149515216
+    },
+    {
+      "event_id": "shield:3:1620:caution:1",
+      "sim_time": 25.791999999998932,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.1437284925467542,
+      "ttc": 7.760712149515216
+    },
+    {
+      "event_id": "shield:2:1622:clear:None",
+      "sim_time": 25.82399999999893,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 7,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1630:caution:1",
+      "sim_time": 25.951999999998915,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 7,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.8255939766603904,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1652:clear:None",
+      "sim_time": 26.303999999998876,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1652:clear:None",
+      "sim_time": 26.303999999998876,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 8,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1662:clear:None",
+      "sim_time": 26.463999999998858,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 8,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1680:caution:7",
+      "sim_time": 26.751999999998826,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 7,
+      "path_version": 9,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7424784817258921,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:7:1680:caution:1",
+      "sim_time": 26.751999999998826,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": 1,
+      "path_version": 1,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7424784817258921,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1700:caution:3",
+      "sim_time": 27.07199999999879,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 3,
+      "path_version": 8,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.6823291519151923,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1700:caution:2",
+      "sim_time": 27.07199999999879,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 2,
+      "path_version": 8,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.6823291519151923,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1712:clear:None",
+      "sim_time": 27.26399999999877,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 10,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:7:1712:clear:None",
+      "sim_time": 27.26399999999877,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": null,
+      "path_version": 2,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1720:caution:2",
+      "sim_time": 27.391999999998756,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 2,
+      "path_version": 10,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.8381799325582634,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:5:1730:caution:2",
+      "sim_time": 27.55199999999874,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 5,
+      "peer_id": 2,
+      "path_version": 2,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.5106976273863733,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:7:1730:caution:5",
+      "sim_time": 27.55199999999874,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": 5,
+      "path_version": 2,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7200339386718883,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1732:clear:None",
+      "sim_time": 27.583999999998735,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1739:clear:None",
+      "sim_time": 27.695999999998723,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1740:caution:1",
+      "sim_time": 27.71199999999872,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 9,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.2989196722937172,
+      "ttc": 4.654774987295564
+    },
+    {
+      "event_id": "shield:3:1740:caution:2",
+      "sim_time": 27.71199999999872,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 2,
+      "path_version": 9,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.6927646694445929,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1752:clear:None",
+      "sim_time": 27.9039999999987,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 10,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1760:caution:2",
+      "sim_time": 28.031999999998686,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 2,
+      "path_version": 10,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.364188109840725,
+      "ttc": 7.027992480433992
+    },
+    {
+      "event_id": "shield:5:1762:clear:None",
+      "sim_time": 28.063999999998682,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 5,
+      "peer_id": null,
+      "path_version": 2,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:7:1762:clear:None",
+      "sim_time": 28.063999999998682,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": null,
+      "path_version": 2,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:5:1770:caution:1",
+      "sim_time": 28.191999999998668,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 5,
+      "peer_id": 1,
+      "path_version": 2,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.5947989818416903,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1772:clear:None",
+      "sim_time": 28.223999999998664,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1779:clear:None",
+      "sim_time": 28.335999999998652,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1780:caution:1",
+      "sim_time": 28.35199999999865,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 9,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.16836895484333417,
+      "ttc": 4.2382521134857765
+    },
+    {
+      "event_id": "shield:3:1780:caution:2",
+      "sim_time": 28.35199999999865,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": 2,
+      "path_version": 9,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.7335423117111655,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1799:clear:None",
+      "sim_time": 28.655999999998617,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 10,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1800:caution:2",
+      "sim_time": 28.671999999998615,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 2,
+      "path_version": 10,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.3105823068525456,
+      "ttc": 4.213897703563425
+    },
+    {
+      "event_id": "shield:5:1802:clear:None",
+      "sim_time": 28.70399999999861,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 5,
+      "peer_id": null,
+      "path_version": 2,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:7:1810:caution:1",
+      "sim_time": 28.831999999998597,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": 1,
+      "path_version": 2,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.07377630035213734,
+      "ttc": 8.703355360683034
+    },
+    {
+      "event_id": "shield:2:1812:clear:None",
+      "sim_time": 28.863999999998594,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:3:1812:clear:None",
+      "sim_time": 28.863999999998594,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 3,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1820:caution:1",
+      "sim_time": 28.99199999999858,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 9,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.517238696760994,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:5:1830:caution:1",
+      "sim_time": 29.151999999998562,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 5,
+      "peer_id": 1,
+      "path_version": 2,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.21466366044871105,
+      "ttc": 5.940807558193693
+    },
+    {
+      "event_id": "shield:1:1839:clear:None",
+      "sim_time": 29.295999999998546,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 10,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1840:caution:2",
+      "sim_time": 29.311999999998545,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 2,
+      "path_version": 10,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.3007377497163268,
+      "ttc": 4.604210553730877
+    },
+    {
+      "event_id": "shield:7:1842:clear:None",
+      "sim_time": 29.34399999999854,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": null,
+      "path_version": 2,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:7:1850:caution:1",
+      "sim_time": 29.471999999998527,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": 1,
+      "path_version": 2,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.019296806579389137,
+      "ttc": 8.015733820677774
+    },
+    {
+      "event_id": "shield:2:1852:clear:None",
+      "sim_time": 29.503999999998523,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": null,
+      "path_version": 9,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:2:1856:caution:1",
+      "sim_time": 29.567999999998516,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 2,
+      "peer_id": 1,
+      "path_version": 9,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.5006500222934855,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:5:1862:clear:None",
+      "sim_time": 29.663999999998506,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 5,
+      "peer_id": null,
+      "path_version": 2,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:5:1867:caution:2",
+      "sim_time": 29.743999999998497,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 5,
+      "peer_id": 2,
+      "path_version": 2,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.8371242753725272,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1873:clear:None",
+      "sim_time": 29.839999999998486,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": null,
+      "path_version": 10,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:1:1874:caution:2",
+      "sim_time": 29.855999999998485,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 1,
+      "peer_id": 2,
+      "path_version": 10,
+      "decision": "caution:speed_scale=0.6",
+      "minimum_distance": 0.6672704148503685,
+      "ttc": null
+    },
+    {
+      "event_id": "shield:7:1882:clear:None",
+      "sim_time": 29.98399999999847,
+      "event_type": "dynamic_safety_shield",
+      "robot_id": 7,
+      "peer_id": null,
+      "path_version": 2,
+      "decision": "clear:speed_scale=1.0",
+      "minimum_distance": null,
+      "ttc": null
+    }
+  ],
+  "joint_cell_traversal_seconds": [
+    0.4800000000000001,
+    2.816,
+    0.016000000000000014,
+    0.19200000000000017,
+    0.4800000000000004,
+    0.41600000000000037,
+    0.5439999999999996,
+    0.7839999999999998,
+    1.4079999999999995,
+    1.3280000000000003,
+    2.112,
+    1.1840000000000002,
+    1.3440000000000003,
+    0.3999999999999986,
+    0.5920000000000005,
+    1.2799999999999994,
+    1.4880000000000013,
+    1.3440000000000012,
+    1.6639999999999997,
+    0.14400000000000013,
+    0.30400000000000027,
+    0.4800000000000004,
+    0.9439999999999991,
+    1.3439999999999994,
+    1.4079999999999995,
+    2.112,
+    0.08000000000000007,
+    0.2879999999999985,
+    0.5439999999999987,
+    0.7839999999999989,
+    1.3439999999999994,
+    1.3599999999999994,
+    2.2879999999999985,
+    1.328000000000003,
+    1.5839999999999996,
+    0.11200000000000188,
+    0.16000000000000014,
+    0.8800000000000026,
+    1.5040000000000013,
+    1.7759999999999998,
+    2.3520000000000003,
+    1.695999999999998,
+    1.5040000000000013,
+    0.01600000000000179,
+    0.5920000000000023,
+    1.2320000000000029,
+    1.4559999999999995,
+    1.5039999999999978,
+    2.304000000000002,
+    0.30400000000000205,
+    0.7680000000000007,
+    0.815999999999999,
+    0.01600000000000179,
+    0.09600000000000009,
+    0.16000000000000014,
+    0.30400000000000205,
+    0.7200000000000024,
+    0.8160000000000025,
+    1.328000000000003,
+    1.4559999999999995,
+    1.8719999999999999,
+    1.7439999999999998,
+    2.3200000000000003,
+    1.855999999999998,
+    1.6799999999999997
+  ],
+  "joint_window_gap_events": [],
+  "reservation_expired_movement_events": [],
+  "motion_continuity_events": [],
+  "terminal_handoff_events": [
+    {
+      "event_type": "inbound_granted",
+      "sim_time": 10.576000000000008,
+      "robot_id": 1,
+      "terminal": "WS1",
+      "terminal_epoch": 0,
+      "owner_id": null
+    },
+    {
+      "event_type": "inbound_granted",
+      "sim_time": 12.65600000000001,
+      "robot_id": 1,
+      "terminal": "WS1",
+      "terminal_epoch": 0,
+      "owner_id": null
+    },
+    {
+      "event_type": "service_complete",
+      "sim_time": 14.512000000000011,
+      "robot_id": 1,
+      "terminal": "WS1",
+      "terminal_epoch": 1,
+      "owner_id": 1
+    },
+    {
+      "event_type": "physically_clear",
+      "sim_time": 20.687999999999494,
+      "robot_id": 1,
+      "terminal": "WS1",
+      "terminal_epoch": 1,
+      "owner_id": 1
+    }
+  ],
+  "progress_lease_events": [],
+  "time_series": [
+    {
+      "sim_time": 4.000000000000003,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 64.71661737398159,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.289657700336632,
+          2.981492517248703
+        ],
+        "2": [
+          -4.000046632831366,
+          -2.9999999998903824
+        ],
+        "3": [
+          4.000046632831367,
+          2.999999999766638
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.999999999938329,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 1,
+          "path_version": 1,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        }
+      }
+    },
+    {
+      "sim_time": 8.000000000000005,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 3,
+      "robots_idle": 5,
+      "robots_active": 3,
+      "conflicts_total": 0,
+      "avg_battery": 64.63617292953661,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.784896307129519,
+          2.946128396174103
+        ],
+        "2": [
+          -4.1769221954402385,
+          -2.734244040256038
+        ],
+        "3": [
+          3.283567910238927,
+          3.000000053724425
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 3,
+          "path_version": 3,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 3,
+          "path_version": 2,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 3,
+          "path_version": 2,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "4": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        }
+      }
+    },
+    {
+      "sim_time": 12.000000000000009,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 64.55172848509163,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.276755853657237,
+          2.9447286312798457
+        ],
+        "2": [
+          -4.268647745463905,
+          -2.0699573072148807
+        ],
+        "3": [
+          2.57723408588653,
+          2.999999998427795
+        ],
+        "4": [
+          4.000046632831367,
+          -3.0000000002333618
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_pickup",
+          "task_id": 1,
+          "goal_location": "WS1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 4,
+          "path_version": 4,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 4,
+          "path_version": 3,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 4,
+          "path_version": 3,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        }
+      }
+    },
+    {
+      "sim_time": 16.00000000000001,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 64.44483959620223,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.7062652779562,
+          3.059110643610857
+        ],
+        "2": [
+          -4.308827460094934,
+          -1.5956016559681316
+        ],
+        "3": [
+          1.8577896679005736,
+          3.0000000003369567
+        ],
+        "4": [
+          4.209986997798302,
+          -2.6742658537412676
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333608
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 6,
+          "path_version": 6,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 6,
+          "path_version": 5,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 6,
+          "path_version": 5,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 6,
+          "path_version": 2,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        }
+      }
+    },
+    {
+      "sim_time": 19.99999999999957,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 4,
+      "robots_idle": 4,
+      "robots_active": 4,
+      "conflicts_total": 0,
+      "avg_battery": 64.3337284850906,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -5.372766289435449,
+          3.0314671847214423
+        ],
+        "2": [
+          -4.300786909213552,
+          -1.1345554397846052
+        ],
+        "3": [
+          1.2381216196114007,
+          3.000000001133817
+        ],
+        "4": [
+          4.279046534884007,
+          -2.05635695369625
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 7,
+          "path_version": 7,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 7,
+          "path_version": 6,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 7,
+          "path_version": 6,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 7,
+          "path_version": 3,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "5": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "7": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        }
+      }
+    },
+    {
+      "sim_time": 23.99999999999913,
+      "tasks_completed": 0,
+      "tasks_pending": 0,
+      "tasks_active": 5,
+      "robots_idle": 2,
+      "robots_active": 6,
+      "conflicts_total": 0,
+      "avg_battery": 64.22039515175676,
+      "min_pair_distance": 1.921002816592404,
+      "robot_positions": {
+        "1": [
+          -4.9912428667892925,
+          3.058414512901558
+        ],
+        "2": [
+          -4.236059406012621,
+          -0.5618502515487339
+        ],
+        "3": [
+          0.6824253402431786,
+          2.999999999555988
+        ],
+        "4": [
+          4.312339725410815,
+          -1.609778585898661
+        ],
+        "5": [
+          -6.99999999993833,
+          -4.663283136814578e-05
+        ],
+        "6": [
+          7.000000000280912,
+          4.663283136732699e-05
+        ],
+        "7": [
+          -8.500046632831365,
+          1.2000000001096167
+        ],
+        "8": [
+          8.500046632831367,
+          -1.2000000002333606
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 8,
+          "path_version": 8,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 8,
+          "path_version": 7,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 8,
+          "path_version": 7,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 8,
+          "path_version": 4,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "6": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "8": {
+          "state": "idle",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": null,
+          "plan_epoch": null,
+          "path_version": 0,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        }
+      }
+    },
+    {
+      "sim_time": 27.99999999999869,
+      "tasks_completed": 0,
+      "tasks_pending": 1,
+      "tasks_active": 6,
+      "robots_idle": 0,
+      "robots_active": 8,
+      "conflicts_total": 0,
+      "avg_battery": 64.07217292953395,
+      "min_pair_distance": 1.894314992490028,
+      "robot_positions": {
+        "1": [
+          -4.8138886705290815,
+          2.949862675407342
+        ],
+        "2": [
+          -4.196796340765697,
+          -0.13586272690201098
+        ],
+        "3": [
+          0.14554125290160053,
+          3.000000000484171
+        ],
+        "4": [
+          4.282071638497657,
+          -1.0824132888426898
+        ],
+        "5": [
+          -6.90281521005307,
+          -0.06231622283133879
+        ],
+        "6": [
+          6.9574991613784105,
+          0.06300481979608413
+        ],
+        "7": [
+          -8.313896267598967,
+          1.201519027431784
+        ],
+        "8": [
+          8.377539604433327,
+          -1.2000477465481945
+        ]
+      },
+      "robot_task_states": {
+        "1": {
+          "state": "en_route_delivery",
+          "task_id": 1,
+          "goal_location": "S5",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 10,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "2": {
+          "state": "en_route_pickup",
+          "task_id": 2,
+          "goal_location": "S2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 9,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "3": {
+          "state": "en_route_pickup",
+          "task_id": 3,
+          "goal_location": "S1",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 9,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "4": {
+          "state": "en_route_pickup",
+          "task_id": 4,
+          "goal_location": "WS2",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 6,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "5": {
+          "state": "en_route_pickup",
+          "task_id": 5,
+          "goal_location": "S3",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 2,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "6": {
+          "state": "en_route_pickup",
+          "task_id": 6,
+          "goal_location": "S6",
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 1,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "7": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 2,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        },
+        "8": {
+          "state": "returning_home",
+          "task_id": null,
+          "goal_location": null,
+          "plan_source": "joint_grid_transaction",
+          "plan_epoch": 10,
+          "path_version": 1,
+          "controller_waypoint_index": 0,
+          "planned_wait": false,
+          "wait_reason": null,
+          "emergency_braking": false,
+          "speed_scale": 1.0
+        }
+      }
+    }
+  ],
+  "execution_metrics": {
+    "webots_wall_seconds": 62.50013770000078,
+    "sim_to_wall_ratio": 0.47999894246632396,
+    "wall_timeout_seconds": 600.0,
+    "batch_mode": "fast-no-rendering"
+  }
+}

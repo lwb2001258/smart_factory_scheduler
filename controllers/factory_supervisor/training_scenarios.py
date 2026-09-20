@@ -1,6 +1,8 @@
 """Factory-grounded scenario generation shared by standalone trainers."""
 
 import math
+from concurrent.futures import Future, ThreadPoolExecutor
+from threading import Lock
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -16,6 +18,9 @@ from experiment_manifest import generate_experiment_manifest
 
 _STATIC_COORDINATOR = None
 _SEGMENT_CACHE = {}
+_SEGMENT_EXECUTOR = None
+_SEGMENT_FUTURES = {}
+_SEGMENT_LOCK = Lock()
 
 
 def factory_free_positions() -> List[Tuple[float, float]]:
@@ -62,13 +67,45 @@ def path_length(path, start):
 class FactoryAStarCostOracle:
     """Cached static Grid-A* travel costs for scheduler observations/masks."""
 
-    def __init__(self, robot_states: Dict[int, dict], num_robots: int):
-        global _STATIC_COORDINATOR
+    def __init__(self, robot_states: Dict[int, dict], num_robots: int,
+                 async_cache_misses: bool = False,
+                 bounded_cache_misses: bool = False):
+        global _STATIC_COORDINATOR, _SEGMENT_EXECUTOR
         self.robot_states = robot_states
         if _STATIC_COORDINATOR is None:
             _STATIC_COORDINATOR = MotionCoordinator(num_active_robots=8)
         self.coordinator = _STATIC_COORDINATOR
         self.cache = _SEGMENT_CACHE
+        self.async_cache_misses = bool(async_cache_misses)
+        self.bounded_cache_misses = bool(bounded_cache_misses)
+        if self.async_cache_misses and _SEGMENT_EXECUTOR is None:
+            _SEGMENT_EXECUTOR = ThreadPoolExecutor(
+                max_workers=1, thread_name_prefix="factory-cost-oracle")
+
+    def _compute_segment(self, snapped, goal):
+        path = self.coordinator.grid_planner.plan(
+            snapped, goal, smooth=True)
+        return path_length(path, snapped)
+
+    def _reap_segment(self, key):
+        future = _SEGMENT_FUTURES.get(key)
+        if future is None or not future.done():
+            return
+        try:
+            value = float(future.result())
+        except Exception:
+            value = math.inf
+        with _SEGMENT_LOCK:
+            self.cache[key] = value
+            _SEGMENT_FUTURES.pop(key, None)
+
+    @staticmethod
+    def _bounded_estimate(snapped, goal):
+        # A deterministic finite estimate keeps rule/RL schedulers responsive
+        # while exact static A* is computed by the single worker.  Navigation
+        # still uses the normal planner and validator before route dispatch.
+        return 2.0 * (abs(goal[0] - snapped[0]) +
+                      abs(goal[1] - snapped[1]))
 
     def bind_robot_states(self, robot_states: Dict[int, dict]):
         """Rebind to the live/deep-copied simulator snapshot."""
@@ -78,11 +115,38 @@ class FactoryAStarCostOracle:
     def segment(self, start, goal):
         start = (float(start[0]), float(start[1]))
         goal = (float(goal[0]), float(goal[1]))
-        key = (start, goal)
+        # Live Webots positions contain millimetre-scale noise.  Caching on
+        # those raw floats turns every dispatch into a fresh Grid-A* search
+        # and creates >50 ms scheduler spikes.  The scheduler only needs a
+        # static grid cost, so cache the grid-centre segment and account for
+        # the short connector explicitly.
+        grid = self.coordinator.grid_planner.grid
+        cell = grid.world_to_grid(*start)
+        snapped = grid.grid_to_world(*cell)
+        connector = math.hypot(start[0] - snapped[0],
+                               start[1] - snapped[1])
+        key = (snapped, goal)
+        if self.async_cache_misses:
+            self._reap_segment(key)
         if key not in self.cache:
-            path = self.coordinator.grid_planner.plan(start, goal, smooth=True)
-            self.cache[key] = path_length(path, start)
-        return self.cache[key]
+            if self.bounded_cache_misses:
+                self.cache[key] = self._bounded_estimate(snapped, goal)
+            elif not self.async_cache_misses:
+                self.cache[key] = self._compute_segment(snapped, goal)
+            else:
+                with _SEGMENT_LOCK:
+                    if (key not in _SEGMENT_FUTURES and
+                            len(_SEGMENT_FUTURES) < 32):
+                        _SEGMENT_FUTURES[key] = _SEGMENT_EXECUTOR.submit(
+                            self._compute_segment, snapped, goal)
+                return connector + self._bounded_estimate(snapped, goal)
+        return connector + self.cache[key]
+
+    def path(self, start, goal):
+        """Return the same smoothed Grid-A* geometry used by ``segment``."""
+        start = (float(start[0]), float(start[1]))
+        goal = (float(goal[0]), float(goal[1]))
+        return self.coordinator.grid_planner.plan(start, goal, smooth=True)
 
     def __call__(self, robot_id: int, task: TransportTask) -> float:
         empty = self.segment(

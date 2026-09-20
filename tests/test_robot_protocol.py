@@ -1,4 +1,5 @@
 import json
+import math
 import sys
 import unittest
 from pathlib import Path
@@ -8,7 +9,7 @@ ROBOT_DIR = (Path(__file__).resolve().parents[1] / "controllers" /
              "robot_controller")
 sys.path.insert(0, str(ROBOT_DIR))
 
-from robot_controller import RobotController, WaypointNavigator
+from robot_controller import MOTION_SAFETY, RobotController, WaypointNavigator
 
 
 class FakeReceiver:
@@ -37,18 +38,54 @@ def command(version, waypoints):
 
 
 class RobotProtocolTests(unittest.TestCase):
-    def test_timed_wait_cell_cannot_advance_before_slot_deadline(self):
+    @staticmethod
+    def _grant(navigator, index, valid_until=100.0, seq=1):
+        navigator.advance_grant_seq = seq
+        navigator.advance_grants[index] = {
+            'plan_epoch': getattr(navigator, 'active_plan_epoch', 0),
+            'grant_seq': seq, 'valid_until': valid_until,
+        }
+
+    def test_active_route_without_target_requests_bounded_replan(self):
+        navigator = WaypointNavigator()
+        navigator.controller_time = 12.0
+        navigator.navigation_active = True
+        navigator.waypoints = []
+        self.assertEqual((0.0, 0.0),
+                         navigator.compute_control(0.0, 0.0, 0.0, []))
+        self.assertTrue(navigator._replan_requested)
+        self.assertEqual('route_exhausted_replan',
+                         navigator.planned_wait_reason)
+        self.assertEqual(12.25, navigator.planned_wait_until)
+
+    def test_granted_cell_advances_without_waiting_for_slot_deadline(self):
         navigator = WaypointNavigator()
         navigator.controller_time = 4.0
         navigator.set_waypoints(
             [(0.0, 0.0), (1.0, 0.0)],
             waypoint_not_before=[5.0, 8.0], partial=True)
-        self.assertEqual((0.0, 0.0),
-                         navigator.compute_control(0.0, 0.0, 0.0, []))
-        self.assertEqual(0, navigator.current_waypoint_idx)
-        navigator.controller_time = 5.0
-        navigator.compute_control(0.0, 0.0, 0.0, [])
+        navigator.joint_coordinated = True
+        self._grant(navigator, 0)
+        self._grant(navigator, 1, seq=2)
+        self.assertNotEqual((0.0, 0.0),
+                            navigator.compute_control(0.0, 0.0, 0.0, []))
         self.assertEqual(1, navigator.current_waypoint_idx)
+        self.assertEqual(4.0, navigator.segment_arrived_at)
+        self.assertEqual(4.0, navigator.waypoint_advanced_at)
+        self.assertEqual(4.0, navigator.completed_segment_arrived_at)
+
+    def test_committed_waypoint_transition_needs_no_redundant_grant(self):
+        navigator = WaypointNavigator()
+        navigator.controller_time = 4.0
+        navigator.set_waypoints(
+            [(0.0, 0.0), (1.0, 0.0)],
+            waypoint_not_before=[5.0, 8.0], partial=True)
+        navigator.joint_coordinated = True
+        self._grant(navigator, 0)
+        self.assertNotEqual((0.0, 0.0),
+                            navigator.compute_control(0.0, 0.0, 0.0, []))
+        self.assertEqual(1, navigator.current_waypoint_idx)
+        self.assertIsNone(navigator.planned_wait_reason)
 
     def test_partial_window_endpoint_is_not_reported_as_business_goal(self):
         navigator = WaypointNavigator()
@@ -103,6 +140,128 @@ class RobotProtocolTests(unittest.TestCase):
         self.assertEqual(0, navigator.current_waypoint_idx)
         self.assertNotEqual((0.0, 0.0), decision)
 
+
+    def test_expired_cell_reservation_stops_and_requests_new_epoch(self):
+        navigator = WaypointNavigator()
+        navigator.controller_time = 6.0 + MOTION_SAFETY.joint_time_slot_s + 0.01
+        navigator.set_waypoints(
+            [(1.0, 0.0)], waypoint_not_before=[6.0], partial=True)
+        navigator.joint_coordinated = True
+        navigator.joint_release_index = 0
+
+        self.assertEqual((0.0, 0.0),
+                         navigator.compute_control(0.0, 0.0, 0.0, []))
+        self.assertTrue(navigator._replan_requested)
+        self.assertTrue(navigator._emergency_stopped)
+        self.assertEqual('reservation_deadline_expired',
+                         navigator._emergency_reason)
+        self.assertEqual(0, navigator.current_waypoint_idx)
+
+    def test_committed_joint_cell_departs_without_redundant_grant(self):
+        navigator = WaypointNavigator()
+        navigator.controller_time = 6.0
+        navigator.set_waypoints(
+            [(1.0, 0.0)], waypoint_not_before=[12.0], partial=True)
+        navigator.joint_coordinated = True
+        navigator.joint_release_index = 0
+
+        self.assertNotEqual((0.0, 0.0),
+                            navigator.compute_control(0.0, 0.0, 0.0, []))
+        self.assertIsNone(navigator.planned_wait_reason)
+        self.assertEqual(0.0, navigator.planned_wait_until)
+        self.assertEqual(0, navigator.current_waypoint_idx)
+
+    def test_valid_advance_hold_stops_committed_segment(self):
+        navigator = WaypointNavigator()
+        navigator.controller_time = 6.0
+        navigator.set_waypoints(
+            [(1.0, 0.0)], waypoint_not_before=[12.0], partial=True)
+        navigator.joint_coordinated = True
+        navigator.joint_release_index = 0
+        navigator.active_plan_epoch = 7
+        navigator.advance_wait_evidence = {
+            'validated': True, 'plan_epoch': 7, 'waypoint_index': 0,
+            'valid_until': 6.25, 'reason': 'swept_occupancy:2'}
+        self.assertEqual((0.0, 0.0),
+                         navigator.compute_control(0.0, 0.0, 0.0, []))
+        self.assertEqual('advance_hold:swept_occupancy:2',
+                         navigator.planned_wait_reason)
+
+    def test_expired_advance_hold_resumes_same_committed_segment(self):
+        navigator = WaypointNavigator()
+        navigator.controller_time = 6.5
+        navigator.set_waypoints(
+            [(1.0, 0.0)], waypoint_not_before=[12.0], partial=True)
+        navigator.joint_coordinated = True
+        navigator.joint_release_index = 0
+        navigator.active_plan_epoch = 7
+        navigator.advance_wait_evidence = {
+            'validated': True, 'plan_epoch': 7, 'waypoint_index': 0,
+            'valid_until': 6.25, 'reason': 'swept_occupancy:2'}
+        self.assertNotEqual((0.0, 0.0),
+                            navigator.compute_control(0.0, 0.0, 0.0, []))
+        self.assertEqual(0, navigator.current_waypoint_idx)
+
+    def test_direct_route_keeps_translation_through_moderate_turn(self):
+        navigator = WaypointNavigator()
+        navigator.set_waypoints([(1.0, 1.0)])
+        navigator.direct_navigation = True
+        left, right = navigator.compute_control(0.0, 0.0, 0.0, [])
+        self.assertGreater(left + right, 0.0)
+        self.assertNotEqual(left, right)
+
+    def test_direct_route_still_rotates_in_place_for_reverse_heading(self):
+        navigator = WaypointNavigator()
+        navigator.set_waypoints([(-1.0, 0.0)])
+        navigator.direct_navigation = True
+        left, right = navigator.compute_control(0.0, 0.0, 0.0, [])
+        self.assertAlmostEqual(0.0, left + right)
+        self.assertNotEqual(0.0, right - left)
+
+    def test_direct_route_reverse_pivot_is_bounded_then_creeps(self):
+        navigator = WaypointNavigator()
+        navigator.set_waypoints([(-1.0, 0.0)])
+        navigator.direct_navigation = True
+        navigator.controller_time = 10.0
+        first = navigator.compute_control(0.0, 0.0, 0.0, [])
+        self.assertAlmostEqual(0.0, first[0] + first[1])
+        navigator.controller_time = 12.01
+        continued = navigator.compute_control(0.0, 0.0, 0.0, [])
+        self.assertLess(continued[0] + continued[1], 0.0)
+
+    def test_direct_route_pivot_timer_resets_after_alignment(self):
+        navigator = WaypointNavigator()
+        navigator.set_waypoints([(-1.0, 0.0)])
+        navigator.direct_navigation = True
+        navigator.controller_time = 1.0
+        navigator.compute_control(0.0, 0.0, 0.0, [])
+        navigator.controller_time = 3.1
+        navigator.compute_control(0.0, 0.0, 0.0, [])
+        navigator.compute_control(0.0, 0.0, math.pi, [])
+        self.assertIsNone(navigator._joint_pivot_started_at)
+        navigator.controller_time = 4.0
+        restarted = navigator.compute_control(0.0, 0.0, 0.0, [])
+        self.assertAlmostEqual(0.0, restarted[0] + restarted[1])
+
+    def test_joint_segment_departure_is_first_nonzero_command_per_index(self):
+        navigator = WaypointNavigator()
+        navigator.set_waypoints([(0.25, 0.0), (0.50, 0.0)])
+        navigator.joint_coordinated = True
+        navigator.controller_time = 2.0
+        navigator.record_segment_departure(0.0, 0.0, 0.0, 0.0)
+        self.assertEqual(-1, navigator.segment_departure_index)
+        navigator.record_segment_departure(1.0, 1.0, 0.0, 0.0)
+        self.assertEqual(0, navigator.segment_departure_index)
+        self.assertEqual(2.0, navigator.segment_departed_at)
+        self.assertEqual(0.25, navigator.segment_departure_distance)
+        navigator.controller_time = 3.0
+        navigator.record_segment_departure(2.0, 2.0, 0.1, 0.0)
+        self.assertEqual(2.0, navigator.segment_departed_at)
+        navigator.current_waypoint_idx = 1
+        navigator.record_segment_departure(2.0, 2.0, 0.25, 0.0)
+        self.assertEqual(1, navigator.segment_departure_index)
+        self.assertEqual(3.0, navigator.segment_departed_at)
+
     def test_status_transmits_joint_planned_wait_evidence(self):
         controller = self.controller_with_messages([])
         controller.position = (1.0, 2.0)
@@ -140,6 +299,122 @@ class RobotProtocolTests(unittest.TestCase):
             0.0, 0.0, 0.0, [])
         self.assertIsNone(decision)
         self.assertFalse(navigator._emergency_stopped)
+
+    def test_unexplained_local_planner_zero_requests_replan(self):
+        controller = RobotController.__new__(RobotController)
+        controller.navigator = WaypointNavigator()
+        controller.navigator.navigation_active = True
+        clock = [7.0]
+        controller.robot = type(
+            'Robot', (), {'getTime': lambda self: clock[0]})()
+        controller.left_motor = None
+        controller.right_motor = None
+        controller._command_motion_state = 'moving'
+        controller._set_motor_speeds(0.0, 0.0)
+        self.assertTrue(controller.navigator._replan_requested)
+        self.assertEqual('local_planner_zero_replan',
+                         controller.navigator.planned_wait_reason)
+        self.assertEqual('local_planner_zero_replan',
+                         controller._last_control_stop_reason)
+        controller.navigator._replan_requested = False
+        controller._set_motor_speeds(0.0, 0.0)
+        self.assertFalse(controller.navigator._replan_requested)
+        controller._set_motor_speeds(1.0, 1.0)
+        controller.navigator.planned_wait_reason = None
+        controller._set_motor_speeds(0.0, 0.0)
+        self.assertFalse(controller.navigator._replan_requested)
+        controller._set_motor_speeds(1.0, 1.0)
+        clock[0] += 0.8
+        controller._set_motor_speeds(1.0, 1.0)
+        controller.navigator.planned_wait_reason = None
+        controller._set_motor_speeds(0.0, 0.0)
+        self.assertTrue(controller.navigator._replan_requested)
+
+    def test_turning_does_not_rearm_local_zero_replan_edge(self):
+        controller = RobotController.__new__(RobotController)
+        controller.navigator = WaypointNavigator()
+        controller.navigator.navigation_active = True
+        controller.robot = type('Robot', (), {'getTime': lambda self: 7.0})()
+        controller.left_motor = None
+        controller.right_motor = None
+        controller._command_motion_state = 'moving'
+        controller._set_motor_speeds(0.0, 0.0)
+        controller.navigator._replan_requested = False
+        controller._set_motor_speeds(-1.0, 1.0)
+        controller.navigator.planned_wait_reason = None
+        controller._set_motor_speeds(0.0, 0.0)
+        self.assertFalse(controller.navigator._replan_requested)
+
+    def test_encoder_velocity_uses_simulation_time_delta(self):
+        controller = RobotController.__new__(RobotController)
+        clock = [2.0]
+        values = [[1.0, 3.0]]
+        controller.robot = type(
+            'Robot', (), {'getTime': lambda self: clock[0]})()
+        controller.gps = None
+        controller.compass = None
+        controller.left_encoder = type(
+            'Encoder', (), {'getValue': lambda self: values[0][0]})()
+        controller.right_encoder = type(
+            'Encoder', (), {'getValue': lambda self: values[0][1]})()
+        controller._encoder_previous = None
+        controller._measured_left_wheel_speed = None
+        controller._measured_right_wheel_speed = None
+
+        controller._read_sensors()
+        self.assertIsNone(controller._measured_left_wheel_speed)
+        clock[0] = 2.5
+        values[0] = [2.0, 2.5]
+        controller._read_sensors()
+        self.assertAlmostEqual(2.0, controller._measured_left_wheel_speed)
+        self.assertAlmostEqual(-1.0, controller._measured_right_wheel_speed)
+
+    def test_wheel_slip_recovery_requires_encoder_and_pose_evidence(self):
+        controller = RobotController.__new__(RobotController)
+        clock = [5.0]
+        controller.robot = type(
+            'Robot', (), {'getTime': lambda self: clock[0]})()
+        controller.navigator = WaypointNavigator()
+        controller.navigator.set_waypoints([(0.0, 1.0)])
+        controller.navigator.joint_coordinated = True
+        controller.position = (0.0, 0.0)
+        controller.heading = 0.0
+        controller._measured_left_wheel_speed = 0.05
+        controller._measured_right_wheel_speed = 6.0
+        controller._slip_watch_target = None
+        controller._slip_watch_position = None
+        controller._slip_watch_heading = 0.0
+        controller._slip_watch_started_at = 0.0
+        controller._slip_recovery_until = 0.0
+        controller._slip_recovery_cooldown_until = 0.0
+
+        self.assertEqual((0.05, 6.0),
+                         controller._apply_local_wheel_slip_recovery(0.05, 6.0))
+        clock[0] = 6.1
+        left, right = controller._apply_local_wheel_slip_recovery(0.05, 6.0)
+        self.assertLess(left, 0.0)
+        self.assertGreater(right, 0.0)
+        self.assertAlmostEqual(abs(left), abs(right))
+
+    def test_wheel_slip_recovery_never_overrides_validated_wait(self):
+        controller = RobotController.__new__(RobotController)
+        controller.robot = type('Robot', (), {'getTime': lambda self: 6.0})()
+        controller.navigator = WaypointNavigator()
+        controller.navigator.set_waypoints([(0.0, 1.0)])
+        controller.navigator.joint_coordinated = True
+        controller.navigator.planned_wait_reason = 'joint_epoch_barrier'
+        controller.position = (0.0, 0.0)
+        controller.heading = 0.0
+        controller._measured_left_wheel_speed = 0.05
+        controller._measured_right_wheel_speed = 6.0
+        controller._slip_watch_target = (0.0, 1.0)
+        controller._slip_watch_position = controller.position
+        controller._slip_watch_heading = controller.heading
+        controller._slip_watch_started_at = 0.0
+        controller._slip_recovery_until = 7.0
+        controller._slip_recovery_cooldown_until = 8.0
+        self.assertEqual((0.0, 0.0),
+                         controller._apply_local_wheel_slip_recovery(0.0, 0.0))
 
     def controller_with_messages(self, messages):
         controller = RobotController.__new__(RobotController)
@@ -187,8 +462,56 @@ class RobotProtocolTests(unittest.TestCase):
         self.assertEqual([(1.0, 0.0)], controller.navigator.waypoints)
         self.assertEqual([5.0], controller.navigator.waypoint_not_before)
         self.assertTrue(controller.navigator.plan_is_partial)
+        self.assertEqual(0.22, controller.navigator.waypoint_threshold)
         terminal = json.loads(controller.emitter.payloads[-1].decode("utf-8"))
         self.assertEqual("PLAN_ACTIVATED", terminal["type"])
+        self.assertEqual([1.0, 0.0], terminal["waypoint_zero"])
+        self.assertEqual([1.0, 0.0], terminal["current_target"])
+        self.assertEqual(1, terminal["waypoint_count"])
+        self.assertEqual(1, terminal["waypoint_offset_count"])
+        self.assertEqual(0, terminal["waypoint_index"])
+
+    def test_advance_grant_protocol_rejects_stale_reordered_and_wrong_index(self):
+        controller = self.controller_with_messages([])
+        controller._active_plan_epoch = 7
+        controller.navigator.active_plan_epoch = 7
+        controller.navigator.set_waypoints([(1.0, 0.0), (2.0, 0.0)])
+        def grant(epoch, index, seq, valid_until):
+            return json.dumps({'target_robot': 1, 'command': {
+                'type': 'advance_grant', 'plan_epoch': epoch,
+                'waypoint_index': index, 'grant_seq': seq,
+                'valid_until': valid_until,
+                'validator_evidence': 'test_clear'}})
+        controller.receiver = FakeReceiver([
+            grant(6, 0, 1, 10.0),       # old epoch
+            grant(7, 2, 2, 10.0),       # skips current + next
+            grant(7, 0, 3, 0.5),        # expired
+            grant(7, 0, 4, 10.0),       # accepted
+            grant(7, 1, 4, 10.0),       # duplicate sequence
+            grant(7, 1, 3, 10.0),       # reordered sequence
+        ])
+        controller._receive_commands()
+        self.assertEqual(4, controller.navigator.advance_grant_seq)
+        self.assertEqual({0}, set(controller.navigator.advance_grants))
+
+    def test_abort_clears_activated_epoch_grants(self):
+        controller = self.controller_with_messages([])
+        controller._active_plan_epoch = 11
+        controller.navigator.active_plan_epoch = 11
+        controller.navigator.advance_grant_seq = 5
+        controller.navigator.advance_grants = {0: {
+            'plan_epoch': 11, 'grant_seq': 5, 'valid_until': 10.0}}
+        controller._prepared_joint_plans = {11: {
+            'path_version': 5, 'rollback_snapshot': {
+                'active_epoch': 4, 'waypoints': [(9.0, 0.0)],
+                'waypoint_index': 0}}}
+        controller.receiver = FakeReceiver([json.dumps({
+            'target_robot': 1,
+            'command': {'type': 'abort_plan', 'plan_epoch': 11}})])
+        controller._receive_commands()
+        self.assertEqual(4, controller.navigator.active_plan_epoch)
+        self.assertEqual({}, controller.navigator.advance_grants)
+        self.assertEqual(-1, controller.navigator.advance_grant_seq)
 
     def test_abort_after_activation_restores_old_execution_snapshot(self):
         prepare = json.dumps({"target_robot": 1, "command": {
@@ -307,6 +630,46 @@ class RobotProtocolTests(unittest.TestCase):
         self.assertLess(factor, 1.0)
         self.assertEqual([(2.0, 0.0)], navigator.waypoints)
         self.assertEqual(0, navigator.current_waypoint_idx)
+
+    def test_stale_peer_pose_stops_motion(self):
+        navigator = WaypointNavigator()
+        navigator.robot_id = 1
+        navigator.set_waypoints([(2.0, 0.0)])
+        navigator.speed_scale = 1.0
+        navigator.peer_samples = {2: {
+            'position': [1.0, 0.0], 'velocity': [0.0, 0.0],
+            'sample_time': 0.0, 'seq': 1}}
+        self.assertEqual(0.0, navigator._peer_predictive_speed_factor(
+            0.0, 0.0, 0.0, 1.0))
+
+    def test_out_of_order_peer_snapshot_cannot_replace_newer_state(self):
+        newer = json.dumps({"target_robot": 1, "command": {
+            "type": "peer_positions", "broadcast_seq": 2,
+            "positions": {"2": [2.0, 0.0]},
+            "samples": {"2": {"position": [2.0, 0.0], "velocity": [0, 0],
+                                  "sample_time": 2.0, "seq": 2}}}})
+        older = json.dumps({"target_robot": 1, "command": {
+            "type": "peer_positions", "broadcast_seq": 1,
+            "positions": {"2": [1.0, 0.0]},
+            "samples": {"2": {"position": [1.0, 0.0], "velocity": [0, 0],
+                                  "sample_time": 1.0, "seq": 1}}}})
+        controller = self.controller_with_messages([newer, older])
+        controller._receive_commands()
+        self.assertEqual((2.0, 0.0), controller.navigator.peer_positions[2])
+        self.assertEqual(2, controller.navigator.peer_samples[2]['seq'])
+
+    def test_new_peer_snapshot_removes_absent_peer(self):
+        first = json.dumps({"target_robot": 1, "command": {
+            "type": "peer_positions", "broadcast_seq": 1,
+            "positions": {"2": [2.0, 0.0]},
+            "samples": {"2": {"position": [2.0, 0.0], "velocity": [0, 0],
+                                  "sample_time": 1.0, "seq": 1}}}})
+        second = json.dumps({"target_robot": 1, "command": {
+            "type": "peer_positions", "broadcast_seq": 2,
+            "positions": {}, "samples": {}}})
+        controller = self.controller_with_messages([first, second])
+        controller._receive_commands()
+        self.assertEqual({}, controller.navigator.peer_samples)
 
 
 if __name__ == "__main__":

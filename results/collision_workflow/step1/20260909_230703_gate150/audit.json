@@ -1,0 +1,48 @@
+{
+  "schema": "collision-workflow-audit-v1",
+  "status": "PASS",
+  "identity": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "seed": 42,
+    "run_mode": "webots"
+  },
+  "motion_safety_fingerprint": "15997276b22185af9d3cdabba663992ced9fdf46e081d41f4d3552617fd141d2",
+  "duration": 150.0000000000039,
+  "safety": {
+    "min_pair_distance": 0.5485229547106126,
+    "pair_distance_violations": 0,
+    "nonphysical_recoveries": 0,
+    "unsafe_reasons": []
+  },
+  "replans": {
+    "total": 48,
+    "by_source": {
+      "_command_reverse": 33,
+      "_joint_stall_recovery": 9,
+      "_priority_yield_direct": 6
+    },
+    "by_category": {
+      "escape_triggered": 33,
+      "other": 6,
+      "stall_recovery": 9
+    }
+  },
+  "route_dispatches": {
+    "total": 252,
+    "by_source": {
+      "_command_reverse": 33,
+      "_joint_stall_recovery": 9,
+      "_priority_yield_direct": 6,
+      "joint_grid_transaction": 204
+    },
+    "by_category": {
+      "escape_recovery": 33,
+      "other": 6,
+      "rolling_joint": 204,
+      "stall_recovery": 9
+    },
+    "unauthorized": 0
+  },
+  "physical_escapes": 42
+}

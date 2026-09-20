@@ -1,0 +1,48 @@
+
+############################################################
+SMART FACTORY MULTI-ROBOT EXPERIMENT SUITE
+Scenarios: ['C']
+Schedulers: ['FCFS']
+Seeds: [44]
+Total experiments: 1
+############################################################
+
+
+[1/1] 
+============================================================
+Running: Scenario C | Scheduler: FCFS | Seed: 44
+============================================================
+Launching Webots simulation (wall timeout: 480s)...
+.25)
+[Nav 1] ¡ú Waypoint 4/7 (-3.00,-3.25)
+[Nav 5] ¡ú Waypoint 3/7 (-1.50,2.00)
+[T=180.0s] Tasks: 1/18 completed | Pending: 9 | Robots idle/active: 0/8 | Conflicts: 0
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: factory_supervisor: Terminating.
+
+================================================================================
+EXPERIMENTAL COMPARISON REPORT
+Learning-Based vs Rule-Based Scheduling for Multi-Robot Coordination
+================================================================================
+
+©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+SCENARIO C: 8 robots, high task arrival rate (1 task per 8 seconds)
+Paired seeds: [44] | mode: webots
+©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
+Scheduler              Throughput    Avg Compl     Avg Wait     Idle %  Conflicts
+                      (tasks/min)    (seconds)    (seconds)                      
+--------------------------------------------------------------------------------
+FCFS                         0.33       105.74         0.00       10.1        0.0
+  valid seeds=1/1; throughput std=0.000, median=0.333, min=0.333, max=0.333
+  scheduling latency across runs: P95 mean=0.1002 ms, P99 mean=0.1002 ms
+
+================================================================================
+
+Report saved to: D:\code\smart_factory_scheduler\scripts\..\results\comparison_report.txt

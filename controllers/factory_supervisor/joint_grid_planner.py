@@ -28,6 +28,10 @@ class JointGridPlan:
     order: Tuple[int, ...]
     expanded_nodes: int
     time_slot_seconds: float
+    score: Tuple[float, ...] = ()
+    orders_evaluated: int = 1
+    generation: int = 0
+    input_snapshot: tuple = ()
 
 
 class JointGridPlanner:
@@ -57,11 +61,19 @@ class JointGridPlanner:
         self.max_expansions_per_robot = int(max_expansions_per_robot)
         self.last_failure_reason = None
         self._static_heuristic_cache = {}
+        radius = self._conflict_radius_cells()
+        self._conflict_offsets = tuple(
+            (dc, dr)
+            for dc in range(-radius, radius + 1)
+            for dr in range(-radius, radius + 1)
+            if self._cells_conflict((0, 0), (dc, dr)))
 
     def plan(self, agents: Dict[int, Tuple[Tuple[float, float],
                                            Tuple[float, float]]],
              *, max_seconds: float = 0.20,
-             priority_order: Optional[Tuple[int, ...]] = None
+             priority_order: Optional[Tuple[int, ...]] = None,
+             blocked_cells: Optional[set] = None,
+             blocked_cells_by_slot: Optional[Dict[int, set]] = None
              ) -> Optional[JointGridPlan]:
         started = time.perf_counter()
         self.last_failure_reason = None
@@ -81,6 +93,7 @@ class JointGridPlanner:
 
         total_expanded = 0
         seen_orders = set()
+        evaluated = 0
         for order in orders:
             if order in seen_orders:
                 continue
@@ -89,7 +102,8 @@ class JointGridPlanner:
                 self.last_failure_reason = "timeout"
                 break
             candidate, expanded = self._plan_order(
-                order, agents, started, max_seconds)
+                order, agents, started, max_seconds, blocked_cells or set(),
+                blocked_cells_by_slot or {})
             total_expanded += expanded
             if candidate is None:
                 continue
@@ -97,19 +111,56 @@ class JointGridPlanner:
                 candidate, 0.0, order, expanded, self.time_slot_seconds)
             if not self.validate(candidate_plan):
                 continue
+            evaluated += 1
+            score = self._candidate_score(candidate, agents)
             elapsed = time.perf_counter() - started
-            return JointGridPlan(candidate, elapsed, order, total_expanded,
-                                 self.time_slot_seconds)
+            # The configured priority order is the fast path. Alternative
+            # deterministic orders are reached only after earlier orders
+            # fail planning or validation; they are fallbacks, not a reason
+            # to delay or replace an already safe preferred candidate.
+            return JointGridPlan(
+                candidate, elapsed, order, total_expanded,
+                self.time_slot_seconds, score, evaluated)
 
         if self.last_failure_reason is None:
             self.last_failure_reason = "no_solution"
         return None
 
-    def _plan_order(self, order, agents, started, max_seconds):
+    def _candidate_score(self, paths, agents) -> Tuple[float, ...]:
+        """Stable fleet cost: movement, wait, worst detour, then order IDs."""
+        total_moves = 0
+        total_waits = 0
+        worst_detour = 1.0
+        for rid, timed in paths.items():
+            cells = [step.cell for step in timed]
+            moves = sum(a != b for a, b in zip(cells, cells[1:]))
+            waits = max(0, len(cells) - 1 - moves)
+            total_moves += moves
+            total_waits += waits
+            start, goal = agents[rid]
+            direct_cells = max(1.0, (
+                abs(goal[0] - start[0]) + abs(goal[1] - start[1])) /
+                GRID_RES)
+            worst_detour = max(worst_detour, moves / direct_cells)
+        return (float(total_moves), float(total_waits),
+                float(worst_detour))
+
+    def _plan_order(self, order, agents, started, max_seconds, blocked_cells,
+                    blocked_cells_by_slot):
         vertex: Dict[Tuple[Cell, int], int] = {}
         edges: Dict[int, List[Tuple[Cell, Cell, int]]] = {}
         result: Dict[int, List[TimedCell]] = {}
         expanded_total = 0
+        # A robot executing a validated physical escape is not writable by
+        # this transaction. Reserve its current/remaining corridor for every
+        # rolling slot so peers can continue planning safely around it.
+        for cell in blocked_cells:
+            for slot in range(self.horizon_slots + 1):
+                vertex[(cell, slot)] = -1
+        for slot, cells in blocked_cells_by_slot.items():
+            if 0 <= int(slot) <= self.horizon_slots:
+                for cell in cells:
+                    vertex[(cell, int(slot))] = -1
         for rid in order:
             start_xy, goal_xy = agents[rid]
             start = self.grid.world_to_grid(*start_xy)
@@ -182,8 +233,6 @@ class JointGridPlanner:
                 state = (nxt, next_slot)
                 if dc == 0 and dr == 0:
                     step_cost = 1.5
-                elif dc and dr:
-                    step_cost = math.sqrt(2.0)
                 else:
                     step_cost = 1.0
                 tentative = g_score[(cell, slot)] + step_cost
@@ -251,22 +300,19 @@ class JointGridPlanner:
         if self.minimum_distance_m is None:
             return ((first[0] - second[0]) ** 2 +
                     (first[1] - second[1]) ** 2) <= self.separation_cells ** 2
-        first_xy = self.grid.grid_to_world(*first)
-        second_xy = self.grid.grid_to_world(*second)
-        return (math.hypot(first_xy[0] - second_xy[0],
-                           first_xy[1] - second_xy[1]) <=
-                self.minimum_distance_m)
+        # OccupancyGrid is uniform, so this is exactly the world-space
+        # Euclidean test without two grid_to_world calls and a square root.
+        # This function is in the innermost space-time A* conflict loop.
+        dx = (first[0] - second[0]) * GRID_RES
+        dy = (first[1] - second[1]) * GRID_RES
+        return dx * dx + dy * dy <= self.minimum_distance_m ** 2
 
     def _vertex_conflict(self, cell, slot, rid, vertex):
-        radius = self._conflict_radius_cells()
-        for dc in range(-radius, radius + 1):
-            for dr in range(-radius, radius + 1):
-                neighbour = (cell[0] + dc, cell[1] + dr)
-                owner = vertex.get((neighbour, slot))
-                if owner is None or owner == rid:
-                    continue
-                if self._cells_conflict(cell, neighbour):
-                    return True
+        for dc, dr in self._conflict_offsets:
+            neighbour = (cell[0] + dc, cell[1] + dr)
+            owner = vertex.get((neighbour, slot))
+            if owner is not None and owner != rid:
+                return True
         return False
 
     def _edge_conflict(self, first, second, slot, rid, edges):
@@ -338,11 +384,6 @@ class JointGridPlanner:
         if self.grid.cells[cell[1]][cell[0]] == CELL_OBSTACLE:
             return False
         return self.grid.is_free(*cell) or cell in endpoint_cells
-
-    def _diagonal_clear(self, cell, dc, dr, endpoint_cells):
-        return (self._traversable((cell[0] + dc, cell[1]), endpoint_cells)
-                and self._traversable(
-                    (cell[0], cell[1] + dr), endpoint_cells))
 
     @staticmethod
     def _heuristic(first: Cell, second: Cell) -> float:

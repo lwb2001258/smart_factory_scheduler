@@ -1,0 +1,6648 @@
+{
+  "inputs": {
+    "animation": "results\\webots_diagnostic_C_FCFS_20260915_140128.json",
+    "experiment": "results\\experiment_C_FCFS_20260915_140128.json",
+    "x3d": "results\\webots_diagnostic_C_FCFS_20260915_140128.x3d"
+  },
+  "settings": {
+    "min_stop_seconds": 2.0,
+    "movement_epsilon_m": 0.03,
+    "rotation_epsilon_rad": 0.1,
+    "pose_epsilon_m": 0.005
+  },
+  "summary": {
+    "stop_intervals": 82,
+    "active_stop_intervals": 76,
+    "unexplained_active_intervals": 62,
+    "max_concurrent_motion_expected_stops": 6,
+    "mass_stop_threshold": 3,
+    "mass_stop_seconds": 51.84,
+    "max_concurrent_abnormal_stops": 5,
+    "abnormal_mass_stop_seconds": 37.28,
+    "rotating_in_place_intervals": 37,
+    "max_concurrent_pose_stationary_abnormal_stops": 1,
+    "pose_stationary_abnormal_mass_stop_seconds": 0
+  },
+  "mass_stop_intervals": [
+    {
+      "started_at": 49.344,
+      "ended_at": 50.08,
+      "duration": 0.736,
+      "robot_ids": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "started_at": 50.112,
+      "ended_at": 51.36,
+      "duration": 1.248,
+      "robot_ids": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "started_at": 55.36,
+      "ended_at": 56.32,
+      "duration": 0.96,
+      "robot_ids": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "started_at": 56.96,
+      "ended_at": 57.344,
+      "duration": 0.384,
+      "robot_ids": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "started_at": 60.288,
+      "ended_at": 61.472,
+      "duration": 1.184,
+      "robot_ids": [
+        1,
+        3,
+        4
+      ]
+    },
+    {
+      "started_at": 61.472,
+      "ended_at": 61.984,
+      "duration": 0.512,
+      "robot_ids": [
+        1,
+        3,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 61.984,
+      "ended_at": 62.016,
+      "duration": 0.032,
+      "robot_ids": [
+        3,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 62.016,
+      "ended_at": 62.88,
+      "duration": 0.864,
+      "robot_ids": [
+        1,
+        3,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 62.88,
+      "ended_at": 63.456,
+      "duration": 0.576,
+      "robot_ids": [
+        1,
+        3,
+        6
+      ]
+    },
+    {
+      "started_at": 63.744,
+      "ended_at": 64.128,
+      "duration": 0.384,
+      "robot_ids": [
+        1,
+        3,
+        4
+      ]
+    },
+    {
+      "started_at": 65.152,
+      "ended_at": 65.408,
+      "duration": 0.256,
+      "robot_ids": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "started_at": 70.208,
+      "ended_at": 70.368,
+      "duration": 0.16,
+      "robot_ids": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 70.368,
+      "ended_at": 72.224,
+      "duration": 1.856,
+      "robot_ids": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 72.224,
+      "ended_at": 72.96,
+      "duration": 0.736,
+      "robot_ids": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "started_at": 73.184,
+      "ended_at": 73.632,
+      "duration": 0.448,
+      "robot_ids": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "started_at": 94.368,
+      "ended_at": 94.656,
+      "duration": 0.288,
+      "robot_ids": [
+        4,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 102.624,
+      "ended_at": 104.352,
+      "duration": 1.728,
+      "robot_ids": [
+        2,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 104.704,
+      "ended_at": 105.248,
+      "duration": 0.544,
+      "robot_ids": [
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "started_at": 105.248,
+      "ended_at": 107.616,
+      "duration": 2.368,
+      "robot_ids": [
+        3,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "started_at": 107.616,
+      "ended_at": 108.32,
+      "duration": 0.704,
+      "robot_ids": [
+        3,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 108.416,
+      "ended_at": 109.376,
+      "duration": 0.96,
+      "robot_ids": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "started_at": 109.376,
+      "ended_at": 109.6,
+      "duration": 0.224,
+      "robot_ids": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "started_at": 109.6,
+      "ended_at": 109.824,
+      "duration": 0.224,
+      "robot_ids": [
+        1,
+        2,
+        3,
+        4,
+        8
+      ]
+    },
+    {
+      "started_at": 109.824,
+      "ended_at": 110.368,
+      "duration": 0.544,
+      "robot_ids": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 110.368,
+      "ended_at": 111.136,
+      "duration": 0.768,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 111.136,
+      "ended_at": 112.256,
+      "duration": 1.12,
+      "robot_ids": [
+        1,
+        2,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 112.256,
+      "ended_at": 112.448,
+      "duration": 0.192,
+      "robot_ids": [
+        1,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 129.728,
+      "ended_at": 131.968,
+      "duration": 2.24,
+      "robot_ids": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "started_at": 136.736,
+      "ended_at": 137.28,
+      "duration": 0.544,
+      "robot_ids": [
+        2,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 137.28,
+      "ended_at": 137.6,
+      "duration": 0.32,
+      "robot_ids": [
+        2,
+        3,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 137.6,
+      "ended_at": 137.824,
+      "duration": 0.224,
+      "robot_ids": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "started_at": 137.824,
+      "ended_at": 138.848,
+      "duration": 1.024,
+      "robot_ids": [
+        2,
+        3,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 138.848,
+      "ended_at": 138.976,
+      "duration": 0.128,
+      "robot_ids": [
+        2,
+        3,
+        6
+      ]
+    },
+    {
+      "started_at": 138.976,
+      "ended_at": 140.224,
+      "duration": 1.248,
+      "robot_ids": [
+        2,
+        3,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 140.224,
+      "ended_at": 141.216,
+      "duration": 0.992,
+      "robot_ids": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 141.216,
+      "ended_at": 141.504,
+      "duration": 0.288,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 141.504,
+      "ended_at": 142.368,
+      "duration": 0.864,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "started_at": 142.368,
+      "ended_at": 143.392,
+      "duration": 1.024,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        7
+      ]
+    },
+    {
+      "started_at": 143.392,
+      "ended_at": 143.488,
+      "duration": 0.096,
+      "robot_ids": [
+        2,
+        4,
+        7
+      ]
+    },
+    {
+      "started_at": 145.344,
+      "ended_at": 145.92,
+      "duration": 0.576,
+      "robot_ids": [
+        2,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 147.68,
+      "ended_at": 148.0,
+      "duration": 0.32,
+      "robot_ids": [
+        2,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 152.448,
+      "ended_at": 152.928,
+      "duration": 0.48,
+      "robot_ids": [
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 152.928,
+      "ended_at": 154.688,
+      "duration": 1.76,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 154.688,
+      "ended_at": 155.2,
+      "duration": 0.512,
+      "robot_ids": [
+        2,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 155.2,
+      "ended_at": 155.36,
+      "duration": 0.16,
+      "robot_ids": [
+        2,
+        4,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 155.36,
+      "ended_at": 155.456,
+      "duration": 0.096,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 155.456,
+      "ended_at": 155.52,
+      "duration": 0.064,
+      "robot_ids": [
+        1,
+        2,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 155.52,
+      "ended_at": 155.904,
+      "duration": 0.384,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 155.904,
+      "ended_at": 157.536,
+      "duration": 1.632,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 157.536,
+      "ended_at": 157.6,
+      "duration": 0.064,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 157.6,
+      "ended_at": 157.632,
+      "duration": 0.032,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 157.632,
+      "ended_at": 157.792,
+      "duration": 0.16,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 157.792,
+      "ended_at": 158.592,
+      "duration": 0.8,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 158.592,
+      "ended_at": 158.688,
+      "duration": 0.096,
+      "robot_ids": [
+        1,
+        2,
+        5,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 158.688,
+      "ended_at": 158.752,
+      "duration": 0.064,
+      "robot_ids": [
+        1,
+        2,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 158.752,
+      "ended_at": 159.808,
+      "duration": 1.056,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 159.808,
+      "ended_at": 159.84,
+      "duration": 0.032,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 159.84,
+      "ended_at": 160.64,
+      "duration": 0.8,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 160.64,
+      "ended_at": 162.176,
+      "duration": 1.536,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 162.176,
+      "ended_at": 162.24,
+      "duration": 0.064,
+      "robot_ids": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "started_at": 162.24,
+      "ended_at": 162.368,
+      "duration": 0.128,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 162.368,
+      "ended_at": 162.528,
+      "duration": 0.16,
+      "robot_ids": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "started_at": 162.56,
+      "ended_at": 163.776,
+      "duration": 1.216,
+      "robot_ids": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "started_at": 163.776,
+      "ended_at": 164.832,
+      "duration": 1.056,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 164.832,
+      "ended_at": 165.44,
+      "duration": 0.608,
+      "robot_ids": [
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 165.44,
+      "ended_at": 166.368,
+      "duration": 0.928,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 166.368,
+      "ended_at": 166.752,
+      "duration": 0.384,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 166.752,
+      "ended_at": 166.88,
+      "duration": 0.128,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 166.88,
+      "ended_at": 169.184,
+      "duration": 2.304,
+      "robot_ids": [
+        2,
+        3,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 169.184,
+      "ended_at": 169.248,
+      "duration": 0.064,
+      "robot_ids": [
+        2,
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 169.248,
+      "ended_at": 170.624,
+      "duration": 1.376,
+      "robot_ids": [
+        2,
+        3,
+        5,
+        7,
+        8
+      ]
+    },
+    {
+      "started_at": 170.624,
+      "ended_at": 170.688,
+      "duration": 0.064,
+      "robot_ids": [
+        3,
+        5,
+        7,
+        8
+      ]
+    },
+    {
+      "started_at": 170.688,
+      "ended_at": 171.136,
+      "duration": 0.448,
+      "robot_ids": [
+        3,
+        5,
+        7
+      ]
+    },
+    {
+      "started_at": 176.448,
+      "ended_at": 179.744,
+      "duration": 3.296,
+      "robot_ids": [
+        1,
+        2,
+        7
+      ]
+    }
+  ],
+  "abnormal_mass_stop_intervals": [
+    {
+      "started_at": 55.36,
+      "ended_at": 56.32,
+      "duration": 0.96,
+      "robot_ids": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "started_at": 61.472,
+      "ended_at": 61.984,
+      "duration": 0.512,
+      "robot_ids": [
+        1,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 62.016,
+      "ended_at": 62.88,
+      "duration": 0.864,
+      "robot_ids": [
+        1,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 65.152,
+      "ended_at": 65.408,
+      "duration": 0.256,
+      "robot_ids": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "started_at": 70.368,
+      "ended_at": 72.224,
+      "duration": 1.856,
+      "robot_ids": [
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 94.368,
+      "ended_at": 94.656,
+      "duration": 0.288,
+      "robot_ids": [
+        4,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 102.624,
+      "ended_at": 104.352,
+      "duration": 1.728,
+      "robot_ids": [
+        2,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 104.704,
+      "ended_at": 107.616,
+      "duration": 2.912,
+      "robot_ids": [
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "started_at": 109.376,
+      "ended_at": 111.136,
+      "duration": 1.76,
+      "robot_ids": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "started_at": 129.728,
+      "ended_at": 131.968,
+      "duration": 2.24,
+      "robot_ids": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "started_at": 136.736,
+      "ended_at": 137.6,
+      "duration": 0.864,
+      "robot_ids": [
+        2,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 140.224,
+      "ended_at": 141.504,
+      "duration": 1.28,
+      "robot_ids": [
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 141.504,
+      "ended_at": 143.392,
+      "duration": 1.888,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        7
+      ]
+    },
+    {
+      "started_at": 143.392,
+      "ended_at": 143.488,
+      "duration": 0.096,
+      "robot_ids": [
+        2,
+        4,
+        7
+      ]
+    },
+    {
+      "started_at": 145.344,
+      "ended_at": 145.92,
+      "duration": 0.576,
+      "robot_ids": [
+        2,
+        4,
+        6
+      ]
+    },
+    {
+      "started_at": 155.2,
+      "ended_at": 155.36,
+      "duration": 0.16,
+      "robot_ids": [
+        2,
+        4,
+        8
+      ]
+    },
+    {
+      "started_at": 155.36,
+      "ended_at": 155.456,
+      "duration": 0.096,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        8
+      ]
+    },
+    {
+      "started_at": 155.456,
+      "ended_at": 155.52,
+      "duration": 0.064,
+      "robot_ids": [
+        1,
+        2,
+        8
+      ]
+    },
+    {
+      "started_at": 155.52,
+      "ended_at": 155.904,
+      "duration": 0.384,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        8
+      ]
+    },
+    {
+      "started_at": 155.904,
+      "ended_at": 157.536,
+      "duration": 1.632,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 157.536,
+      "ended_at": 157.6,
+      "duration": 0.064,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 157.6,
+      "ended_at": 157.632,
+      "duration": 0.032,
+      "robot_ids": [
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 157.632,
+      "ended_at": 157.792,
+      "duration": 0.16,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 157.792,
+      "ended_at": 158.592,
+      "duration": 0.8,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 158.592,
+      "ended_at": 158.752,
+      "duration": 0.16,
+      "robot_ids": [
+        1,
+        2,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 158.752,
+      "ended_at": 159.808,
+      "duration": 1.056,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 159.808,
+      "ended_at": 159.84,
+      "duration": 0.032,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 159.84,
+      "ended_at": 160.64,
+      "duration": 0.8,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 160.64,
+      "ended_at": 162.176,
+      "duration": 1.536,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 162.176,
+      "ended_at": 162.24,
+      "duration": 0.064,
+      "robot_ids": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "started_at": 162.24,
+      "ended_at": 162.368,
+      "duration": 0.128,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 162.368,
+      "ended_at": 162.528,
+      "duration": 0.16,
+      "robot_ids": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "started_at": 162.56,
+      "ended_at": 163.776,
+      "duration": 1.216,
+      "robot_ids": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "started_at": 163.776,
+      "ended_at": 164.832,
+      "duration": 1.056,
+      "robot_ids": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 164.832,
+      "ended_at": 165.44,
+      "duration": 0.608,
+      "robot_ids": [
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "started_at": 165.44,
+      "ended_at": 166.368,
+      "duration": 0.928,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "started_at": 166.368,
+      "ended_at": 166.752,
+      "duration": 0.384,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        6,
+        8
+      ]
+    },
+    {
+      "started_at": 166.752,
+      "ended_at": 166.88,
+      "duration": 0.128,
+      "robot_ids": [
+        2,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 166.88,
+      "ended_at": 169.184,
+      "duration": 2.304,
+      "robot_ids": [
+        2,
+        3,
+        4,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 169.184,
+      "ended_at": 169.248,
+      "duration": 0.064,
+      "robot_ids": [
+        2,
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "started_at": 169.248,
+      "ended_at": 170.624,
+      "duration": 1.376,
+      "robot_ids": [
+        2,
+        3,
+        5,
+        7,
+        8
+      ]
+    },
+    {
+      "started_at": 170.624,
+      "ended_at": 170.688,
+      "duration": 0.064,
+      "robot_ids": [
+        3,
+        5,
+        7,
+        8
+      ]
+    },
+    {
+      "started_at": 170.688,
+      "ended_at": 171.136,
+      "duration": 0.448,
+      "robot_ids": [
+        3,
+        5,
+        7
+      ]
+    },
+    {
+      "started_at": 176.448,
+      "ended_at": 179.744,
+      "duration": 3.296,
+      "robot_ids": [
+        1,
+        2,
+        7
+      ]
+    }
+  ],
+  "pose_stationary_abnormal_mass_stop_intervals": [],
+  "stops": [
+    {
+      "robot_id": 2,
+      "started_at": 0.0,
+      "ended_at": 3.072,
+      "duration": 3.072,
+      "position": [
+        -4.0265,
+        -3.0104
+      ],
+      "max_yaw_change_rad": 0.5948,
+      "max_translation_change_m": 0.02847,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 2,
+        "path_version": 1,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "turning",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 1.9879999999999995,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 3.84,
+        "heading": 0.5511170677110406,
+        "controller_target": [
+          -4.25,
+          -2.75
+        ],
+        "controller_target_distance": 0.3260482314070131,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 2.6440000000000015,
+        "hold_until": 0.0,
+        "sample_time": 4.000000000000003
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 2.672000000000002,
+          "robot_id": 2,
+          "path_version": 1,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 2,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 0.0,
+      "ended_at": 4.448,
+      "duration": 4.448,
+      "position": [
+        4.0265,
+        3.0104
+      ],
+      "max_yaw_change_rad": 0.5948,
+      "max_translation_change_m": 0.02847,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 3,
+        "goal_location": "WS3",
+        "plan_source": null,
+        "plan_epoch": null,
+        "path_version": 0,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 3.84,
+        "heading": 3.1415899986838585,
+        "controller_target": [
+          6.0,
+          3.25
+        ],
+        "controller_target_distance": 2.0155181643849884,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 4.000000000000003
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 4.048000000000003,
+          "robot_id": 3,
+          "path_version": 1,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 3,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 0.0,
+      "ended_at": 16.064,
+      "duration": 16.064,
+      "position": [
+        4.0249,
+        -2.9905
+      ],
+      "max_yaw_change_rad": 0.5779,
+      "max_translation_change_m": 0.02665,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "idle",
+        "task_id": null,
+        "goal_location": null,
+        "plan_source": null,
+        "plan_epoch": null,
+        "path_version": 0,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 7.84,
+        "heading": 3.1415899986838536,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 8.000000000000005
+      },
+      "motion_expected": false,
+      "evidence": [
+        {
+          "sim_time": 15.680000000000012,
+          "robot_id": 4,
+          "path_version": 1,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 5,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "idle"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 0.0,
+      "ended_at": 18.848,
+      "duration": 18.848,
+      "position": [
+        -6.9783,
+        -0.019
+      ],
+      "max_yaw_change_rad": 0.5196,
+      "max_translation_change_m": 0.02884,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "idle",
+        "task_id": null,
+        "goal_location": null,
+        "plan_source": null,
+        "plan_epoch": null,
+        "path_version": 0,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 7.84,
+        "heading": 1.570800497201033,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 8.000000000000005
+      },
+      "motion_expected": false,
+      "evidence": [
+        {
+          "sim_time": 18.35199999999975,
+          "robot_id": 5,
+          "path_version": 1,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 6,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "idle"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 0.0,
+      "ended_at": 44.32,
+      "duration": 44.32,
+      "position": [
+        7.0,
+        -0.0299
+      ],
+      "max_yaw_change_rad": 0.0,
+      "max_translation_change_m": 0.0299,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "idle",
+        "task_id": null,
+        "goal_location": null,
+        "plan_source": null,
+        "plan_epoch": null,
+        "path_version": 0,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 23.84,
+        "heading": 1.5708004998345906,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 23.99999999999913
+      },
+      "motion_expected": false,
+      "evidence": [
+        {
+          "sim_time": 43.90399999999694,
+          "robot_id": 6,
+          "path_version": 1,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 17,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "idle"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 0.0,
+      "ended_at": 24.32,
+      "duration": 24.32,
+      "position": [
+        -8.472,
+        1.2
+      ],
+      "max_yaw_change_rad": 0.0001,
+      "max_translation_change_m": 0.028,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "idle",
+        "task_id": null,
+        "goal_location": null,
+        "plan_source": null,
+        "plan_epoch": null,
+        "path_version": 0,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 11.84,
+        "heading": -0.0014121185970020788,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 12.000000000000009
+      },
+      "motion_expected": false,
+      "evidence": [
+        {
+          "sim_time": 23.519999999999182,
+          "robot_id": 7,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.487999999999396,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 24.111999999999117,
+          "robot_id": 7,
+          "path_version": 1,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 9,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 0.0,
+      "ended_at": 49.632,
+      "duration": 49.632,
+      "position": [
+        8.4712,
+        -1.2002
+      ],
+      "max_yaw_change_rad": 0.0062,
+      "max_translation_change_m": 0.0288,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "idle",
+        "task_id": null,
+        "goal_location": null,
+        "plan_source": null,
+        "plan_epoch": null,
+        "path_version": 0,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 23.84,
+        "heading": 3.1415899986838376,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 23.99999999999913
+      },
+      "motion_expected": false,
+      "evidence": [
+        {
+          "sim_time": 48.52799999999643,
+          "robot_id": 8,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.0079999999994484,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 49.11999999999637,
+          "robot_id": 8,
+          "path_version": 1,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 19,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 18.432,
+      "ended_at": 23.104,
+      "duration": 4.672,
+      "position": [
+        -4.3267,
+        -1.4527
+      ],
+      "max_yaw_change_rad": 0.1456,
+      "max_translation_change_m": 0.02892,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 2,
+        "path_version": 1,
+        "controller_waypoint_index": 0,
+        "planned_wait": true,
+        "wait_reason": "joint_window_endpoint",
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "joint_window_endpoint",
+        "controller_local_risk_level": "planned_wait",
+        "controller_status_sample_time": 19.84,
+        "heading": 1.6207879986912606,
+        "controller_target": [
+          -4.25,
+          -1.25
+        ],
+        "controller_target_distance": 0.21925039005148733,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 20.34,
+        "controller_joint_wait_reason": "joint_window_endpoint",
+        "dispatch_not_before": 2.6440000000000015,
+        "hold_until": 0.0,
+        "sample_time": 19.99999999999957
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "robot_id": 2,
+          "started_at": 19.99999999999957,
+          "last_seen_at": 19.99999999999957,
+          "reason": "joint_window_endpoint",
+          "deadline": 20.34,
+          "max_deadline": 20.34,
+          "task_id": 2,
+          "plan_epoch": 2,
+          "plan_source": "joint_grid_transaction",
+          "path_version": 1,
+          "goal_location": "S2",
+          "ended_at": 23.99999999999913,
+          "duration": 3.9999999999995595,
+          "outcome": "deadline_expired",
+          "_event_stream": "planned_wait_events"
+        },
+        {
+          "sim_time": 22.111999999999338,
+          "robot_id": 2,
+          "path_version": 2,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 8,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "planned_wait:joint_window_endpoint"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 33.504,
+      "ended_at": 36.8,
+      "duration": 3.296,
+      "position": [
+        4.4585,
+        3.1059
+      ],
+      "max_yaw_change_rad": 0.125,
+      "max_translation_change_m": 0.03,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_delivery",
+        "task_id": 3,
+        "goal_location": "S7",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 12,
+        "path_version": 3,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.16002209424746447,
+        "controller_angular_speed": 1.087660503261976,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 35.84,
+        "heading": 3.061958937800421,
+        "controller_target": [
+          4.25,
+          3.0
+        ],
+        "controller_target_distance": 0.2354252053106452,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 33.58799999999813,
+        "hold_until": 0.0,
+        "sample_time": 35.99999999999781
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 33.615999999998074,
+          "robot_id": 3,
+          "path_version": 3,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 12,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 37.11999999999769,
+          "robot_id": 3,
+          "path_version": 4,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 13,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 40.672,
+      "ended_at": 43.616,
+      "duration": 2.944,
+      "position": [
+        -5.0684,
+        0.8439
+      ],
+      "max_yaw_change_rad": 0.2958,
+      "max_translation_change_m": 0.02931,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 16,
+        "path_version": 7,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "turning",
+        "controller_linear_speed": -0.01875657273911802,
+        "controller_angular_speed": 0.34506,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 43.84,
+        "heading": 2.349010302724841,
+        "controller_target": [
+          -4.75,
+          0.75
+        ],
+        "controller_target_distance": 0.3229286058578171,
+        "controller_paused_until": 43.03199999999715,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 41.58799999999725,
+        "hold_until": 0.0,
+        "sample_time": 43.99999999999693
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 42.03199999999715,
+          "robot_id": 1,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.311999999999415,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 42.03199999999715,
+          "event_type": "yield_start",
+          "robot_id": 1,
+          "winner": 5,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 42.03199999999715,
+          "event_type": "yield_wait_start",
+          "robot_id": 1,
+          "winner": 5,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 41.61599999999719,
+          "robot_id": 1,
+          "path_version": 7,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 16,
+          "waypoint_count": 13,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 42.112,
+      "ended_at": 45.184,
+      "duration": 3.072,
+      "position": [
+        -6.9295,
+        0.2386
+      ],
+      "max_yaw_change_rad": 0.5139,
+      "max_translation_change_m": 0.0297,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "idle",
+        "task_id": null,
+        "goal_location": null,
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 15,
+        "path_version": 4,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 43.84,
+        "heading": 1.4844166620943637,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 39.58799999999747,
+        "hold_until": 0.0,
+        "sample_time": 43.99999999999693
+      },
+      "motion_expected": false,
+      "evidence": [
+        {
+          "sim_time": 44.71999999999685,
+          "robot_id": 7,
+          "path_version": 5,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 18,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "idle"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 46.4,
+      "ended_at": 50.08,
+      "duration": 3.68,
+      "position": [
+        -4.9846,
+        0.8202
+      ],
+      "max_yaw_change_rad": 0.7812,
+      "max_translation_change_m": 0.02897,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 16,
+        "path_version": 7,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "turning",
+        "controller_linear_speed": -0.004544100000000006,
+        "controller_angular_speed": 0.34506,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 47.84,
+        "heading": 1.5497992253140558,
+        "controller_target": [
+          -4.75,
+          0.75
+        ],
+        "controller_target_distance": 0.2640318789403807,
+        "controller_paused_until": 43.03199999999715,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 41.58799999999725,
+        "hold_until": 0.0,
+        "sample_time": 47.99999999999649
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 47.776,
+      "ended_at": 52.608,
+      "duration": 4.832,
+      "position": [
+        -5.2457,
+        0.0803
+      ],
+      "max_yaw_change_rad": 0.6905,
+      "max_translation_change_m": 0.02874,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 20,
+        "path_version": 6,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "turning",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": -1.1182499999999997,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 51.84,
+        "heading": 0.28358826646167556,
+        "controller_target": [
+          -5.25,
+          -0.25
+        ],
+        "controller_target_distance": 0.3602178268982427,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 51.58799999999615,
+        "hold_until": 0.0,
+        "sample_time": 51.99999999999605
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 51.02399999999616,
+          "robot_id": 5,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.343999999999411,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 51.215999999996136,
+          "robot_id": 5,
+          "path_version": 5,
+          "plan_epoch": 16,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 51.61599999999609,
+          "robot_id": 5,
+          "path_version": 6,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 20,
+          "waypoint_count": 13,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 49.344,
+      "ended_at": 51.36,
+      "duration": 2.016,
+      "position": [
+        -4.1531,
+        0.7204
+      ],
+      "max_yaw_change_rad": 0.0072,
+      "max_translation_change_m": 0.02993,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 15,
+        "path_version": 6,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.096579694826327,
+        "controller_angular_speed": 0.4582882938416756,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 51.84,
+        "heading": 1.5154351279916563,
+        "controller_target": [
+          -4.25,
+          1.0
+        ],
+        "controller_target_distance": 0.27794453131928143,
+        "controller_paused_until": 51.031999999996266,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 39.58799999999747,
+        "hold_until": 0.0,
+        "sample_time": 51.99999999999605
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 50.031999999996266,
+          "event_type": "yield_start",
+          "robot_id": 2,
+          "winner": 5,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 50.031999999996266,
+          "event_type": "yield_wait_start",
+          "robot_id": 2,
+          "winner": 5,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 50.112,
+      "ended_at": 51.84,
+      "duration": 1.728,
+      "position": [
+        -4.9558,
+        0.8094
+      ],
+      "max_yaw_change_rad": 0.1526,
+      "max_translation_change_m": 0.02975,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 16,
+        "path_version": 7,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.030472847809934464,
+        "controller_angular_speed": -0.2574129894393511,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 51.84,
+        "heading": 1.0843333601313585,
+        "controller_target": [
+          -5.0,
+          0.5
+        ],
+        "controller_target_distance": 0.31216180493902235,
+        "controller_paused_until": 43.03199999999715,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 41.58799999999725,
+        "hold_until": 0.0,
+        "sample_time": 51.99999999999605
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 52.128,
+      "ended_at": 56.32,
+      "duration": 4.192,
+      "position": [
+        -4.9447,
+        0.781
+      ],
+      "max_yaw_change_rad": 0.2128,
+      "max_translation_change_m": 0.02925,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 16,
+        "path_version": 7,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "advance_hold:swept_occupancy:5",
+        "controller_local_risk_level": "planned_wait",
+        "controller_status_sample_time": 55.84,
+        "heading": 1.2838179833942105,
+        "controller_target": [
+          -5.0,
+          0.5
+        ],
+        "controller_target_distance": 0.28875675437960435,
+        "controller_paused_until": 43.03199999999715,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 41.58799999999725,
+        "hold_until": 0.0,
+        "sample_time": 55.99999999999561
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 54.144,
+      "ended_at": 58.368,
+      "duration": 4.224,
+      "position": [
+        -4.1476,
+        0.8123
+      ],
+      "max_yaw_change_rad": 0.0063,
+      "max_translation_change_m": 0.02967,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 15,
+        "path_version": 6,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.09083812567907694,
+        "controller_angular_speed": 0.5945212357085514,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 55.84,
+        "heading": 1.5044850174286333,
+        "controller_target": [
+          -4.25,
+          1.0
+        ],
+        "controller_target_distance": 0.22638148624803625,
+        "controller_paused_until": 51.031999999996266,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 39.58799999999747,
+        "hold_until": 0.0,
+        "sample_time": 55.99999999999561
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 55.36,
+      "ended_at": 57.344,
+      "duration": 1.984,
+      "position": [
+        6.0794,
+        -1.2938
+      ],
+      "max_yaw_change_rad": 0.0006,
+      "max_translation_change_m": 0.0294,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 21,
+        "path_version": 6,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "advance_hold:swept_occupancy:6",
+        "controller_local_risk_level": "planned_wait",
+        "controller_status_sample_time": 55.84,
+        "heading": 1.5649228943191,
+        "controller_target": [
+          6.0,
+          -1.0
+        ],
+        "controller_target_distance": 0.32364797776789994,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 55.58799999999571,
+        "hold_until": 0.0,
+        "sample_time": 55.99999999999561
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 54.89599999999573,
+          "robot_id": 4,
+          "path_version": 5,
+          "plan_epoch": 15,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 56.031999999995605,
+          "event_type": "yield_start",
+          "robot_id": 4,
+          "winner": 6,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 56.031999999995605,
+          "event_type": "yield_wait_start",
+          "robot_id": 4,
+          "winner": 6,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 55.61599999999565,
+          "robot_id": 4,
+          "path_version": 6,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 21,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 56.96,
+      "ended_at": 64.128,
+      "duration": 7.168,
+      "position": [
+        4.1356,
+        1.2129
+      ],
+      "max_yaw_change_rad": 0.0041,
+      "max_translation_change_m": 0.02961,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_delivery",
+        "task_id": 3,
+        "goal_location": "S7",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 15,
+        "path_version": 6,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.15939000910110016,
+        "controller_angular_speed": 1.1006561718924825,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 59.84,
+        "heading": -1.6558346966770694,
+        "controller_target": [
+          4.25,
+          1.0
+        ],
+        "controller_target_distance": 0.2520992310996774,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 39.58799999999747,
+        "hold_until": 0.0,
+        "sample_time": 59.99999999999517
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 61.023999999995056,
+          "robot_id": 3,
+          "lease_generation": 2,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.471999999999397,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 64.03199999999474,
+          "robot_id": 3,
+          "lease_generation": 2,
+          "stage": "hard_escape",
+          "no_progress_seconds": 8.47999999999908,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 64.03199999999474,
+          "robot_id": 3,
+          "source": "_joint_stall_recovery",
+          "plan_epoch": 26,
+          "result": "succeeded",
+          "dispatched": true,
+          "_event_stream": "replan_events"
+        },
+        {
+          "sim_time": 64.03199999999474,
+          "robot_id": 3,
+          "source": "_joint_stall_recovery",
+          "target": [
+            4.25,
+            0.0
+          ],
+          "_event_stream": "escape_events"
+        },
+        {
+          "sim_time": 62.111999999994936,
+          "robot_id": 3,
+          "path_version": 7,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 24,
+          "waypoint_count": 13,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 64.03199999999474,
+          "robot_id": 3,
+          "path_version": 8,
+          "source": "_joint_stall_recovery",
+          "plan_epoch": 26,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:hard_escape,soft_replan"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 59.712,
+      "ended_at": 61.984,
+      "duration": 2.272,
+      "position": [
+        -4.9529,
+        0.7424
+      ],
+      "max_yaw_change_rad": 0.745,
+      "max_translation_change_m": 0.02884,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 16,
+        "path_version": 7,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.035254310035391784,
+        "controller_angular_speed": -0.15133936879570972,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 59.84,
+        "heading": 1.4842273048417824,
+        "controller_target": [
+          -5.0,
+          0.5
+        ],
+        "controller_target_distance": 0.22485540722679187,
+        "controller_paused_until": 43.03199999999715,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 41.58799999999725,
+        "hold_until": 0.0,
+        "sample_time": 59.99999999999517
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 60.6239999999951,
+          "robot_id": 1,
+          "path_version": 8,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 23,
+          "waypoint_count": 13,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 62.111999999994936,
+          "robot_id": 1,
+          "path_version": 9,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 24,
+          "waypoint_count": 12,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 60.288,
+      "ended_at": 62.88,
+      "duration": 2.592,
+      "position": [
+        6.0508,
+        -1.2072
+      ],
+      "max_yaw_change_rad": 0.6567,
+      "max_translation_change_m": 0.02801,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 21,
+        "path_version": 6,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.06357664152096297,
+        "controller_angular_speed": 0.24123449750748757,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 59.84,
+        "heading": 1.596131368026177,
+        "controller_target": [
+          6.0,
+          -1.0
+        ],
+        "controller_target_distance": 0.21795846341231268,
+        "controller_paused_until": 57.031999999995605,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 55.58799999999571,
+        "hold_until": 0.0,
+        "sample_time": 59.99999999999517
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 62.111999999994936,
+          "robot_id": 4,
+          "path_version": 7,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 24,
+          "waypoint_count": 13,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 61.472,
+      "ended_at": 63.456,
+      "duration": 1.984,
+      "position": [
+        6.6047,
+        -0.5329
+      ],
+      "max_yaw_change_rad": 0.4781,
+      "max_translation_change_m": 0.02869,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 24,
+        "path_version": 3,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.04396136974890047,
+        "controller_angular_speed": 0.6134399999999999,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 63.84,
+        "heading": -2.237172968715056,
+        "controller_target": [
+          6.25,
+          -0.5
+        ],
+        "controller_target_distance": 0.33349544271151543,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 62.083999999994994,
+        "hold_until": 0.0,
+        "sample_time": 63.99999999999473
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 62.111999999994936,
+          "robot_id": 6,
+          "path_version": 3,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 24,
+          "waypoint_count": 12,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 62.016,
+      "ended_at": 65.408,
+      "duration": 3.392,
+      "position": [
+        -4.9265,
+        0.7316
+      ],
+      "max_yaw_change_rad": 0.2144,
+      "max_translation_change_m": 0.02991,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 24,
+        "path_version": 9,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": -0.035327984833353844,
+        "controller_angular_speed": 0.61344,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 63.84,
+        "heading": 2.081325555673896,
+        "controller_target": [
+          -4.5,
+          0.75
+        ],
+        "controller_target_distance": 0.4357307735930641,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 62.083999999994994,
+        "hold_until": 0.0,
+        "sample_time": 63.99999999999473
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 62.111999999994936,
+          "robot_id": 1,
+          "path_version": 9,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 24,
+          "waypoint_count": 12,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 63.744,
+      "ended_at": 66.336,
+      "duration": 2.592,
+      "position": [
+        5.9494,
+        -1.215
+      ],
+      "max_yaw_change_rad": 0.7209,
+      "max_translation_change_m": 0.02998,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 24,
+        "path_version": 7,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "turning",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": -0.7156799999999996,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 63.84,
+        "heading": 3.0435747087211094,
+        "controller_target": [
+          6.0,
+          -0.75
+        ],
+        "controller_target_distance": 0.43817871220534116,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 62.083999999994994,
+        "hold_until": 0.0,
+        "sample_time": 63.99999999999473
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 65.1199999999951,
+          "robot_id": 4,
+          "path_version": 8,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 28,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 66.11199999999543,
+          "robot_id": 4,
+          "path_version": 9,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 29,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 65.152,
+      "ended_at": 67.616,
+      "duration": 2.464,
+      "position": [
+        -4.1192,
+        1.2478
+      ],
+      "max_yaw_change_rad": 0.0068,
+      "max_translation_change_m": 0.02996,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 31,
+        "path_version": 10,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.18128445747188074,
+        "controller_angular_speed": 0.49575298072064466,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 67.84,
+        "heading": 1.5021296480680695,
+        "controller_target": [
+          -4.25,
+          2.0
+        ],
+        "controller_target_distance": 0.7243635804817512,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 67.58799999999576,
+        "hold_until": 0.0,
+        "sample_time": 67.99999999999606
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 66.11199999999543,
+          "robot_id": 2,
+          "path_version": 9,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 29,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 67.61599999999594,
+          "robot_id": 2,
+          "path_version": 10,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 31,
+          "waypoint_count": 4,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 67.168,
+      "ended_at": 72.96,
+      "duration": 5.792,
+      "position": [
+        5.8576,
+        -1.2883
+      ],
+      "max_yaw_change_rad": 1.3854,
+      "max_translation_change_m": 0.02773,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 33,
+        "path_version": 10,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "advance_hold:swept_occupancy:6",
+        "controller_local_risk_level": "planned_wait",
+        "controller_status_sample_time": 71.84,
+        "heading": -1.2223210492216996,
+        "controller_target": [
+          6.0,
+          -1.0
+        ],
+        "controller_target_distance": 0.35917417779886046,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 70.59599999999676,
+        "hold_until": 0.0,
+        "sample_time": 71.9999999999974
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 70.62399999999694,
+          "robot_id": 4,
+          "path_version": 10,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 33,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 72.11199999999744,
+          "robot_id": 4,
+          "path_version": 11,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 34,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 70.112,
+      "ended_at": 72.224,
+      "duration": 2.112,
+      "position": [
+        -4.9294,
+        -0.3516
+      ],
+      "max_yaw_change_rad": 0.0038,
+      "max_translation_change_m": 0.02717,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 33,
+        "path_version": 9,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.16030849848471154,
+        "controller_angular_speed": 1.0817258635846156,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 71.84,
+        "heading": 0.06905354586197678,
+        "controller_target": [
+          -4.75,
+          -0.25
+        ],
+        "controller_target_distance": 0.22008936880160448,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 70.59599999999676,
+        "hold_until": 0.0,
+        "sample_time": 71.9999999999974
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 70.62399999999694,
+          "robot_id": 5,
+          "path_version": 9,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 33,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 72.11199999999744,
+          "robot_id": 5,
+          "path_version": 10,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 34,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 70.208,
+      "ended_at": 78.624,
+      "duration": 8.416,
+      "position": [
+        4.1,
+        0.7392
+      ],
+      "max_yaw_change_rad": 0.0463,
+      "max_translation_change_m": 0.02601,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_delivery",
+        "task_id": 3,
+        "goal_location": "S7",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 34,
+        "path_version": 10,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.1590448708624674,
+        "controller_angular_speed": 1.1076944183275577,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 75.84,
+        "heading": -1.5807208663972894,
+        "controller_target": [
+          4.25,
+          0.5
+        ],
+        "controller_target_distance": 0.2898446939031642,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 72.08399999999726,
+        "hold_until": 0.0,
+        "sample_time": 75.99999999999874
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 75.51999999999857,
+          "robot_id": 3,
+          "lease_generation": 2,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.408000000001806,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 78.52799999999958,
+          "robot_id": 3,
+          "lease_generation": 2,
+          "stage": "hard_escape",
+          "no_progress_seconds": 8.41600000000281,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 78.52799999999958,
+          "robot_id": 3,
+          "source": "_joint_stall_recovery",
+          "plan_epoch": 39,
+          "result": "succeeded",
+          "dispatched": true,
+          "_event_stream": "replan_events"
+        },
+        {
+          "sim_time": 78.52799999999958,
+          "robot_id": 3,
+          "source": "_joint_stall_recovery",
+          "target": [
+            4.25,
+            0.0
+          ],
+          "_event_stream": "escape_events"
+        },
+        {
+          "sim_time": 70.62399999999694,
+          "robot_id": 3,
+          "path_version": 9,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 33,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 72.11199999999744,
+          "robot_id": 3,
+          "path_version": 10,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 34,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 76.62399999999894,
+          "robot_id": 3,
+          "path_version": 11,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 37,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 78.52799999999958,
+          "robot_id": 3,
+          "path_version": 12,
+          "source": "_joint_stall_recovery",
+          "plan_epoch": 39,
+          "waypoint_count": 6,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:hard_escape,soft_replan"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 70.368,
+      "ended_at": 73.632,
+      "duration": 3.264,
+      "position": [
+        -4.1089,
+        1.5308
+      ],
+      "max_yaw_change_rad": 0.1234,
+      "max_translation_change_m": 0.02901,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 33,
+        "path_version": 11,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.05655635269192762,
+        "controller_angular_speed": 0.4127805365253174,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 71.84,
+        "heading": 1.5793891214808058,
+        "controller_target": [
+          -4.25,
+          1.75
+        ],
+        "controller_target_distance": 0.27436789106228276,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 70.59599999999676,
+        "hold_until": 0.0,
+        "sample_time": 71.9999999999974
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 70.62399999999694,
+          "robot_id": 2,
+          "path_version": 11,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 33,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 72.11199999999744,
+          "robot_id": 2,
+          "path_version": 12,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 34,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 73.184,
+      "ended_at": 75.968,
+      "duration": 2.784,
+      "position": [
+        -4.81,
+        0.8447
+      ],
+      "max_yaw_change_rad": 0.7079,
+      "max_translation_change_m": 0.02906,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 36,
+        "path_version": 14,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.035403327657373744,
+        "controller_angular_speed": 0.51546,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 75.84,
+        "heading": 1.1529253256282395,
+        "controller_target": [
+          -4.5,
+          0.75
+        ],
+        "controller_target_distance": 0.3237155563704004,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 75.58799999999843,
+        "hold_until": 0.0,
+        "sample_time": 75.99999999999874
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 75.6159999999986,
+          "robot_id": 1,
+          "path_version": 14,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 36,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 76.0,
+      "ended_at": 78.848,
+      "duration": 2.848,
+      "position": [
+        -4.7131,
+        -0.3716
+      ],
+      "max_yaw_change_rad": 0.0395,
+      "max_translation_change_m": 0.02991,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 34,
+        "path_version": 10,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.16321991562296698,
+        "controller_angular_speed": 1.0196342298397194,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 75.84,
+        "heading": 0.0728613249039197,
+        "controller_target": [
+          -4.5,
+          -0.25
+        ],
+        "controller_target_distance": 0.26815473906589166,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 72.08399999999726,
+        "hold_until": 0.0,
+        "sample_time": 75.99999999999874
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 76.62399999999894,
+          "robot_id": 5,
+          "path_version": 11,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 37,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 90.368,
+      "ended_at": 94.656,
+      "duration": 4.288,
+      "position": [
+        5.7819,
+        0.679
+      ],
+      "max_yaw_change_rad": 0.225,
+      "max_translation_change_m": 0.02744,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 46,
+        "path_version": 10,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.05674928045696109,
+        "controller_angular_speed": 0.4089607127119719,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 91.84,
+        "heading": -3.1345534627493365,
+        "controller_target": [
+          5.5,
+          0.5
+        ],
+        "controller_target_distance": 0.3437890765705081,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 89.09200000000294,
+        "hold_until": 0.0,
+        "sample_time": 92.00000000000408
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 94.60800000000495,
+          "robot_id": 6,
+          "path_version": 11,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 49,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 91.872,
+      "ended_at": 94.912,
+      "duration": 3.04,
+      "position": [
+        6.7424,
+        0.1571
+      ],
+      "max_yaw_change_rad": 0.2366,
+      "max_translation_change_m": 0.02912,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 8,
+        "goal_location": "WS1",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 46,
+        "path_version": 10,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.04053097823655393,
+        "controller_angular_speed": 0.4670691246292625,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 91.84,
+        "heading": 2.9549257913065894,
+        "controller_target": [
+          6.5,
+          0.0
+        ],
+        "controller_target_distance": 0.3091184493733899,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 89.09200000000294,
+        "hold_until": 0.0,
+        "sample_time": 92.00000000000408
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 94.60800000000495,
+          "robot_id": 8,
+          "path_version": 11,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 49,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 94.368,
+      "ended_at": 96.704,
+      "duration": 2.336,
+      "position": [
+        5.8955,
+        -0.5527
+      ],
+      "max_yaw_change_rad": 1.127,
+      "max_translation_change_m": 0.02887,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 49,
+        "path_version": 18,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "turning",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": -0.7156799999999996,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 95.84,
+        "heading": -2.795741969077241,
+        "controller_target": [
+          6.0,
+          -0.25
+        ],
+        "controller_target_distance": 0.34253147125007527,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 94.58000000000477,
+        "hold_until": 0.0,
+        "sample_time": 96.00000000000541
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 94.60800000000495,
+          "robot_id": 4,
+          "path_version": 18,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 49,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 98.72,
+      "ended_at": 111.136,
+      "duration": 12.416,
+      "position": [
+        5.8867,
+        -0.433
+      ],
+      "max_yaw_change_rad": 0.0117,
+      "max_translation_change_m": 0.02952,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 49,
+        "path_version": 18,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.0780793813936072,
+        "controller_angular_speed": -0.5397656182939277,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 103.84,
+        "heading": -1.608054744124459,
+        "controller_target": [
+          6.0,
+          -0.25
+        ],
+        "controller_target_distance": 0.22926405023472035,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 94.58000000000477,
+        "hold_until": 0.0,
+        "sample_time": 104.00000000000809
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 111.05600000001044,
+          "robot_id": 4,
+          "path_version": 20,
+          "plan_epoch": 57,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 107.6160000000093,
+          "robot_id": 4,
+          "path_version": 19,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 56,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 108.60800000000962,
+          "robot_id": 4,
+          "path_version": 20,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 57,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 99.808,
+      "ended_at": 104.352,
+      "duration": 4.544,
+      "position": [
+        -2.2046,
+        2.1121
+      ],
+      "max_yaw_change_rad": 0.0049,
+      "max_translation_change_m": 0.02867,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 53,
+        "path_version": 20,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.0574064891865776,
+        "controller_angular_speed": -0.3957024168159729,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 103.84,
+        "heading": 0.06909799415589214,
+        "controller_target": [
+          -2.0,
+          2.0
+        ],
+        "controller_target_distance": 0.24095986948664128,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 102.08400000000728,
+        "hold_until": 0.0,
+        "sample_time": 104.00000000000809
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 102.11200000000746,
+          "robot_id": 2,
+          "path_version": 20,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 53,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 102.624,
+      "ended_at": 108.32,
+      "duration": 5.696,
+      "position": [
+        5.1913,
+        0.646
+      ],
+      "max_yaw_change_rad": 0.0031,
+      "max_translation_change_m": 0.02927,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 49,
+        "path_version": 11,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.05823373820568591,
+        "controller_angular_speed": -0.3784237731082963,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 103.84,
+        "heading": 3.071664789371883,
+        "controller_target": [
+          5.0,
+          0.75
+        ],
+        "controller_target_distance": 0.23269018548934287,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 94.58000000000477,
+        "hold_until": 0.0,
+        "sample_time": 104.00000000000809
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 106.11200000000879,
+          "robot_id": 6,
+          "path_version": 12,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 55,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 108.60800000000962,
+          "robot_id": 6,
+          "path_version": 13,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 57,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 104.704,
+      "ended_at": 107.616,
+      "duration": 2.912,
+      "position": [
+        -3.7151,
+        2.0025
+      ],
+      "max_yaw_change_rad": 0.0029,
+      "max_translation_change_m": 0.02981,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 7,
+        "goal_location": "WS2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 56,
+        "path_version": 18,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.06690427065361321,
+        "controller_angular_speed": -0.08005796218333482,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 107.84,
+        "heading": 0.0979378791715759,
+        "controller_target": [
+          -3.25,
+          2.0
+        ],
+        "controller_target_distance": 0.4396901296015928,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 107.58800000000912,
+        "hold_until": 0.0,
+        "sample_time": 108.00000000000942
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 107.6160000000093,
+          "robot_id": 7,
+          "path_version": 18,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 56,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 105.248,
+      "ended_at": 110.368,
+      "duration": 5.12,
+      "position": [
+        4.3683,
+        -1.7886
+      ],
+      "max_yaw_change_rad": 0.208,
+      "max_translation_change_m": 0.02957,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_delivery",
+        "task_id": 3,
+        "goal_location": "S7",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 49,
+        "path_version": 16,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.1597761473887263,
+        "controller_angular_speed": -1.09273366902026,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 107.84,
+        "heading": -1.489048618074757,
+        "controller_target": [
+          4.25,
+          -2.0
+        ],
+        "controller_target_distance": 0.23266138548669976,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 94.58000000000477,
+        "hold_until": 0.0,
+        "sample_time": 108.00000000000942
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 109.52000000000993,
+          "robot_id": 3,
+          "lease_generation": 2,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.200000000001737,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 108.60800000000962,
+          "robot_id": 3,
+          "path_version": 17,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 57,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 110.11200000001013,
+          "robot_id": 3,
+          "path_version": 18,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 58,
+          "waypoint_count": 4,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 108.416,
+      "ended_at": 112.256,
+      "duration": 3.84,
+      "position": [
+        -1.9907,
+        2.1258
+      ],
+      "max_yaw_change_rad": 0.0043,
+      "max_translation_change_m": 0.02917,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 57,
+        "path_version": 21,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.05793609666241553,
+        "controller_angular_speed": -0.3847211814143348,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 111.84,
+        "heading": 0.07042307351260227,
+        "controller_target": [
+          -1.75,
+          2.0
+        ],
+        "controller_target_distance": 0.27873502148170376,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 108.58000000000945,
+        "hold_until": 0.0,
+        "sample_time": 112.00000000001076
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 108.60800000000962,
+          "robot_id": 2,
+          "path_version": 21,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 57,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 109.376,
+      "ended_at": 113.824,
+      "duration": 4.448,
+      "position": [
+        -5.1002,
+        -0.7923
+      ],
+      "max_yaw_change_rad": 1.1357,
+      "max_translation_change_m": 0.02917,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 60,
+        "path_version": 22,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "advance_hold:swept_occupancy:5",
+        "controller_local_risk_level": "planned_wait",
+        "controller_status_sample_time": 111.84,
+        "heading": 1.412941178169235,
+        "controller_target": [
+          -4.75,
+          -0.75
+        ],
+        "controller_target_distance": 0.3898294495273706,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 111.58800000001045,
+        "hold_until": 0.0,
+        "sample_time": 112.00000000001076
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 111.61600000001063,
+          "robot_id": 1,
+          "path_version": 22,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 60,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 113.12000000001113,
+          "robot_id": 1,
+          "path_version": 23,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 61,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 109.6,
+      "ended_at": 113.28,
+      "duration": 3.68,
+      "position": [
+        6.1076,
+        0.8896
+      ],
+      "max_yaw_change_rad": 0.1794,
+      "max_translation_change_m": 0.02894,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 8,
+        "goal_location": "WS1",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 57,
+        "path_version": 14,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.04805488743888965,
+        "controller_angular_speed": 0.3362183360116165,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 111.84,
+        "heading": 2.943883511763933,
+        "controller_target": [
+          5.75,
+          0.75
+        ],
+        "controller_target_distance": 0.39580252258756504,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 108.58000000000945,
+        "hold_until": 0.0,
+        "sample_time": 112.00000000001076
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 113.52000000001127,
+          "robot_id": 8,
+          "lease_generation": 3,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.440000000001817,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 113.12000000001113,
+          "robot_id": 8,
+          "path_version": 15,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 61,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 109.824,
+      "ended_at": 112.448,
+      "duration": 2.624,
+      "position": [
+        5.0999,
+        0.6106
+      ],
+      "max_yaw_change_rad": 0.4532,
+      "max_translation_change_m": 0.02969,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 58,
+        "path_version": 14,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.03562355332957261,
+        "controller_angular_speed": 0.61344,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 111.84,
+        "heading": 2.6789513020435445,
+        "controller_target": [
+          4.75,
+          -2.75
+        ],
+        "controller_target_distance": 3.3849198381791683,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 110.08400000000995,
+        "hold_until": 0.0,
+        "sample_time": 112.00000000001076
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 109.52000000000993,
+          "robot_id": 6,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.392000000001801,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 110.11200000001013,
+          "robot_id": 6,
+          "path_version": 14,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 58,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 117.664,
+      "ended_at": 120.448,
+      "duration": 2.784,
+      "position": [
+        5.8784,
+        -0.2794
+      ],
+      "max_yaw_change_rad": 0.006,
+      "max_translation_change_m": 0.02987,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 61,
+        "path_version": 21,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.05041387857512968,
+        "controller_angular_speed": -0.2848198411417811,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 119.84,
+        "heading": -1.6395908558326129,
+        "controller_target": [
+          6.0,
+          0.0
+        ],
+        "controller_target_distance": 0.3083007718068729,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 113.09200000001096,
+        "hold_until": 0.0,
+        "sample_time": 120.00000000001343
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 118.688,
+      "ended_at": 121.12,
+      "duration": 2.432,
+      "position": [
+        5.4884,
+        1.438
+      ],
+      "max_yaw_change_rad": 0.0362,
+      "max_translation_change_m": 0.02864,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 8,
+        "goal_location": "WS1",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 62,
+        "path_version": 16,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "emergency",
+        "controller_local_risk_level": "emergency",
+        "controller_status_sample_time": 119.84,
+        "heading": 2.340212889908249,
+        "controller_target": [
+          3.25,
+          3.75
+        ],
+        "controller_target_distance": 3.2197759906050667,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 114.08400000001129,
+        "hold_until": 0.0,
+        "sample_time": 120.00000000001343
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 118.89600000001306,
+          "robot_id": 8,
+          "path_version": 16,
+          "plan_epoch": 62,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 121.1200000000138,
+          "robot_id": 8,
+          "path_version": 17,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 64,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 120.576,
+      "ended_at": 125.92,
+      "duration": 5.344,
+      "position": [
+        5.8761,
+        -0.2489
+      ],
+      "max_yaw_change_rad": 0.0072,
+      "max_translation_change_m": 0.02958,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 65,
+        "path_version": 22,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.04937560185896374,
+        "controller_angular_speed": -0.3084047835032573,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 123.84,
+        "heading": -1.646194575426577,
+        "controller_target": [
+          6.0,
+          0.0
+        ],
+        "controller_target_distance": 0.29072228890633595,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 123.58800000001446,
+        "hold_until": 0.0,
+        "sample_time": 124.00000000001477
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 122.73600000001434,
+          "robot_id": 4,
+          "path_version": 21,
+          "plan_epoch": 61,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 123.61600000001464,
+          "robot_id": 4,
+          "path_version": 22,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 65,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 123.104,
+      "ended_at": 125.376,
+      "duration": 2.272,
+      "position": [
+        -1.5057,
+        2.2163
+      ],
+      "max_yaw_change_rad": 0.0105,
+      "max_translation_change_m": 0.02868,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 63,
+        "path_version": 23,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.06039777781253723,
+        "controller_angular_speed": -0.329375887607256,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 123.84,
+        "heading": 0.06877534965902705,
+        "controller_target": [
+          -1.0,
+          2.0
+        ],
+        "controller_target_distance": 0.5667145195768893,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 119.09200000001296,
+        "hold_until": 0.0,
+        "sample_time": 124.00000000001477
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 124.01600000001477,
+          "robot_id": 2,
+          "path_version": 23,
+          "plan_epoch": 63,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 125.12000000001514,
+          "robot_id": 2,
+          "path_version": 24,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 66,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 125.952,
+      "ended_at": 129.12,
+      "duration": 3.168,
+      "position": [
+        5.8739,
+        -0.2183
+      ],
+      "max_yaw_change_rad": 0.0154,
+      "max_translation_change_m": 0.02987,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 68,
+        "path_version": 23,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.047943808091313884,
+        "controller_angular_speed": -0.33846351139300235,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 127.84,
+        "heading": -1.6340950336385056,
+        "controller_target": [
+          6.0,
+          0.0
+        ],
+        "controller_target_distance": 0.2634206443592681,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 126.58000000001546,
+        "hold_until": 0.0,
+        "sample_time": 128.0000000000161
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 126.60800000001564,
+          "robot_id": 4,
+          "path_version": 23,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 68,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 128.48,
+      "ended_at": 131.968,
+      "duration": 3.488,
+      "position": [
+        -4.4619,
+        -0.8687
+      ],
+      "max_yaw_change_rad": 0.037,
+      "max_translation_change_m": 0.02898,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 69,
+        "path_version": 25,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.16756336148960638,
+        "controller_angular_speed": -0.9199627917843352,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 131.84,
+        "heading": 0.11556977606329193,
+        "controller_target": [
+          -4.25,
+          -1.0
+        ],
+        "controller_target_distance": 0.2481553246356147,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 128.58000000001604,
+        "hold_until": 0.0,
+        "sample_time": 132.00000000001387
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 128.60800000001575,
+          "robot_id": 1,
+          "path_version": 25,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 69,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 129.6,
+      "ended_at": 133.44,
+      "duration": 3.84,
+      "position": [
+        2.9499,
+        -2.1089
+      ],
+      "max_yaw_change_rad": 0.0044,
+      "max_translation_change_m": 0.02928,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_delivery",
+        "task_id": 3,
+        "goal_location": "S7",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 68,
+        "path_version": 20,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.15969547756772165,
+        "controller_angular_speed": -1.0943930479538044,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 131.84,
+        "heading": -3.0670228952275753,
+        "controller_target": [
+          2.75,
+          -2.0
+        ],
+        "controller_target_distance": 0.23682966396918517,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 126.58000000001546,
+        "hold_until": 0.0,
+        "sample_time": 132.00000000001387
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 129.728,
+      "ended_at": 132.256,
+      "duration": 2.528,
+      "position": [
+        -1.2125,
+        2.2182
+      ],
+      "max_yaw_change_rad": 0.3286,
+      "max_translation_change_m": 0.02919,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 68,
+        "path_version": 25,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.05536650145339851,
+        "controller_angular_speed": -0.4356815995578273,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 131.84,
+        "heading": 0.21669323255947184,
+        "controller_target": [
+          -1.0,
+          2.0
+        ],
+        "controller_target_distance": 0.3109446981717761,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 126.58000000001546,
+        "hold_until": 0.0,
+        "sample_time": 132.00000000001387
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 132.1120000000138,
+          "robot_id": 2,
+          "path_version": 26,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 70,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 133.696,
+      "ended_at": 135.744,
+      "duration": 2.048,
+      "position": [
+        5.8656,
+        -0.0954
+      ],
+      "max_yaw_change_rad": 0.003,
+      "max_translation_change_m": 0.02967,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 72,
+        "path_version": 25,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.051118487704607335,
+        "controller_angular_speed": -0.2677288921064943,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 135.84,
+        "heading": -1.6413280955842033,
+        "controller_target": [
+          6.0,
+          0.25
+        ],
+        "controller_target_distance": 0.36790922709821977,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 134.58000000001272,
+        "hold_until": 0.0,
+        "sample_time": 136.00000000001165
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 133.61600000001297,
+          "robot_id": 4,
+          "path_version": 24,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 71,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 134.60800000001242,
+          "robot_id": 4,
+          "path_version": 25,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 72,
+          "waypoint_count": 12,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 135.488,
+      "ended_at": 137.6,
+      "duration": 2.112,
+      "position": [
+        4.1487,
+        -1.2956
+      ],
+      "max_yaw_change_rad": 0.0,
+      "max_translation_change_m": 0.0297,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 72,
+        "path_version": 18,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.1644530150180022,
+        "controller_angular_speed": 0.9922745981539294,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 135.84,
+        "heading": 1.6512691257336225,
+        "controller_target": [
+          4.25,
+          -1.5
+        ],
+        "controller_target_distance": 0.24362385412579535,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 134.58000000001272,
+        "hold_until": 0.0,
+        "sample_time": 136.00000000001165
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 135.84,
+      "ended_at": 138.848,
+      "duration": 3.008,
+      "position": [
+        5.8633,
+        -0.0643
+      ],
+      "max_yaw_change_rad": 0.005,
+      "max_translation_change_m": 0.02998,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 72,
+        "path_version": 25,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.051118487704607335,
+        "controller_angular_speed": -0.2677288921064943,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 135.84,
+        "heading": -1.6413280955842033,
+        "controller_target": [
+          6.0,
+          0.25
+        ],
+        "controller_target_distance": 0.36790922709821977,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 134.58000000001272,
+        "hold_until": 0.0,
+        "sample_time": 136.00000000001165
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 139.12000000000992,
+          "robot_id": 4,
+          "path_version": 26,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 75,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 136.736,
+      "ended_at": 170.624,
+      "duration": 33.888,
+      "position": [
+        -1.0015,
+        1.7151
+      ],
+      "max_yaw_change_rad": 0.0032,
+      "max_translation_change_m": 0.02965,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 80,
+        "path_version": 29,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 151.84,
+        "heading": 1.476487739444016,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 151.09200000000357,
+        "hold_until": 0.0,
+        "sample_time": 152.00000000000279
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 152.00000000000279,
+          "robot_id": 2,
+          "state": "en_route_pickup",
+          "stopped_seconds": 11.99999999999335,
+          "position": [
+            -1.001804698244168,
+            1.7167785350550013
+          ],
+          "path_version": 29,
+          "plan_epoch": 80,
+          "plan_source": "joint_grid_transaction",
+          "task_id": 2,
+          "goal_location": "S2",
+          "planned_wait": false,
+          "_event_stream": "unplanned_stop_events"
+        },
+        {
+          "sim_time": 139.12000000000992,
+          "robot_id": 2,
+          "path_version": 28,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 75,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 151.12000000000327,
+          "robot_id": 2,
+          "path_version": 29,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 80,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 162.14399999999716,
+          "robot_id": 2,
+          "path_version": 30,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 88,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 170.62399999999246,
+          "robot_id": 2,
+          "path_version": 31,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 103,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unplanned_stop"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 137.28,
+      "ended_at": 141.216,
+      "duration": 3.936,
+      "position": [
+        2.7329,
+        -2.125
+      ],
+      "max_yaw_change_rad": 0.0043,
+      "max_translation_change_m": 0.02938,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_delivery",
+        "task_id": 3,
+        "goal_location": "S7",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 22,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.159632101748615,
+        "controller_angular_speed": -1.0956951057334514,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 139.84,
+        "heading": -3.0653208124091984,
+        "controller_target": [
+          2.5,
+          -2.0
+        ],
+        "controller_target_distance": 0.27293755851136275,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 140.00000000000944
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 141.5200000000086,
+          "robot_id": 3,
+          "lease_generation": 2,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.311999999997056,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 139.12000000000992,
+          "robot_id": 3,
+          "path_version": 22,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 75,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 137.824,
+      "ended_at": 142.368,
+      "duration": 4.544,
+      "position": [
+        4.1463,
+        -1.324
+      ],
+      "max_yaw_change_rad": 0.0014,
+      "max_translation_change_m": 0.0275,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 19,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.15918266952623197,
+        "controller_angular_speed": 1.1048891721608614,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 139.84,
+        "heading": 1.6525741698638345,
+        "controller_target": [
+          4.25,
+          -1.5
+        ],
+        "controller_target_distance": 0.22407937920411722,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 140.00000000000944
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 139.5200000000097,
+          "robot_id": 6,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.407999999997003,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 139.12000000000992,
+          "robot_id": 6,
+          "path_version": 19,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 75,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 140.11200000000937,
+          "robot_id": 6,
+          "path_version": 20,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 76,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 138.976,
+      "ended_at": 145.92,
+      "duration": 6.944,
+      "position": [
+        5.8609,
+        -0.0343
+      ],
+      "max_yaw_change_rad": 0.0089,
+      "max_translation_change_m": 0.0292,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 26,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.04882837375514293,
+        "controller_angular_speed": -0.3201941114315655,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 143.84,
+        "heading": -1.6554371385543103,
+        "controller_target": [
+          6.0,
+          0.25
+        ],
+        "controller_target_distance": 0.3216545434263734,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 144.00000000000722
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 139.12000000000992,
+          "robot_id": 4,
+          "path_version": 26,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 75,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 140.224,
+      "ended_at": 143.392,
+      "duration": 3.168,
+      "position": [
+        -2.4579,
+        -2.1041
+      ],
+      "max_yaw_change_rad": 0.0015,
+      "max_translation_change_m": 0.02987,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 20,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.06032885029609756,
+        "controller_angular_speed": 0.3310410559384071,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 139.84,
+        "heading": -0.06995223568816566,
+        "controller_target": [
+          -2.25,
+          -2.0
+        ],
+        "controller_target_distance": 0.264847700819486,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 140.00000000000944
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 141.504,
+      "ended_at": 143.488,
+      "duration": 1.984,
+      "position": [
+        -1.2553,
+        2.5203
+      ],
+      "max_yaw_change_rad": 0.0004,
+      "max_translation_change_m": 0.02961,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 7,
+        "goal_location": "WS2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 24,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.037289689297756445,
+        "controller_angular_speed": -0.0708407709221833,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 143.84,
+        "heading": 0.08903176239437292,
+        "controller_target": [
+          -1.0,
+          2.5
+        ],
+        "controller_target_distance": 0.2426998438186271,
+        "controller_paused_until": 142.5200000000086,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 144.00000000000722
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 141.5200000000086,
+          "event_type": "yield_start",
+          "robot_id": 7,
+          "winner": 2,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 141.5200000000086,
+          "event_type": "yield_wait_start",
+          "robot_id": 7,
+          "winner": 2,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 145.344,
+      "ended_at": 148.0,
+      "duration": 2.656,
+      "position": [
+        4.1308,
+        -1.5105
+      ],
+      "max_yaw_change_rad": 0.0,
+      "max_translation_change_m": 0.0299,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 76,
+        "path_version": 20,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.16009777645149326,
+        "controller_angular_speed": 1.0860951141402724,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 147.84,
+        "heading": 1.653643875732998,
+        "controller_target": [
+          4.25,
+          -1.75
+        ],
+        "controller_target_distance": 0.26755337302231336,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 140.08400000000967,
+        "hold_until": 0.0,
+        "sample_time": 148.000000000005
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 147.68,
+      "ended_at": 154.688,
+      "duration": 7.008,
+      "position": [
+        -2.3297,
+        -2.1206
+      ],
+      "max_yaw_change_rad": 0.8191,
+      "max_translation_change_m": 0.02895,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 79,
+        "path_version": 21,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": -0.06038888075641601,
+        "controller_angular_speed": 0.6134399999999999,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 151.84,
+        "heading": -0.4334758648472681,
+        "controller_target": [
+          -4.75,
+          -2.0
+        ],
+        "controller_target_distance": 2.45803506837665,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 149.5880000000044,
+        "hold_until": 0.0,
+        "sample_time": 152.00000000000279
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 151.52000000000305,
+          "robot_id": 5,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.327999999997047,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 154.52800000000138,
+          "robot_id": 5,
+          "lease_generation": 1,
+          "stage": "hard_escape",
+          "no_progress_seconds": 8.33599999999538,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 154.52800000000138,
+          "robot_id": 5,
+          "source": "_joint_stall_recovery",
+          "plan_epoch": 82,
+          "result": "succeeded",
+          "dispatched": true,
+          "_event_stream": "replan_events"
+        },
+        {
+          "sim_time": 148.65600000000464,
+          "robot_id": 5,
+          "path_version": 20,
+          "plan_epoch": 75,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 154.41600000000145,
+          "robot_id": 5,
+          "path_version": 21,
+          "plan_epoch": 79,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 154.52800000000138,
+          "robot_id": 5,
+          "source": "_joint_stall_recovery",
+          "target": [
+            -4.75,
+            -0.5
+          ],
+          "_event_stream": "escape_events"
+        },
+        {
+          "sim_time": 149.6160000000041,
+          "robot_id": 5,
+          "path_version": 21,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 79,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 154.52800000000138,
+          "robot_id": 5,
+          "path_version": 22,
+          "source": "_joint_stall_recovery",
+          "plan_epoch": 82,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:hard_escape,soft_replan"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 152.448,
+      "ended_at": 155.456,
+      "duration": 3.008,
+      "position": [
+        5.8482,
+        0.1178
+      ],
+      "max_yaw_change_rad": 0.0045,
+      "max_translation_change_m": 0.02998,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 26,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.051551376730992124,
+        "controller_angular_speed": -0.2567046418266945,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 151.84,
+        "heading": -1.6553065208300923,
+        "controller_target": [
+          6.0,
+          0.5
+        ],
+        "controller_target_distance": 0.444357370263109,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 152.00000000000279
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 153.45600000000198,
+          "robot_id": 4,
+          "path_version": 26,
+          "plan_epoch": 75,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 154.11200000000161,
+          "robot_id": 4,
+          "path_version": 27,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 81,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 152.928,
+      "ended_at": 158.688,
+      "duration": 5.76,
+      "position": [
+        4.1117,
+        -1.7243
+      ],
+      "max_yaw_change_rad": 0.0137,
+      "max_translation_change_m": 0.0296,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 76,
+        "path_version": 20,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "emergency",
+        "controller_local_risk_level": "emergency",
+        "controller_status_sample_time": 155.84,
+        "heading": 1.6543616310224625,
+        "controller_target": [
+          4.25,
+          -2.0
+        ],
+        "controller_target_distance": 0.3162347287559737,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 140.08400000000967,
+        "hold_until": 0.0,
+        "sample_time": 156.00000000000057
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 159.0239999999989,
+          "robot_id": 6,
+          "lease_generation": 1,
+          "stage": "soft_replan",
+          "no_progress_seconds": 5.455999999996976,
+          "_event_stream": "progress_lease_events"
+        },
+        {
+          "sim_time": 154.41600000000145,
+          "robot_id": 6,
+          "path_version": 20,
+          "plan_epoch": 76,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 158.6239999999991,
+          "robot_id": 6,
+          "path_version": 21,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 86,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "progress_recovery:soft_replan"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 155.2,
+      "ended_at": 157.536,
+      "duration": 2.336,
+      "position": [
+        2.2344,
+        2.1166
+      ],
+      "max_yaw_change_rad": 0.0,
+      "max_translation_change_m": 0.0291,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 8,
+        "goal_location": "WS1",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 20,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.1631156616511325,
+        "controller_angular_speed": 1.0219166867461238,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 155.84,
+        "heading": 3.061432301719179,
+        "controller_target": [
+          2.0,
+          2.0
+        ],
+        "controller_target_distance": 0.27374475977270873,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 156.00000000000057
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 155.36,
+      "ended_at": 157.6,
+      "duration": 2.24,
+      "position": [
+        -3.1806,
+        -2.0394
+      ],
+      "max_yaw_change_rad": 0.0093,
+      "max_translation_change_m": 0.02876,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 78,
+        "path_version": 29,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "advance_hold:swept_occupancy:5",
+        "controller_local_risk_level": "planned_wait",
+        "controller_status_sample_time": 155.84,
+        "heading": 0.06077465863398429,
+        "controller_target": [
+          -2.75,
+          -2.0
+        ],
+        "controller_target_distance": 0.4559137560585543,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 146.58000000000607,
+        "hold_until": 0.0,
+        "sample_time": 156.00000000000057
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 155.52,
+      "ended_at": 158.592,
+      "duration": 3.072,
+      "position": [
+        5.846,
+        0.1476
+      ],
+      "max_yaw_change_rad": 0.0051,
+      "max_translation_change_m": 0.02918,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 81,
+        "path_version": 27,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.05085615542855501,
+        "controller_angular_speed": -0.27420773070085036,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 155.84,
+        "heading": -1.6418327153906018,
+        "controller_target": [
+          6.0,
+          0.5
+        ],
+        "controller_target_distance": 0.4058317974029093,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 154.0840000000019,
+        "hold_until": 0.0,
+        "sample_time": 156.00000000000057
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 155.904,
+      "ended_at": 162.176,
+      "duration": 6.272,
+      "position": [
+        -2.3878,
+        -2.1073
+      ],
+      "max_yaw_change_rad": 0.2176,
+      "max_translation_change_m": 0.02921,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "_joint_stall_recovery",
+        "plan_epoch": 82,
+        "path_version": 22,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "supervisor_hold",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 159.84,
+        "heading": -1.1163363171311813,
+        "controller_target": [
+          -4.75,
+          -2.0
+        ],
+        "controller_target_distance": 2.3763313166113673,
+        "controller_paused_until": 159.9699999999986,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 159.99999999999835
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 162.52799999999695,
+          "event_type": "yield_start",
+          "robot_id": 5,
+          "winner": 1,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 162.52799999999695,
+          "event_type": "yield_wait_start",
+          "robot_id": 5,
+          "winner": 1,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 161.11999999999773,
+          "robot_id": 5,
+          "path_version": 23,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 87,
+          "waypoint_count": 5,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 162.14399999999716,
+          "robot_id": 5,
+          "path_version": 24,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 88,
+          "waypoint_count": 7,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 157.632,
+      "ended_at": 159.808,
+      "duration": 2.176,
+      "position": [
+        -3.1493,
+        -2.0419
+      ],
+      "max_yaw_change_rad": 0.0104,
+      "max_translation_change_m": 0.0299,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 78,
+        "path_version": 29,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.06618327809807942,
+        "controller_angular_speed": 0.1324999018097428,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 159.84,
+        "heading": 0.07923348286976872,
+        "controller_target": [
+          -2.75,
+          -2.0
+        ],
+        "controller_target_distance": 0.3992549147221092,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 146.58000000000607,
+        "hold_until": 0.0,
+        "sample_time": 159.99999999999835
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 157.792,
+      "ended_at": 160.64,
+      "duration": 2.848,
+      "position": [
+        2.2039,
+        2.1189
+      ],
+      "max_yaw_change_rad": 0.0182,
+      "max_translation_change_m": 0.02958,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 8,
+        "goal_location": "WS1",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 75,
+        "path_version": 20,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.15919688057330647,
+        "controller_angular_speed": 1.1045995067039573,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 159.84,
+        "heading": 3.0597258928798228,
+        "controller_target": [
+          2.0,
+          2.0
+        ],
+        "controller_target_distance": 0.25785058677044864,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 139.09200000001022,
+        "hold_until": 0.0,
+        "sample_time": 159.99999999999835
+      },
+      "motion_expected": true,
+      "evidence": [],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 158.752,
+      "ended_at": 162.368,
+      "duration": 3.616,
+      "position": [
+        5.8436,
+        0.1777
+      ],
+      "max_yaw_change_rad": 0.0073,
+      "max_translation_change_m": 0.0291,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 81,
+        "path_version": 27,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.04961700337090982,
+        "controller_angular_speed": -0.3030716743840011,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 159.84,
+        "heading": -1.6503910586147477,
+        "controller_target": [
+          6.0,
+          0.5
+        ],
+        "controller_target_distance": 0.3767603556127656,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 154.0840000000019,
+        "hold_until": 0.0,
+        "sample_time": 159.99999999999835
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 162.14399999999716,
+          "robot_id": 4,
+          "path_version": 28,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 88,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "event_type": "inbound_granted",
+          "sim_time": 162.14399999999716,
+          "robot_id": 4,
+          "terminal": "WS3",
+          "terminal_epoch": 0,
+          "owner_id": null,
+          "reason": null,
+          "attempt": null,
+          "_event_stream": "terminal_handoff_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 159.84,
+      "ended_at": 162.528,
+      "duration": 2.688,
+      "position": [
+        -3.1303,
+        -2.0644
+      ],
+      "max_yaw_change_rad": 0.1681,
+      "max_translation_change_m": 0.02843,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 78,
+        "path_version": 29,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.06618327809807942,
+        "controller_angular_speed": 0.1324999018097428,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 159.84,
+        "heading": 0.07923348286976872,
+        "controller_target": [
+          -2.75,
+          -2.0
+        ],
+        "controller_target_distance": 0.3992549147221092,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 146.58000000000607,
+        "hold_until": 0.0,
+        "sample_time": 159.99999999999835
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 161.11999999999773,
+          "robot_id": 1,
+          "path_version": 30,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 87,
+          "waypoint_count": 4,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 162.14399999999716,
+          "robot_id": 1,
+          "path_version": 31,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 88,
+          "waypoint_count": 6,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "event_type": "inbound_granted",
+          "sim_time": 161.13599999999772,
+          "robot_id": 1,
+          "terminal": "WS5",
+          "terminal_epoch": 0,
+          "owner_id": null,
+          "reason": null,
+          "attempt": null,
+          "_event_stream": "terminal_handoff_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 162.24,
+      "ended_at": 171.936,
+      "duration": 9.696,
+      "position": [
+        -2.3603,
+        -2.1116
+      ],
+      "max_yaw_change_rad": 0.2092,
+      "max_translation_change_m": 0.0291,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "_command_reverse",
+        "plan_epoch": 96,
+        "path_version": 25,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "turning",
+        "controller_linear_speed": 0.016593640657254854,
+        "controller_angular_speed": -0.27264000000000005,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 167.84,
+        "heading": -1.174934746593781,
+        "controller_target": [
+          -1.4286391734625719,
+          -1.9094010986313512
+        ],
+        "controller_target_distance": 0.9846689406322141,
+        "controller_paused_until": 167.8199999999942,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 167.99999999999392
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 167.99999999999392,
+          "robot_id": 5,
+          "state": "en_route_pickup",
+          "stopped_seconds": 11.99999999999335,
+          "position": [
+            -2.391789391243947,
+            -2.114131605965886
+          ],
+          "path_version": 25,
+          "plan_epoch": 96,
+          "plan_source": "_command_reverse",
+          "task_id": 5,
+          "goal_location": "S2",
+          "planned_wait": false,
+          "_event_stream": "unplanned_stop_events"
+        },
+        {
+          "sim_time": 167.02399999999446,
+          "robot_id": 5,
+          "source": "_command_reverse",
+          "plan_epoch": 96,
+          "result": "succeeded",
+          "dispatched": true,
+          "_event_stream": "replan_events"
+        },
+        {
+          "sim_time": 171.51999999999197,
+          "robot_id": 5,
+          "source": "_command_reverse",
+          "plan_epoch": 106,
+          "result": "succeeded",
+          "dispatched": true,
+          "_event_stream": "replan_events"
+        },
+        {
+          "sim_time": 167.02399999999446,
+          "robot_id": 5,
+          "source": "_joint_escape_robot",
+          "target": [
+            -1.4286391734625719,
+            -1.9094010986313512
+          ],
+          "_event_stream": "escape_events"
+        },
+        {
+          "sim_time": 171.51999999999197,
+          "robot_id": 5,
+          "source": "_joint_escape_robot",
+          "target": [
+            -1.3930574350261318,
+            -1.913191462738004
+          ],
+          "_event_stream": "escape_events"
+        },
+        {
+          "sim_time": 162.52799999999695,
+          "event_type": "yield_start",
+          "robot_id": 5,
+          "winner": 1,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 162.52799999999695,
+          "event_type": "yield_wait_start",
+          "robot_id": 5,
+          "winner": 1,
+          "target": null,
+          "_event_stream": "yield_resume_events"
+        },
+        {
+          "sim_time": 162.14399999999716,
+          "robot_id": 5,
+          "path_version": 24,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 88,
+          "waypoint_count": 7,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 167.02399999999446,
+          "robot_id": 5,
+          "path_version": 25,
+          "source": "_command_reverse",
+          "plan_epoch": 96,
+          "waypoint_count": 1,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 170.62399999999246,
+          "robot_id": 5,
+          "path_version": 26,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 103,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 171.51999999999197,
+          "robot_id": 5,
+          "path_version": 27,
+          "source": "_command_reverse",
+          "plan_epoch": 106,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unplanned_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 162.56,
+      "ended_at": 164.832,
+      "duration": 2.272,
+      "position": [
+        -3.111,
+        -2.0889
+      ],
+      "max_yaw_change_rad": 0.1398,
+      "max_translation_change_m": 0.02905,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 88,
+        "path_version": 31,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.0914457431343595,
+        "controller_angular_speed": -0.5815032208757579,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 163.84,
+        "heading": 0.33997784711512913,
+        "controller_target": [
+          -2.75,
+          -2.5
+        ],
+        "controller_target_distance": 0.556821295787454,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 162.11599999999746,
+        "hold_until": 0.0,
+        "sample_time": 163.99999999999613
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 162.14399999999716,
+          "robot_id": 1,
+          "path_version": 31,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 88,
+          "waypoint_count": 6,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 4,
+      "started_at": 163.776,
+      "ended_at": 169.184,
+      "duration": 5.408,
+      "position": [
+        5.8476,
+        0.2676
+      ],
+      "max_yaw_change_rad": 0.1565,
+      "max_translation_change_m": 0.02894,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 4,
+        "goal_location": "WS3",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 89,
+        "path_version": 29,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.048381484550133455,
+        "controller_angular_speed": -0.32953780270073957,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 167.84,
+        "heading": -1.5318292195454504,
+        "controller_target": [
+          6.0,
+          0.5
+        ],
+        "controller_target_distance": 0.28867488121839346,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 164.08399999999637,
+        "hold_until": 0.0,
+        "sample_time": 167.99999999999392
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 164.11199999999607,
+          "robot_id": 4,
+          "path_version": 29,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 89,
+          "waypoint_count": 8,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 6,
+      "started_at": 165.44,
+      "ended_at": 166.752,
+      "duration": 1.312,
+      "position": [
+        3.8104,
+        -1.9728
+      ],
+      "max_yaw_change_rad": 0.0091,
+      "max_translation_change_m": 0.02979,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 6,
+        "goal_location": "S5",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 88,
+        "path_version": 22,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "emergency",
+        "controller_local_risk_level": "emergency",
+        "controller_status_sample_time": 167.84,
+        "heading": 2.8320094908280784,
+        "controller_target": [
+          -3.0,
+          -2.0
+        ],
+        "controller_target_distance": 6.81044797832235,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 162.11599999999746,
+        "hold_until": 0.0,
+        "sample_time": 167.99999999999392
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 167.21599999999435,
+          "robot_id": 6,
+          "path_version": 22,
+          "plan_epoch": 88,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "event_type": "inbound_denied",
+          "sim_time": 164.9759999999956,
+          "robot_id": 6,
+          "terminal": "S5",
+          "terminal_epoch": 0,
+          "owner_id": 1,
+          "reason": null,
+          "attempt": null,
+          "_event_stream": "terminal_handoff_events"
+        },
+        {
+          "event_type": "inbound_denied",
+          "sim_time": 164.9759999999956,
+          "robot_id": 6,
+          "terminal": "S5",
+          "terminal_epoch": 0,
+          "owner_id": 1,
+          "reason": null,
+          "attempt": null,
+          "_event_stream": "terminal_handoff_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 8,
+      "started_at": 166.368,
+      "ended_at": 170.688,
+      "duration": 4.32,
+      "position": [
+        2.022,
+        2.1321
+      ],
+      "max_yaw_change_rad": 0.0109,
+      "max_translation_change_m": 0.02475,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 8,
+        "goal_location": "WS1",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 88,
+        "path_version": 21,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "emergency",
+        "controller_local_risk_level": "emergency",
+        "controller_status_sample_time": 167.84,
+        "heading": 3.051680036006566,
+        "controller_target": [
+          -1.0,
+          2.0
+        ],
+        "controller_target_distance": 3.0377941332658476,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 162.11599999999746,
+        "hold_until": 0.0,
+        "sample_time": 167.99999999999392
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 167.21599999999435,
+          "robot_id": 8,
+          "path_version": 21,
+          "plan_epoch": 88,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 170.62399999999246,
+          "robot_id": 8,
+          "path_version": 22,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 103,
+          "waypoint_count": 7,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 3,
+      "started_at": 166.88,
+      "ended_at": 171.136,
+      "duration": 4.256,
+      "position": [
+        1.7415,
+        -2.7489
+      ],
+      "max_yaw_change_rad": 0.2082,
+      "max_translation_change_m": 0.02712,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 9,
+        "goal_location": "WS6",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 88,
+        "path_version": 25,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "emergency",
+        "controller_local_risk_level": "emergency",
+        "controller_status_sample_time": 167.84,
+        "heading": 1.056925696631014,
+        "controller_target": [
+          2.0,
+          -3.25
+        ],
+        "controller_target_distance": 0.5811951114964891,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 162.11599999999746,
+        "hold_until": 0.0,
+        "sample_time": 167.99999999999392
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 166.89599999999453,
+          "robot_id": 3,
+          "path_version": 25,
+          "plan_epoch": 88,
+          "_event_stream": "replan_request_events"
+        },
+        {
+          "sim_time": 170.62399999999246,
+          "robot_id": 3,
+          "path_version": 26,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 103,
+          "waypoint_count": 4,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 7,
+      "started_at": 169.248,
+      "ended_at": 180.0,
+      "duration": 10.752,
+      "position": [
+        -0.026,
+        3.2848
+      ],
+      "max_yaw_change_rad": 0.0128,
+      "max_translation_change_m": 0.01686,
+      "rotated_in_place": false,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 7,
+        "goal_location": "WS2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 113,
+        "path_version": 29,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 175.84,
+        "heading": 1.366511496421821,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 175.09199999999026,
+        "hold_until": 0.0,
+        "sample_time": 175.99999999998948
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 170.62399999999246,
+          "robot_id": 7,
+          "path_version": 28,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 103,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 175.11999999998997,
+          "robot_id": 7,
+          "path_version": 29,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 113,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 5,
+      "started_at": 171.968,
+      "ended_at": 175.008,
+      "duration": 3.04,
+      "position": [
+        -2.3311,
+        -2.107
+      ],
+      "max_yaw_change_rad": 0.2066,
+      "max_translation_change_m": 0.02849,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 5,
+        "goal_location": "S2",
+        "plan_source": "_command_reverse",
+        "plan_epoch": 106,
+        "path_version": 27,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.03270114057704765,
+        "controller_angular_speed": -0.51546,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 171.84,
+        "heading": -1.0456752596872878,
+        "controller_target": [
+          -1.5,
+          -2.0
+        ],
+        "controller_target_distance": 0.8658524846186029,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 171.9999999999917
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 171.51999999999197,
+          "robot_id": 5,
+          "source": "_command_reverse",
+          "plan_epoch": 106,
+          "result": "succeeded",
+          "dispatched": true,
+          "_event_stream": "replan_events"
+        },
+        {
+          "sim_time": 171.51999999999197,
+          "robot_id": 5,
+          "source": "_joint_escape_robot",
+          "target": [
+            -1.3930574350261318,
+            -1.913191462738004
+          ],
+          "_event_stream": "escape_events"
+        },
+        {
+          "sim_time": 171.51999999999197,
+          "robot_id": 5,
+          "path_version": 27,
+          "source": "_command_reverse",
+          "plan_epoch": 106,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        },
+        {
+          "sim_time": 175.11999999998997,
+          "robot_id": 5,
+          "path_version": 28,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 113,
+          "waypoint_count": 9,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 2,
+      "started_at": 175.104,
+      "ended_at": 180.0,
+      "duration": 4.896,
+      "position": [
+        -1.0014,
+        1.7143
+      ],
+      "max_yaw_change_rad": 0.0,
+      "max_translation_change_m": 0.0,
+      "rotated_in_place": false,
+      "pose_stationary": true,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 2,
+        "goal_location": "S2",
+        "plan_source": "joint_grid_transaction",
+        "plan_epoch": 113,
+        "path_version": 32,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "zero",
+        "controller_linear_speed": 0.0,
+        "controller_angular_speed": 0.0,
+        "controller_stop_reason": "business_goal_or_inactive",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 175.84,
+        "heading": 1.4742507673227,
+        "controller_target": null,
+        "controller_target_distance": null,
+        "controller_paused_until": 0.0,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 175.09199999999026,
+        "hold_until": 0.0,
+        "sample_time": 175.99999999998948
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "sim_time": 175.11999999998997,
+          "robot_id": 2,
+          "path_version": 32,
+          "source": "joint_grid_transaction",
+          "plan_epoch": 113,
+          "waypoint_count": 2,
+          "_event_stream": "route_dispatch_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    },
+    {
+      "robot_id": 1,
+      "started_at": 176.448,
+      "ended_at": 179.744,
+      "duration": 3.296,
+      "position": [
+        -2.8421,
+        -2.3698
+      ],
+      "max_yaw_change_rad": 0.1534,
+      "max_translation_change_m": 0.02937,
+      "rotated_in_place": true,
+      "pose_stationary": false,
+      "task_state": {
+        "state": "en_route_pickup",
+        "task_id": 1,
+        "goal_location": "WS5",
+        "plan_source": "_command_reverse",
+        "plan_epoch": 114,
+        "path_version": 37,
+        "controller_waypoint_index": 0,
+        "planned_wait": false,
+        "wait_reason": null,
+        "emergency_braking": false,
+        "speed_scale": 1.0,
+        "controller_motion_state": "moving",
+        "controller_linear_speed": 0.033003749108650476,
+        "controller_angular_speed": 0.20753163919063372,
+        "controller_stop_reason": "moving",
+        "controller_local_risk_level": "clear",
+        "controller_status_sample_time": 179.84,
+        "heading": 1.0886802397167865,
+        "controller_target": [
+          -1.4314878487390803,
+          -3.3276989380604585
+        ],
+        "controller_target_distance": 1.6984925227693484,
+        "controller_paused_until": 179.32399999998782,
+        "controller_joint_wait_until": 0.0,
+        "controller_joint_wait_reason": null,
+        "dispatch_not_before": 0.0,
+        "hold_until": 0.0,
+        "sample_time": 179.99999999998727
+      },
+      "motion_expected": true,
+      "evidence": [
+        {
+          "robot_id": 1,
+          "started_at": 175.99999999998948,
+          "last_seen_at": 175.99999999998948,
+          "reason": "controller_hold",
+          "deadline": 176.02399999999002,
+          "max_deadline": 176.02399999999002,
+          "task_id": 1,
+          "plan_epoch": 114,
+          "plan_source": "_command_reverse",
+          "path_version": 37,
+          "goal_location": "WS5",
+          "ended_at": 179.99999999998727,
+          "duration": 3.999999999997783,
+          "outcome": "deadline_expired",
+          "_event_stream": "planned_wait_events"
+        }
+      ],
+      "classification": "unexplained_active_stop"
+    }
+  ]
+}

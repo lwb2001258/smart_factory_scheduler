@@ -88,6 +88,8 @@ class MetricsCollector:
         self.replan_count = 0
         self.replan_request_count = 0
         self.replan_request_events: List[dict] = []
+        self.joint_plan_requests_by_reason: Dict[str, int] = {}
+        self.joint_plan_requests_by_class: Dict[str, int] = {}
         self.escape_count = 0
         self.unplanned_stop_count = 0
         self._motion_watch: Dict[int, dict] = {}
@@ -114,6 +116,16 @@ class MetricsCollector:
         self.safety_events: List[dict] = []
         self._last_safety_event: Dict[tuple, float] = {}
         self.scheduling_latencies_ms: List[float] = []
+        self.supervisor_step_wall_ms: List[float] = []
+        self.supervisor_webots_step_wall_ms: List[float] = []
+        self.phase_wall_ms: Dict[str, List[float]] = {}
+        self.joint_planning_wall_ms: List[float] = []
+        self.joint_planning_tier_wall_ms: Dict[str, List[float]] = {}
+        self.robot_dwa_wall_ms: List[float] = []
+        self.joint_equivalent_refreshes_suppressed = 0
+        self.communication_wall_ms: Dict[str, List[float]] = {}
+        self.communication_messages: Dict[str, int] = {}
+        self.communication_bytes: Dict[str, int] = {}
         self.invalid_scheduler_outputs = 0
         self.scheduler_fallbacks = 0
         self.native_scheduler_commits = 0
@@ -124,6 +136,14 @@ class MetricsCollector:
         self.rl_policy_decisions = 0
         self.rl_fallback_decisions = 0
         self.rl_event_ledger: List[dict] = []
+        self.rl_decisions: List[dict] = []
+        self.joint_cell_traversal_seconds: List[float] = []
+        self.joint_window_gap_events: List[dict] = []
+        self.reservation_expired_movement_events: List[dict] = []
+        self.motion_continuity_by_robot: Dict[int, dict] = {}
+        self.motion_continuity_events: List[dict] = []
+        self.progress_lease_events: List[dict] = []
+        self.terminal_handoff_events: List[dict] = []
 
         # Output path
         self.output_dir = os.path.join(
@@ -145,9 +165,93 @@ class MetricsCollector:
             if len(self.rl_event_ledger) > 10000:
                 del self.rl_event_ledger[:1000]
 
+    def record_rl_decision(self, decision: dict):
+        """Record a committed policy decision for offline Webots training."""
+        if isinstance(decision, dict):
+            self.rl_decisions.append(dict(decision))
+
+    def record_terminal_handoff(self, event_type: str, sim_time: float,
+                                robot_id: int, terminal: str, epoch: int,
+                                owner_id=None, reason=None,
+                                attempt=None) -> None:
+        """Record transition-only terminal ownership/handoff evidence."""
+        self.terminal_handoff_events.append({
+            'event_type': str(event_type), 'sim_time': float(sim_time),
+            'robot_id': int(robot_id), 'terminal': str(terminal),
+            'terminal_epoch': int(epoch), 'owner_id': owner_id,
+            'reason': reason,
+            'attempt': (int(attempt) if attempt is not None else None),
+        })
+        self._cap_events(self.terminal_handoff_events)
+
     def record_scheduling_latency(self, seconds: float):
         if math.isfinite(seconds) and seconds >= 0:
             self.scheduling_latencies_ms.append(seconds * 1000.0)
+
+    def record_supervisor_step_wall(self, seconds: float) -> None:
+        """Record one complete synchronous Webots/Supervisor iteration."""
+        value = float(seconds) * 1000.0
+        if math.isfinite(value) and value >= 0.0:
+            self.supervisor_step_wall_ms.append(value)
+
+    def record_supervisor_webots_step_wall(self, seconds: float) -> None:
+        """Record only the blocking Webots `Supervisor.step()` call."""
+        value = float(seconds) * 1000.0
+        if math.isfinite(value) and value >= 0.0:
+            self.supervisor_webots_step_wall_ms.append(value)
+
+    def record_phase_wall(self, phase: str, seconds: float) -> None:
+        """Record one named Supervisor Python phase for hotspot evidence."""
+        value = float(seconds) * 1000.0
+        if math.isfinite(value) and value >= 0.0:
+            self.phase_wall_ms.setdefault(str(phase), []).append(value)
+
+    def record_joint_planning_wall(self, seconds: float) -> None:
+        """Record wall time spent building one joint candidate."""
+        value = float(seconds) * 1000.0
+        if math.isfinite(value) and value >= 0.0:
+            self.joint_planning_wall_ms.append(value)
+
+    def record_joint_planning_tier_wall(self, tier: str,
+                                        seconds: float) -> None:
+        """Record one bounded joint-grid search tier for hotspot evidence."""
+        value = float(seconds) * 1000.0
+        if math.isfinite(value) and value >= 0.0:
+            self.joint_planning_tier_wall_ms.setdefault(
+                str(tier), []).append(value)
+
+    def record_robot_dwa_wall(self, seconds: float) -> None:
+        """Record a reported DWA wall time sample from robot telemetry."""
+        value = float(seconds) * 1000.0
+        if math.isfinite(value) and value >= 0.0:
+            self.robot_dwa_wall_ms.append(value)
+
+    def record_joint_refresh_suppressed(self) -> None:
+        """Count equivalent candidates discarded without route churn."""
+        self.joint_equivalent_refreshes_suppressed += 1
+
+    def record_joint_plan_request(self, reason: str,
+                                  request_class: str) -> None:
+        """Count accepted edge-triggered requests without hot-path I/O."""
+        reason_key = str(reason or 'unknown')
+        class_key = str(request_class or 'unknown')
+        self.joint_plan_requests_by_reason[reason_key] = (
+            self.joint_plan_requests_by_reason.get(reason_key, 0) + 1)
+        self.joint_plan_requests_by_class[class_key] = (
+            self.joint_plan_requests_by_class.get(class_key, 0) + 1)
+
+    def record_communication(self, channel: str, seconds: float,
+                             messages: int = 0, byte_count: int = 0) -> None:
+        """Accumulate bounded in-memory communication cost evidence."""
+        value = float(seconds) * 1000.0
+        if not math.isfinite(value) or value < 0.0:
+            return
+        key = str(channel)
+        self.communication_wall_ms.setdefault(key, []).append(value)
+        self.communication_messages[key] = (
+            self.communication_messages.get(key, 0) + int(messages))
+        self.communication_bytes[key] = (
+            self.communication_bytes.get(key, 0) + int(byte_count))
 
     def record_scheduler_fallback(self, invalid_output: bool = True):
         self.scheduler_fallbacks += 1
@@ -179,6 +283,140 @@ class MetricsCollector:
         name = str(algorithm_name or "unknown")
         self.commits_by_algorithm[name] = (
             self.commits_by_algorithm.get(name, 0) + 1)
+
+    def record_motion_telemetry(self, sim_time: float, robot_id: int,
+                                status: dict):
+        """Integrate ordered controller samples in O(1) per status packet."""
+        rid = int(robot_id)
+        try:
+            seq = int(status.get('status_seq', -1))
+            sample_time = float(status.get('status_sample_time', float('nan')))
+            linear = abs(float(status.get('commanded_linear_speed', 0.0)))
+            angular = abs(float(status.get('commanded_angular_speed', 0.0)))
+        except (TypeError, ValueError):
+            return
+        if seq < 1 or not all(math.isfinite(value) for value in (
+                sample_time, linear, angular)):
+            return
+        state = self.motion_continuity_by_robot.setdefault(rid, {
+            'session': str(status.get('status_session', 'legacy')),
+            'last_seq': 0, 'last_sample_time': sample_time,
+            'status_samples': 0, 'status_drops': 0,
+            'eligible_seconds': 0.0, 'moving_seconds': 0.0,
+            'turning_seconds': 0.0, 'valid_wait_seconds': 0.0,
+            'unblocked_zero_speed_seconds': 0.0,
+            'unblocked_stop_episodes': 0,
+            'unblocked_stop_started_at': None,
+            'unblocked_stop_reason': None,
+        })
+        session = str(status.get('status_session', 'legacy'))
+        if session != state['session']:
+            state['session'] = session
+            state['last_seq'] = 0
+            state['last_sample_time'] = sample_time
+            state['unblocked_stop_started_at'] = None
+            state['unblocked_stop_reason'] = None
+
+        if seq <= state['last_seq'] or sample_time < state['last_sample_time']:
+            return
+        contiguous = state['last_seq'] == 0 or seq == state['last_seq'] + 1
+        if state['last_seq']:
+            state['status_drops'] += max(0, seq - state['last_seq'] - 1)
+        dt = sample_time - state['last_sample_time']
+        state['last_seq'] = seq
+        state['last_sample_time'] = sample_time
+        state['status_samples'] += 1
+
+        if status.get('dwa_control_active') is True:
+            try:
+                dwa_ms = float(status.get('dwa_control_wall_ms', 0.0))
+            except (TypeError, ValueError):
+                dwa_ms = 0.0
+            if math.isfinite(dwa_ms) and dwa_ms >= 0.0:
+                self.record_robot_dwa_wall(dwa_ms / 1000.0)
+
+        # Missing intervals are intentionally not classified as clear/moving.
+        if not contiguous or dt <= 0.0 or dt > 0.5:
+            # Never bridge an episode across an unobserved interval.
+            state['unblocked_stop_started_at'] = None
+            return
+        eligible = status.get('navigating') is True
+        emergency = status.get('emergency_braking') is True
+        moving = linear >= 0.03
+        turning = not moving and angular >= 0.10
+        # Until Step 5A-2 supplies validator evidence, a fixed-slot wait is
+        # observable but cannot receive a valid-conflict exemption.
+        wait_evidence = status.get('wait_validator_evidence')
+        try:
+            evidence_until = float(
+                wait_evidence.get('valid_until', 0.0))
+        except (AttributeError, TypeError, ValueError):
+            evidence_until = float('-inf')
+        valid_wait = (
+            isinstance(wait_evidence, dict) and
+            wait_evidence.get('validated') is True and
+            math.isfinite(evidence_until) and
+            evidence_until >= sample_time)
+        unblocked_zero = eligible and not emergency and not moving and (
+            not turning) and not valid_wait
+        if eligible:
+            state['eligible_seconds'] += dt
+            if moving:
+                state['moving_seconds'] += dt
+            elif turning:
+                state['turning_seconds'] += dt
+            elif valid_wait:
+                state['valid_wait_seconds'] += dt
+            elif unblocked_zero:
+                state['unblocked_zero_speed_seconds'] += dt
+
+        started = state['unblocked_stop_started_at']
+        if unblocked_zero and started is None:
+            changed_at = status.get('command_motion_changed_at', sample_time)
+            try:
+                changed_at = float(changed_at)
+            except (TypeError, ValueError):
+                changed_at = sample_time
+            if not math.isfinite(changed_at) or not 0.0 <= changed_at <= sample_time:
+                changed_at = sample_time
+            # The actuator may have remained at zero through an intervening
+            # validated wait. That excluded interval must cut the unblocked
+            # episode even though the motor transition timestamp is older.
+            state['unblocked_stop_started_at'] = max(
+                changed_at, sample_time - dt)
+            state['unblocked_stop_reason'] = status.get(
+                'control_stop_reason') or status.get(
+                    'planned_wait_reason') or 'unclassified_zero_command'
+        elif not unblocked_zero and started is not None:
+            changed_at = status.get('command_motion_changed_at', sample_time)
+            try:
+                ended_at = float(changed_at)
+            except (TypeError, ValueError):
+                ended_at = sample_time
+            if not math.isfinite(ended_at) or not started <= ended_at <= sample_time:
+                ended_at = sample_time
+            duration = max(0.0, ended_at - started)
+            if duration > 0.5:
+                state['unblocked_stop_episodes'] += 1
+                self.motion_continuity_events.append({
+                    'robot_id': rid, 'started_at': started,
+                    'ended_at': ended_at, 'duration': duration,
+                    'reason': state['unblocked_stop_reason'],
+                })
+                self._cap_events(self.motion_continuity_events)
+            state['unblocked_stop_started_at'] = None
+            state['unblocked_stop_reason'] = None
+
+    def record_progress_lease_event(self, sim_time: float, robot_id: int,
+                                    generation: int, stage: str,
+                                    elapsed: float) -> None:
+        """Record one transition of the cross-epoch liveness lease."""
+        self.progress_lease_events.append({
+            'sim_time': float(sim_time), 'robot_id': int(robot_id),
+            'lease_generation': int(generation), 'stage': str(stage),
+            'no_progress_seconds': float(elapsed),
+        })
+        self._cap_events(self.progress_lease_events)
 
     def record_unauthorized_route_write(self, sim_time: float, robot_id: int,
                                         source: str, path_version: int,
@@ -391,6 +629,56 @@ class MetricsCollector:
                     'emergency_braking': bool(rs.get(
                         'emergency_braking', False)),
                     'speed_scale': float(rs.get('speed_scale', 1.0)),
+                    'controller_motion_state': str(rs.get(
+                        'controller_motion_state', 'unknown')),
+                    'controller_linear_speed': float(rs.get(
+                        'controller_linear_speed', 0.0)),
+                    'controller_angular_speed': float(rs.get(
+                        'controller_angular_speed', 0.0)),
+                    'controller_measured_left_wheel_speed': (
+                        float(rs['controller_measured_left_wheel_speed'])
+                        if rs.get('controller_measured_left_wheel_speed')
+                        is not None else None),
+                    'controller_measured_right_wheel_speed': (
+                        float(rs['controller_measured_right_wheel_speed'])
+                        if rs.get('controller_measured_right_wheel_speed')
+                        is not None else None),
+                    'controller_stop_reason': str(rs.get(
+                        'controller_stop_reason', 'unknown')),
+                    'controller_local_risk_level': str(rs.get(
+                        'controller_local_risk_level', 'unknown')),
+                    'controller_status_sample_time': float(rs.get(
+                        'controller_status_sample_time', 0.0)),
+                    'heading': float(rs.get('heading', 0.0)),
+                    'controller_target': (
+                        [float(value) for value in rs['controller_target'][:2]]
+                        if rs.get('controller_target') is not None else None),
+                    'controller_target_distance': (
+                        float(rs['controller_target_distance'])
+                        if rs.get('controller_target_distance') is not None
+                        else None),
+                    'controller_reported_target': (
+                        [float(value) for value in
+                         rs['controller_reported_target'][:2]]
+                        if rs.get('controller_reported_target') is not None
+                        else None),
+                    'controller_reported_target_distance': (
+                        float(rs['controller_reported_target_distance'])
+                        if rs.get('controller_reported_target_distance')
+                        is not None else None),
+                    'controller_reported_waypoint_count': int(rs.get(
+                        'controller_reported_waypoint_count', 0)),
+                    'controller_target_mismatch': bool(rs.get(
+                        'controller_target_mismatch', False)),
+                    'controller_paused_until': float(
+                        rs.get('controller_paused_until', 0.0)),
+                    'controller_joint_wait_until': float(
+                        rs.get('controller_joint_wait_until', 0.0)),
+                    'controller_joint_wait_reason': rs.get(
+                        'controller_joint_wait_reason'),
+                    'dispatch_not_before': float(
+                        rs.get('dispatch_not_before', 0.0)),
+                    'hold_until': float(rs.get('hold_until', 0.0)),
                 }
                 for rid, rs in robot_states.items()
             },
@@ -549,7 +837,7 @@ class MetricsCollector:
 
     def record_route_dispatch(self, robot_id: int, path_version: int,
                               plan_epoch: int, source: str, waypoint_count: int,
-                              sim_time: float) -> bool:
+                              sim_time: float, diagnostics: dict = None) -> bool:
         """Audit route ownership and rapid cross-source replacement."""
         event = {
             'sim_time': float(sim_time), 'robot_id': int(robot_id),
@@ -557,6 +845,8 @@ class MetricsCollector:
             'plan_epoch': int(plan_epoch),
             'waypoint_count': int(waypoint_count),
         }
+        if diagnostics:
+            event['diagnostics'] = dict(diagnostics)
         previous = self._last_route_dispatch.get(int(robot_id))
         if (previous is not None and
                 sim_time - previous['sim_time'] < 1.0 and
@@ -601,6 +891,28 @@ class MetricsCollector:
             del self.safety_events[:1000]
         return True
     
+    def record_joint_cell_traversal(self, seconds: float) -> None:
+        if math.isfinite(seconds) and seconds >= 0:
+            self.joint_cell_traversal_seconds.append(float(seconds))
+
+    def record_joint_window_gap(self, sim_time: float, robot_id: int,
+                                epoch: int, deadline: float) -> None:
+        key = (int(robot_id), int(epoch))
+        if any((event["robot_id"], event["plan_epoch"]) == key
+               for event in self.joint_window_gap_events):
+            return
+        self.joint_window_gap_events.append({
+            "sim_time": float(sim_time), "robot_id": int(robot_id),
+            "plan_epoch": int(epoch), "deadline": float(deadline)})
+
+    def record_expired_reservation_movement(
+            self, sim_time: float, robot_id: int, epoch: int,
+            waypoint_index: int, deadline: float) -> None:
+        self.reservation_expired_movement_events.append({
+            "sim_time": float(sim_time), "robot_id": int(robot_id),
+            "plan_epoch": int(epoch), "waypoint_index": int(waypoint_index),
+            "deadline": float(deadline)})
+
     def compute_final_metrics(self, robots: dict, task_stats: dict,
                               coord_stats: dict, total_time: float) -> dict:
         """
@@ -643,6 +955,60 @@ class MetricsCollector:
             workload_cv = 0.0
         
         latency = self.scheduling_latencies_ms
+        supervisor_steps = self.supervisor_step_wall_ms
+        webots_steps = self.supervisor_webots_step_wall_ms
+        joint_planning = self.joint_planning_wall_ms
+        route_dispatches_by_source = {}
+        for event in self.route_dispatch_events:
+            source = event.get('source', 'unknown')
+            route_dispatches_by_source[source] = (
+                route_dispatches_by_source.get(source, 0) + 1)
+        route_overrides_by_transition = {}
+        for event in self.route_override_events:
+            transition = (f"{event.get('previous_source', 'unknown')}->"
+                          f"{event.get('new_source', 'unknown')}")
+            route_overrides_by_transition[transition] = (
+                route_overrides_by_transition.get(transition, 0) + 1)
+        communication = {}
+        for channel, samples in self.communication_wall_ms.items():
+            communication[channel] = {
+                'samples': len(samples),
+                'messages': self.communication_messages.get(channel, 0),
+                'bytes': self.communication_bytes.get(channel, 0),
+                'wall_p50_ms': self._percentile(samples, 0.50),
+                'wall_p95_ms': self._percentile(samples, 0.95),
+                'wall_p99_ms': self._percentile(samples, 0.99),
+                'wall_max_ms': max(samples, default=0.0),
+            }
+
+        def wall_summary(samples):
+            if not samples:
+                return {
+                    'samples': 0,
+                    'mean_ms': 0.0,
+                    'p50_ms': 0.0,
+                    'p95_ms': 0.0,
+                    'p99_ms': 0.0,
+                    'max_ms': 0.0,
+                }
+            return {
+                'samples': len(samples),
+                'mean_ms': statistics.fmean(samples),
+                'p50_ms': self._percentile(samples, 0.50),
+                'p95_ms': self._percentile(samples, 0.95),
+                'p99_ms': self._percentile(samples, 0.99),
+                'max_ms': max(samples),
+            }
+
+        phase_metrics = {
+            channel: wall_summary(samples)
+            for channel, samples in self.phase_wall_ms.items()
+        }
+        joint_tier_metrics = {
+            tier: wall_summary(samples)
+            for tier, samples in self.joint_planning_tier_wall_ms.items()
+        }
+        robot_dwa_metrics = wall_summary(self.robot_dwa_wall_ms)
         completion_marks = sorted(
             float(item['completion_time']) for item in self.task_completions
             if item.get('completion_time') is not None)
@@ -670,6 +1036,40 @@ class MetricsCollector:
             float(item.get('deadline')) < float(total_time) and
             item['task_id'] not in completed_ids
             for item in arrived_deadline_tasks)
+        continuity = {}
+        continuity_totals = {
+            'eligible_seconds': 0.0, 'moving_seconds': 0.0,
+            'turning_seconds': 0.0, 'valid_wait_seconds': 0.0,
+            'unblocked_zero_speed_seconds': 0.0,
+            'unblocked_stop_episodes': 0, 'status_samples': 0,
+            'status_drops': 0,
+        }
+        for rid, raw in self.motion_continuity_by_robot.items():
+            item = {key: raw[key] for key in continuity_totals}
+            eligible = item['eligible_seconds']
+            clear_eligible = max(
+                0.0, eligible - item['valid_wait_seconds'])
+            item['clear_eligible_seconds'] = clear_eligible
+            item['clear_motion_duty_cycle'] = (
+                (item['moving_seconds'] + item['turning_seconds']) /
+                clear_eligible if clear_eligible > 0.0 else None)
+            item['unblocked_zero_speed_ratio'] = (
+                item['unblocked_zero_speed_seconds'] / eligible
+                if eligible > 0.0 else None)
+            continuity[str(rid)] = item
+            for key in continuity_totals:
+                continuity_totals[key] += item[key]
+        total_eligible = continuity_totals['eligible_seconds']
+        clear_eligible = max(
+            0.0, total_eligible - continuity_totals['valid_wait_seconds'])
+        continuity_totals['clear_eligible_seconds'] = clear_eligible
+        continuity_totals['clear_motion_duty_cycle'] = (
+            (continuity_totals['moving_seconds'] +
+             continuity_totals['turning_seconds']) / clear_eligible
+            if clear_eligible > 0.0 else None)
+        continuity_totals['unblocked_zero_speed_ratio'] = (
+            continuity_totals['unblocked_zero_speed_seconds'] /
+            total_eligible if total_eligible > 0.0 else None)
         return {
             # Primary KPIs
             "throughput_per_minute": throughput,
@@ -695,9 +1095,15 @@ class MetricsCollector:
             "predicted_conflicts": self.conflict_episode_count,
             "route_dispatches": self.route_dispatch_count,
             "rapid_route_overrides": self.route_override_count,
+            "route_dispatches_by_source": route_dispatches_by_source,
+            "route_overrides_by_transition": route_overrides_by_transition,
             "unauthorized_route_writes": self.unauthorized_route_write_count,
             "audited_replans": self.replan_count,
             "replan_requests": self.replan_request_count,
+            "joint_plan_requests_by_reason": dict(sorted(
+                self.joint_plan_requests_by_reason.items())),
+            "joint_plan_requests_by_class": dict(sorted(
+                self.joint_plan_requests_by_class.items())),
             "physical_escapes": self.escape_count,
             "nonphysical_recoveries": self.nonphysical_recoveries,
             "yield_start": self.yield_start_count,
@@ -747,6 +1153,39 @@ class MetricsCollector:
             "scheduling_latency_p95_ms": self._percentile(latency, 0.95),
             "scheduling_latency_p99_ms": self._percentile(latency, 0.99),
             "scheduling_latency_max_ms": max(latency, default=0.0),
+            "supervisor_step_wall_p50_ms": self._percentile(
+                supervisor_steps, 0.50),
+            "supervisor_step_wall_p95_ms": self._percentile(
+                supervisor_steps, 0.95),
+            "supervisor_step_wall_p99_ms": self._percentile(
+                supervisor_steps, 0.99),
+            "supervisor_step_wall_max_ms": max(
+                supervisor_steps, default=0.0),
+            "supervisor_step_samples": len(supervisor_steps),
+            "supervisor_webots_step_wall_p50_ms": self._percentile(
+                webots_steps, 0.50),
+            "supervisor_webots_step_wall_p95_ms": self._percentile(
+                webots_steps, 0.95),
+            "supervisor_webots_step_wall_p99_ms": self._percentile(
+                webots_steps, 0.99),
+            "supervisor_webots_step_wall_max_ms": max(
+                webots_steps, default=0.0),
+            "supervisor_webots_step_samples": len(webots_steps),
+            "supervisor_phase_metrics": phase_metrics,
+            "joint_planning_wall_p50_ms": self._percentile(
+                joint_planning, 0.50),
+            "joint_planning_wall_p95_ms": self._percentile(
+                joint_planning, 0.95),
+            "joint_planning_wall_p99_ms": self._percentile(
+                joint_planning, 0.99),
+            "joint_planning_wall_max_ms": max(
+                joint_planning, default=0.0),
+            "joint_equivalent_refreshes_suppressed": (
+                self.joint_equivalent_refreshes_suppressed),
+            "joint_planning_samples": len(joint_planning),
+            "joint_planning_tier_metrics": joint_tier_metrics,
+            "robot_dwa_metrics": robot_dwa_metrics,
+            "communication_metrics": communication,
             "invalid_scheduler_outputs": self.invalid_scheduler_outputs,
             "scheduler_fallbacks": self.scheduler_fallbacks,
             "native_scheduler_commits": self.native_scheduler_commits,
@@ -766,6 +1205,47 @@ class MetricsCollector:
                 self.rl_inference_latencies_ms, 0.95),
             "rl_inference_max_ms": max(
                 self.rl_inference_latencies_ms, default=0.0),
+            "joint_cell_traversal_p50_seconds": self._percentile(
+                self.joint_cell_traversal_seconds, 0.50),
+            "joint_cell_traversal_p95_seconds": self._percentile(
+                self.joint_cell_traversal_seconds, 0.95),
+            "joint_cell_traversal_p99_seconds": self._percentile(
+                self.joint_cell_traversal_seconds, 0.99),
+            "joint_cell_traversal_samples": len(
+                self.joint_cell_traversal_seconds),
+            "joint_window_gaps": len(self.joint_window_gap_events),
+            "reservation_expired_movements": len(
+                self.reservation_expired_movement_events),
+            "motion_continuity": continuity_totals,
+            "motion_continuity_by_robot": continuity,
+            "unknown_stop_episodes": sum(
+                event.get('reason') in (
+                    'unknown', 'unclassified_zero_command')
+                for event in self.motion_continuity_events),
+            "progress_lease_soft_deadlines": sum(
+                event.get('stage') == 'soft_replan'
+                for event in self.progress_lease_events),
+            "progress_lease_hard_deadlines": sum(
+                event.get('stage') in ('hard_escape', 'hard_zero_escape')
+                for event in self.progress_lease_events),
+            "terminal_service_complete": sum(
+                event.get('event_type') == 'service_complete'
+                for event in self.terminal_handoff_events),
+            "terminal_physically_clear": sum(
+                event.get('event_type') == 'physically_clear'
+                for event in self.terminal_handoff_events),
+            "terminal_inbound_denied": sum(
+                event.get('event_type') == 'inbound_denied'
+                for event in self.terminal_handoff_events),
+            "terminal_inbound_granted": sum(
+                event.get('event_type') == 'inbound_granted'
+                for event in self.terminal_handoff_events),
+            "terminal_egress_retry_failed": sum(
+                event.get('event_type') == 'egress_retry_failed'
+                for event in self.terminal_handoff_events),
+            "terminal_egress_retry_dispatched": sum(
+                event.get('event_type') == 'egress_retry_dispatched'
+                for event in self.terminal_handoff_events),
         }
     
     def save_results(self, robots: dict, task_stats: dict,
@@ -796,6 +1276,7 @@ class MetricsCollector:
             "coordination_stats": coord_stats,
             "task_completions": self.task_completions,
             "rl_event_ledger": self.rl_event_ledger,
+            "rl_decisions": self.rl_decisions,
             "conflict_events": self.conflict_events,
             "route_dispatch_events": self.route_dispatch_events,
             "route_override_events": self.route_override_events,
@@ -811,6 +1292,13 @@ class MetricsCollector:
                 self.planned_wait_events + active_wait_events),
             "deadlock_events": self.deadlock_events,
             "safety_events": self.safety_events,
+            "joint_cell_traversal_seconds": self.joint_cell_traversal_seconds,
+            "joint_window_gap_events": self.joint_window_gap_events,
+            "reservation_expired_movement_events": (
+                self.reservation_expired_movement_events),
+            "motion_continuity_events": self.motion_continuity_events,
+            "terminal_handoff_events": self.terminal_handoff_events,
+            "progress_lease_events": self.progress_lease_events,
             "time_series": [asdict(sr) for sr in self.step_records[-100:]],  # last 100 steps
         }
         

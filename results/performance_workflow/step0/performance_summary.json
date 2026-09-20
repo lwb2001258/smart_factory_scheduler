@@ -1,0 +1,66 @@
+{
+  "step": "Step0_baseline",
+  "result_file": "experiment_C_FCFS_20260915_162540.json",
+  "run_mode": "fast-no-rendering + animation recording",
+  "wall_seconds_derived": 131.2200023,
+  "sim_to_wall_ratio_derived": 1.372,
+  "tasks_completed": 1,
+  "tasks_generated": 18,
+  "route_dispatches": 330,
+  "rapid_route_overrides": 42,
+  "audited_replans": 34,
+  "unplanned_task_stops": 5,
+  "min_pair_distance": 0.5477145111028323,
+  "pair_distance_violations": 0,
+  "supervisor_step_wall_p50_ms": 4.9423999998907675,
+  "supervisor_step_wall_p95_ms": 10.298200000306679,
+  "supervisor_step_wall_p99_ms": 316.0641999998006,
+  "supervisor_step_wall_max_ms": 1548.020500000348,
+  "joint_planning_wall_p50_ms": 102.21809999984544,
+  "joint_planning_wall_p95_ms": 172.40040000024237,
+  "joint_planning_wall_p99_ms": 193.63269999985278,
+  "joint_planning_wall_max_ms": 205.77060000005076,
+  "joint_planning_samples": 251,
+  "communication_metrics": {
+    "peer_broadcast": {
+      "samples": 11250,
+      "messages": 90000,
+      "bytes": 146770939,
+      "wall_p50_ms": 0.2893999999287189,
+      "wall_p95_ms": 0.3666000002340297,
+      "wall_p99_ms": 0.5489000000125088,
+      "wall_max_ms": 1.398700000208919
+    },
+    "receive": {
+      "samples": 11250,
+      "messages": 0,
+      "bytes": 0,
+      "wall_p50_ms": 0.003200000264769187,
+      "wall_p95_ms": 0.4293000001780456,
+      "wall_p99_ms": 1.0165999997298059,
+      "wall_max_ms": 17.10529999991195
+    },
+    "command": {
+      "samples": 5312,
+      "messages": 5312,
+      "bytes": 783093,
+      "wall_p50_ms": 0.00670000008540228,
+      "wall_p95_ms": 0.014899999769113492,
+      "wall_p99_ms": 0.04239999998389976,
+      "wall_max_ms": 0.13590000025942572
+    }
+  },
+  "stop_analysis_summary": {
+    "stop_intervals": 95,
+    "active_stop_intervals": 89,
+    "unexplained_active_intervals": 61,
+    "max_concurrent_motion_expected_stops": 8,
+    "mass_stop_threshold": 3,
+    "mass_stop_seconds": 48.352,
+    "max_concurrent_abnormal_stops": 7,
+    "abnormal_mass_stop_seconds": 40.128,
+    "rotating_in_place_intervals": 46,
+    "max_concurrent_pose_stationary_abnormal_stops": 0,
+    "pose_stationary_abnormal_mass_stop_seconds": 0
+  }
+}

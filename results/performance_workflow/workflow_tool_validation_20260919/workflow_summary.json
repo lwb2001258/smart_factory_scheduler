@@ -1,0 +1,44 @@
+{
+  "step": "workflow_tool_validation_20260919",
+  "metrics": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "seed": 44,
+    "duration": 180.0,
+    "tasks_completed": 1,
+    "route_dispatches": 220,
+    "audited_replans": 16,
+    "unplanned_task_stops": 0,
+    "min_pair_distance": 0.5488477299901041,
+    "pair_distance_violations": 0,
+    "clear_motion_duty_cycle": 0.9614197530864198,
+    "unexplained_active_intervals": 41,
+    "abnormal_mass_stop_seconds": 5.856,
+    "rotating_in_place_intervals": 32,
+    "sim_to_wall_ratio": 1.2038714620151079,
+    "webots_wall_seconds": 149.51762350002537,
+    "supervisor_step_wall_p99_ms": 73.50070000393316,
+    "joint_planning_wall_p99_ms": 322.95530004194006,
+    "artifacts": {
+      "html": "webots_diagnostic_C_FCFS_20260919_191709.html",
+      "json": "webots_diagnostic_C_FCFS_20260919_191709.json",
+      "x3d": "webots_diagnostic_C_FCFS_20260919_191709.x3d",
+      "css": "webots_diagnostic_C_FCFS_20260919_191709.css"
+    }
+  },
+  "gate": {
+    "passed": false,
+    "checks": {
+      "recording_exists": true,
+      "pair_distance_violations_zero": true,
+      "sim_to_wall_ratio": true,
+      "abnormal_mass_stop_seconds_not_worse": false,
+      "unexplained_active_intervals_not_worse": false,
+      "rotating_in_place_intervals_not_worse": true,
+      "unplanned_task_stops_not_worse": true,
+      "clear_motion_duty_cycle_not_worse": false,
+      "tasks_completed_not_worse": true,
+      "min_pair_distance_not_worse": true
+    }
+  }
+}

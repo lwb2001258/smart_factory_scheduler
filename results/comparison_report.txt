@@ -4,13 +4,14 @@ Learning-Based vs Rule-Based Scheduling for Multi-Robot Coordination
 ================================================================================
 
 ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
-SCENARIO A: 3 robots, low task arrival rate (1 task per 30 seconds)
+SCENARIO C: 8 robots, high task arrival rate (1 task per 8 seconds)
+Paired seeds: [44] | mode: webots
 ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
 Scheduler              Throughput    Avg Compl     Avg Wait     Idle %  Conflicts
                       (tasks/min)    (seconds)    (seconds)                      
 --------------------------------------------------------------------------------
-DQN                          0.00         0.00         0.00        2.8        0.0
-  valid seeds=1/1; throughput std=0.000, median=0.000, min=0.000, max=0.000
-  scheduling latency across runs: P95 mean=7.6548 ms, P99 mean=7.6548 ms
+FCFS                         0.33       105.74         0.00       10.1        0.0
+  valid seeds=1/1; throughput std=0.000, median=0.333, min=0.333, max=0.333
+  scheduling latency across runs: P95 mean=0.1002 ms, P99 mean=0.1002 ms
 
 ================================================================================

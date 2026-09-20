@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "error_type": "RuntimeError",
+  "message": "DQN result is fallback-contaminated: rl_fallback=1, scheduler_fallback=1, fallback_commits=0",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\code\\smart_factory_scheduler\\scripts\\run_webots_finetune_workflow.py\", line 290, in main\n    print(json.dumps(run(args), indent=2))\n                     ^^^^^^^^^\n  File \"D:\\code\\smart_factory_scheduler\\scripts\\run_webots_finetune_workflow.py\", line 244, in run\n    result = run_webots_with_retry(\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\code\\smart_factory_scheduler\\scripts\\run_webots_finetune_workflow.py\", line 170, in run_webots_with_retry\n    result = run_single_experiment(\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\code\\smart_factory_scheduler\\scripts\\run_experiments.py\", line 254, in run_single_experiment\n    validate_native_rl_result(experiment_result, scheduler)\n  File \"D:\\code\\smart_factory_scheduler\\scripts\\run_experiments.py\", line 115, in validate_native_rl_result\n    raise RuntimeError(\nRuntimeError: DQN result is fallback-contaminated: rl_fallback=1, scheduler_fallback=1, fallback_commits=0\n"
+}

@@ -1,0 +1,12 @@
+﻿{
+    "diagnostic_recording":  true,
+    "scenario":  "C",
+    "run_mode":  "fast-no-rendering",
+    "step":  "Step1_observability",
+    "sim_duration":  180,
+    "created_at":  "2026-09-15T16:42:03+08:00",
+    "seed":  44,
+    "webots_exe":  "C:\\Program Files\\Webots\\msys64\\mingw64\\bin\\webots.exe",
+    "auto_stop":  true,
+    "scheduler":  "FCFS"
+}

@@ -1,0 +1,92 @@
+
+============================================================
+Running: Scenario C | Scheduler: FCFS | Seed: 44
+============================================================
+Launching Webots simulation (wall timeout: 1320s)...
+ ¡ú Waypoint 4/8 (-6.75,0.00)
+INFO: HTML5 animation successfully exported in 'D:/code/smart_factory_scheduler/results/webots_diagnostic_C_FCFS_20260920_105059.html'
+
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: factory_supervisor: Terminating.
+
+
+============================================================
+Running: Scenario C | Scheduler: FCFS | Seed: 44
+============================================================
+Launching Webots simulation (wall timeout: 1320s)...
+int 3/8 (-1.75,-3.00)
+[Nav 5] ¡ú Waypoint 4/8 (-3.00,-2.75)
+[T=599.3] New task 66: S6 -> WS2
+[Nav 6] ¡ú Waypoint 3/8 (-1.00,-2.00)
+[Nav 3] ¡ú Waypoint 4/8 (-6.75,0.00)
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: robot_controller: Terminating.
+INFO: factory_supervisor: Terminating.
+
+{
+  "step": "step_k_long_baseline_20260920",
+  "metrics": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "seed": 44,
+    "duration": 600.0,
+    "recorded_sim_duration": 600.0000000000529,
+    "tasks_completed": 11,
+    "tasks_generated": 66,
+    "throughput_per_minute": 1.099999999999903,
+    "longest_completion_plateau_seconds": 164.67200000020125,
+    "final_completion_plateau_seconds": 22.36799999994787,
+    "robots_without_completed_tasks": 1,
+    "reservation_deadline_stop_episodes": 60,
+    "total_distance_all_robots": 313.0635762892264,
+    "route_dispatches": 972,
+    "rapid_route_overrides": 194,
+    "audited_replans": 123,
+    "unplanned_task_stops": 7,
+    "min_pair_distance": 0.5426948499998488,
+    "pair_distance_violations": 0,
+    "clear_motion_duty_cycle": 0.9334127051620037,
+    "unexplained_active_intervals": 134,
+    "abnormal_mass_stop_seconds": 57.12,
+    "rotating_in_place_intervals": 151,
+    "sim_to_wall_ratio": 1.0699850259697306,
+    "webots_wall_seconds": 560.7555109999957,
+    "supervisor_step_wall_p99_ms": 370.9536999813281,
+    "joint_planning_wall_p99_ms": 329.8631000216119,
+    "artifacts": {
+      "html": "webots_diagnostic_C_FCFS_20260920_105059.html",
+      "json": "webots_diagnostic_C_FCFS_20260920_105059.json",
+      "x3d": "webots_diagnostic_C_FCFS_20260920_105059.x3d",
+      "css": "webots_diagnostic_C_FCFS_20260920_105059.css"
+    }
+  },
+  "gate": {
+    "passed": false,
+    "checks": {
+      "recording_exists": true,
+      "pair_distance_violations_zero": true,
+      "sim_to_wall_ratio": true,
+      "recording_duration_5_to_10_minutes": true,
+      "recording_reached_requested_duration": true,
+      "throughput_absolute_minimum": true,
+      "longest_completion_plateau_bounded": false,
+      "final_completion_plateau_bounded": true,
+      "fleet_task_participation": true,
+      "reservation_deadline_stops_bounded": false
+    },
+    "material_improvements": {}
+  }
+}

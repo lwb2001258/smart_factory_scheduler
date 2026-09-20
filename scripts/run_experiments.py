@@ -202,12 +202,15 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
     env["SMART_FACTORY_RUN_MODE"] = checkpoint_audit["run_mode"]
     
     webots_run_ok = False
+    webots_wall_seconds = None
+    wall_timeout = None
     if webots_available:
         # Launch Webots in batch mode (no GUI, faster)
         wall_timeout = webots_wall_timeout_seconds()
         print(f"Launching Webots simulation (wall timeout: "
               f"{wall_timeout:.0f}s)...")
         try:
+            wall_started = time.perf_counter()
             result = subprocess.run(
                 [webots_path, "--batch", "--no-rendering", "--mode=fast",
                  "--stdout", "--stderr", WORLD_FILE],
@@ -216,6 +219,7 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
                 text=True,
                 timeout=wall_timeout
             )
+            webots_wall_seconds = time.perf_counter() - wall_started
             tail = result.stdout[-500:] if len(result.stdout) > 500 else result.stdout
             print(console_safe(tail))
             if result.returncode != 0:
@@ -250,6 +254,24 @@ def run_single_experiment(scenario: str, scheduler: str, seed: int,
     
     # Find and load the most recent results file
     experiment_result = load_latest_results(scenario, scheduler)
+    if webots_run_ok and webots_wall_seconds is not None:
+        execution = {
+            "webots_wall_seconds": webots_wall_seconds,
+            "sim_to_wall_ratio": duration / webots_wall_seconds,
+            "wall_timeout_seconds": wall_timeout,
+            "batch_mode": "fast-no-rendering",
+        }
+        experiment_result["execution_metrics"] = execution
+        pattern = f"experiment_{scenario}_{scheduler}_"
+        files = sorted(f for f in os.listdir(RESULTS_DIR)
+                       if f.startswith(pattern) and f.endswith(".json"))
+        if not files:
+            raise RuntimeError("completed Webots run has no result file")
+        result_path = os.path.join(RESULTS_DIR, files[-1])
+        temporary_path = result_path + ".execution.tmp"
+        with open(temporary_path, "w", encoding="utf-8") as handle:
+            json.dump(experiment_result, handle, indent=2, allow_nan=False)
+        os.replace(temporary_path, result_path)
     if scheduler in RL_SCHEDULER_TYPES and not allow_rl_fallback:
         validate_native_rl_result(experiment_result, scheduler)
         from evaluation_gate import validate_evaluation_result
@@ -927,6 +949,8 @@ def run_all_experiments(scenarios: List[str] = None,
 
 def generate_comparison_report(all_results: Dict):
     """Generate a comparison table of all experiment results."""
+    from comparison_integrity import validate_paired_results
+    comparison_audit = validate_paired_results(all_results)
     report_path = os.path.join(RESULTS_DIR, "comparison_report.txt")
     
     lines = []
@@ -939,6 +963,9 @@ def generate_comparison_report(all_results: Dict):
         sc = SCENARIOS[scenario]
         lines.append(f"\n{'─'*80}")
         lines.append(f"SCENARIO {scenario}: {sc['description']}")
+        audit = comparison_audit[scenario]
+        lines.append(
+            f"Paired seeds: {audit['paired_seeds']} | mode: {audit['run_mode']}")
         lines.append(f"{'─'*80}")
         lines.append(f"{'Scheduler':<20} {'Throughput':>12} {'Avg Compl':>12} "
                      f"{'Avg Wait':>12} {'Idle %':>10} {'Conflicts':>10}")

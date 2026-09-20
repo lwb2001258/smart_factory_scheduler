@@ -1,0 +1,10 @@
+usage: run_experiments.py [-h] [--scenario {A,B,C} [{A,B,C} ...]]
+                          [--scheduler {FCFS,NearestNeighbour,RoundRobin,Greedy,Random,Hungarian,Auction,GA,SA,PPO_RL,SARSA,DQN,SARSA_LAMBDA,RAINBOW_DQN,A2C,DISCRETE_SAC,QR_DQN} [{FCFS,NearestNeighbour,RoundRobin,Greedy,Random,Hungarian,Auction,GA,SA,PPO_RL,SARSA,DQN,SARSA_LAMBDA,RAINBOW_DQN,A2C,DISCRETE_SAC,QR_DQN} ...]]
+                          [--seeds SEEDS]
+                          [--seed-values SEED_VALUES [SEED_VALUES ...]]
+                          [--webots WEBOTS] [--standalone]
+                          [--sarsa-model SARSA_MODEL] [--dqn-model DQN_MODEL]
+                          [--ppo-model PPO_MODEL]
+                          [--advanced-model ALGORITHM=PATH]
+                          [--allow-rl-fallback]
+run_experiments.py: error: unrecognized arguments: Files\Webots\msys64\mingw64\bin\webots.exe

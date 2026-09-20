@@ -6,6 +6,12 @@ All factory layout, robot, scheduling, and experiment parameters.
 import math
 import os
 import random
+import sys
+
+_CONTROLLERS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _CONTROLLERS_DIR not in sys.path:
+    sys.path.insert(0, _CONTROLLERS_DIR)
+from motion_safety import MOTION_SAFETY
 
 # ================================================================
 # SIMULATION PARAMETERS
@@ -323,7 +329,7 @@ GRAPH_EDGES = [
 # Forward-declare ROBOT_RADIUS here so OBSTACLE_BOXES can reference it.
 # The authoritative definition is in the ROBOT PARAMETERS section below;
 # this just makes Python happy with the module-level dict literal.
-ROBOT_RADIUS = 0.18  # metres (bounding radius for collision)
+ROBOT_RADIUS = MOTION_SAFETY.footprint_radius_m
 OBSTACLE_BOXES = [
     # 4 shelves at y=0, x ∈ {-3, -1, +1, +3} — size 1.0 × 2.0 m
     {"name": "shelf_1", "cx": -3.0, "cy": 0.0,
@@ -631,7 +637,7 @@ STARTUP_CONFIG = {
 # ================================================================
 # RL TRAINING PARAMETERS (PPO)
 # ================================================================
-RL_ENVIRONMENT_VERSION = "rl-scheduling-v7-deadline-time-aware"
+RL_ENVIRONMENT_VERSION = "rl-scheduling-v8-webots-proxy-score-parity"
 
 RL_CONFIG = {
     "learning_rate": 3e-4,

@@ -1,0 +1,52 @@
+{
+  "step": "step_g3_avoidance_20260919",
+  "metrics": {
+    "scenario": "C",
+    "scheduler": "FCFS",
+    "seed": 44,
+    "duration": 180.0,
+    "tasks_completed": 0,
+    "route_dispatches": 195,
+    "audited_replans": 12,
+    "unplanned_task_stops": 2,
+    "min_pair_distance": 0.6720105300159297,
+    "pair_distance_violations": 0,
+    "clear_motion_duty_cycle": 0.9716253443526173,
+    "unexplained_active_intervals": 36,
+    "abnormal_mass_stop_seconds": 0.992,
+    "rotating_in_place_intervals": 21,
+    "sim_to_wall_ratio": 0.8759718674278414,
+    "webots_wall_seconds": 205.48605119995773,
+    "supervisor_step_wall_p99_ms": 221.1953999940306,
+    "joint_planning_wall_p99_ms": 450.10389998788014,
+    "artifacts": {
+      "html": "webots_diagnostic_C_FCFS_20260919_210736.html",
+      "json": "webots_diagnostic_C_FCFS_20260919_210736.json",
+      "x3d": "webots_diagnostic_C_FCFS_20260919_210736.x3d",
+      "css": "webots_diagnostic_C_FCFS_20260919_210736.css"
+    }
+  },
+  "gate": {
+    "passed": false,
+    "checks": {
+      "recording_exists": true,
+      "pair_distance_violations_zero": true,
+      "sim_to_wall_ratio": false,
+      "abnormal_mass_stop_seconds_within_noise": true,
+      "unexplained_active_intervals_within_noise": true,
+      "rotating_in_place_intervals_within_noise": true,
+      "unplanned_task_stops_not_worse": false,
+      "clear_motion_duty_cycle_within_noise": true,
+      "tasks_completed_not_worse": false,
+      "minimum_pair_distance_absolute": true,
+      "material_robot_efficiency_improvement": true
+    },
+    "material_improvements": {
+      "tasks": false,
+      "abnormal_mass_stop": true,
+      "unexplained_active": false,
+      "rotating_in_place": true,
+      "motion_duty": false
+    }
+  }
+}

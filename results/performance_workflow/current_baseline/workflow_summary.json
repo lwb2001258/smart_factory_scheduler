@@ -1,0 +1,16 @@
+{
+  "step": "current_baseline_before_workflow_tool",
+  "metrics": {
+    "tasks_completed": 1,
+    "route_dispatches": 224,
+    "audited_replans": 15,
+    "unplanned_task_stops": 0,
+    "min_pair_distance": 0.5488477299901041,
+    "pair_distance_violations": 0,
+    "clear_motion_duty_cycle": 0.9765096034268342,
+    "unexplained_active_intervals": 36,
+    "abnormal_mass_stop_seconds": 5.376,
+    "rotating_in_place_intervals": 35,
+    "sim_to_wall_ratio": 1.0151709950866024
+  }
+}

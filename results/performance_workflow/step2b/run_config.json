@@ -1,0 +1,12 @@
+﻿{
+    "diagnostic_recording":  true,
+    "scenario":  "C",
+    "run_mode":  "fast-no-rendering",
+    "step":  "Step2b_segment_distance_lru",
+    "sim_duration":  180,
+    "created_at":  "2026-09-15T16:59:31+08:00",
+    "seed":  44,
+    "webots_exe":  "C:\\Program Files\\Webots\\msys64\\mingw64\\bin\\webots.exe",
+    "auto_stop":  true,
+    "scheduler":  "FCFS"
+}

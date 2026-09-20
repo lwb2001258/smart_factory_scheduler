@@ -18,6 +18,9 @@ from rl_agents import DQNAgent, DQNConfig, SarsaAgent, SarsaConfig
 from rl_environment import (RLEnvironmentConfig, RewardConfig,
                             SchedulingEnvironment)
 from training_scenarios import manifest_scenario
+from evaluation_objective import (SelectionMetrics,
+                                  algorithm_selection_score,
+                                  objective_metadata)
 
 
 def scenario(seed: int, max_robots=8, max_tasks=20):
@@ -29,6 +32,8 @@ def scenario(seed: int, max_robots=8, max_tasks=20):
 
 def evaluate(agent, algorithm: str, seeds, env_config, reward_config=None):
     rewards, completed, invalid = [], [], 0
+    completion_times, waiting_times, makespans, distances = [], [], [], []
+    generated_counts = []
     for seed in seeds:
         env = SchedulingEnvironment(env_config, reward_config,
                                     simulation_mode="abstract")
@@ -49,24 +54,41 @@ def evaluate(agent, algorithm: str, seeds, env_config, reward_config=None):
                     "completed_count", len(env._completed_ids)))
                 break
         rewards.append(total)
+        generated_counts.append(len(env._tasks))
+        finished = [task for task in env._tasks
+                    if task.completion_time is not None]
+        completion_times.extend(float(task.completion_duration)
+                                for task in finished)
+        waiting_times.extend(float(task.waiting_time) for task in finished)
+        makespans.append(float(env._context.current_time))
+        distances.append(sum(float(state.get("total_distance", 0.0))
+                             for state in env._robots.values()))
+    mean_completed = float(np.mean(completed)) if completed else 0.0
+    completion_rate = (sum(completed) / max(sum(generated_counts), 1))
     return {
         "mean_reward": float(np.mean(rewards)),
         "std_reward": float(np.std(rewards)),
-        "mean_completed": float(np.mean(completed)) if completed else 0.0,
+        "mean_completed": mean_completed,
+        "completion_rate": completion_rate,
+        "mean_completion_time": (float(np.mean(completion_times))
+                                 if completion_times else 0.0),
+        "mean_waiting_time": (float(np.mean(waiting_times))
+                              if waiting_times else 0.0),
+        "mean_makespan": float(np.mean(makespans)) if makespans else 0.0,
+        "mean_distance": float(np.mean(distances)) if distances else 0.0,
         "invalid_actions": invalid,
     }
 
 
 def validation_selection_score(metrics):
-    """Reward-scale-independent checkpoint score.
-
-    Reward profiles intentionally use different coefficients, so raw return
-    cannot fairly compare them. Completion dominates, illegal actions are a
-    hard regression, and normalized return only breaks near ties.
-    """
-    return (100.0 * float(metrics["mean_completed"])
-            - 100.0 * float(metrics["invalid_actions"])
-            + 0.01 * float(metrics["mean_reward"]))
+    return algorithm_selection_score(SelectionMetrics(
+        completion_rate=float(metrics["completion_rate"]),
+        mean_completion_time=float(metrics["mean_completion_time"]),
+        mean_waiting_time=float(metrics["mean_waiting_time"]),
+        mean_makespan=float(metrics["mean_makespan"]),
+        mean_distance=float(metrics["mean_distance"]),
+        invalid_actions=int(metrics["invalid_actions"]),
+        mean_reward=float(metrics["mean_reward"])))
 
 
 def train(args):
@@ -188,6 +210,7 @@ def train(args):
         "best_validation_metrics": best_validation_metrics,
         "reward_config": reward_config.__dict__,
         "test_not_used_for_selection": True,
+        "selection_objective": objective_metadata(),
     }
     (output / "training_metrics.json").write_text(
         json.dumps(report, indent=2), encoding="utf-8")

@@ -20,6 +20,11 @@ class JointPlanTransaction:
     state: str = "preparing"
     failure_reason: Optional[str] = None
     activate_at: Optional[float] = None
+    activation_positions: Dict[int, tuple] = field(default_factory=dict)
+    activation_goals: Dict[int, object] = field(default_factory=dict)
+    planning_positions: Dict[int, tuple] = field(default_factory=dict)
+    creation_positions: Dict[int, tuple] = field(default_factory=dict)
+    activation_ack_details: Dict[int, dict] = field(default_factory=dict)
 
     @property
     def members(self):

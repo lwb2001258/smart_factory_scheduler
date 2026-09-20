@@ -18,7 +18,7 @@ class RLSchedulingContract:
     robot_order: str = "ascending_robot_id"
     task_order: str = "task_id_then_arrival_time"
     action_semantics: str = "robot_slot*max_tasks+task_slot; final=NO_OP"
-    no_op_rule: str = "WAIT legal only when no feasible pair in v7"
+    no_op_rule: str = "WAIT legal only when no feasible pair in v8"
     feasibility_contract: str = "deadline-v1+build_cost_matrix+validate_assignment"
     reward_contract: str = "deadline-event-reward-v2"
     discount_contract: str = "elapsed-seconds-bootstrap-v1"

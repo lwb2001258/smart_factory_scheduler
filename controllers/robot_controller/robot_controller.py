@@ -15,7 +15,14 @@ import json
 import math
 import random
 import os
+import time
+import uuid
 from typing import List, Tuple, Optional
+
+_CONTROLLERS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _CONTROLLERS_DIR not in sys.path:
+    sys.path.insert(0, _CONTROLLERS_DIR)
+from motion_safety import MOTION_SAFETY
 
 try:
     from controller import Robot
@@ -34,7 +41,7 @@ except ImportError:
 # CONSTANTS
 # ================================================================
 MAX_SPEED = 6.67          # rad/s (max wheel angular velocity)
-MAX_LINEAR_SPEED = 0.22   # m/s
+MAX_LINEAR_SPEED = MOTION_SAFETY.maximum_speed_mps
 MAX_ANGULAR_SPEED = 2.84  # rad/s
 WHEEL_RADIUS = 0.033      # m
 WHEEL_BASE = 0.287        # m (distance between wheels)
@@ -54,7 +61,7 @@ GOAL_THRESHOLD = 0.35     # m - distance to consider waypoint reached
 HEADING_THRESHOLD = 0.15  # rad - heading alignment threshold
 
 OBSTACLE_THRESHOLD = 0.8  # m - increased for earlier steering clearance
-CRITICAL_DISTANCE = 0.40  # m - increased from 0.25: avoid bumping shelves
+CRITICAL_DISTANCE = MOTION_SAFETY.dwa_critical_distance_m
 
 # DWA parameters
 DWA_V_RESOLUTION = 0.01   # m/s
@@ -93,11 +100,10 @@ DOCK_ZONE_X_RANGE = (-3.7, 3.7)  # shelves span x∈[-3.5, 3.5] + margin
 # ══════════════════════════════════════════════════════════════════════
 # 物理参数 �?所有避障距离的计算基础
 # ══════════════════════════════════════════════════════════════════════
-ROBOT_RADIUS = 0.18             # m �?机器人碰撞半�?
+ROBOT_RADIUS = MOTION_SAFETY.footprint_radius_m
 ROBOT_DIAMETER = 2 * ROBOT_RADIUS  # 0.36m �?两机器人碰撞时的中心�?
-MAX_LINEAR_SPEED = 0.22         # m/s �?最大线速度
-BRAKING_DECEL = 0.5             # m/s² �?制动减速度(保守估计)
-BRAKING_DISTANCE = MAX_LINEAR_SPEED**2 / (2 * BRAKING_DECEL)  # �?.048m
+BRAKING_DECEL = MOTION_SAFETY.braking_deceleration_mps2
+BRAKING_DISTANCE = MOTION_SAFETY.stopping_distance_m
 BRAKING_TIME = MAX_LINEAR_SPEED / BRAKING_DECEL                # �?.44s
 SAFETY_MARGIN = 0.12            # m �?额外安全裕度
 
@@ -111,7 +117,7 @@ SAFETY_MARGIN = 0.12            # m �?额外安全裕度
 PATH_CONFLICT_DIST = 1.4         # m �?前方路径上peer距离小于此值则"冲突"
 PATH_CONFLICT_CHECK_INTERVAL = 5 # �?帧检测一�?160ms)
 # 紧急制�?最后保�?:
-EMERGENCY_STOP_DIST = 0.55       # m �?中心距小于此值才紧急制�?仅保�?
+EMERGENCY_STOP_DIST = MOTION_SAFETY.coordinated_stop_distance_m
 
 # ══════════════════════════════════════════════════════════════════════
 # LAYER 1: 平滑减�?�?接近peer时减速（配合前瞻重规划）
@@ -119,8 +125,8 @@ EMERGENCY_STOP_DIST = 0.55       # m �?中心距小于此值才紧急制�?�
 # 正常情况下，前瞻检测会提前重规划，机器人不会靠近peer�?
 # 此层仅在重规划延迟期间提供平滑减速保护�?
 PEER_SLOW_DIST = 1.2              # m �?开始减�?
-PEER_STOP_DIST = 0.70             # m �?停止(保留0.50m硬冲突边界外的余�?
-PEER_RADIAL_STOP_DIST = 0.80      # m �?独立欧氏距离保护，覆盖侧向接近和制动惯�?
+PEER_STOP_DIST = MOTION_SAFETY.planning_clearance_m
+PEER_RADIAL_STOP_DIST = MOTION_SAFETY.peer_radial_stop_distance_m
 # Legacy aliases for compatibility:
 PEER_LOOKAHEAD_DIST = 2.0
 PEER_REPLAN_DIST = 1.5
@@ -150,6 +156,7 @@ class WaypointNavigator:
         self._nav_step_count = 0          # 总帧�?用于冷却计时)
         self._replan_cooldown_until = 0.0 # 冷却结束时间
         self._emergency_stopped = False   # 紧急制动状�?
+        self._emergency_reason = None
         self.robot_id = 0  # Set by RobotController
         
         # ── Sidestep state (lateral avoidance for head-on robots) ──
@@ -166,9 +173,19 @@ class WaypointNavigator:
         # ── Peer robot positions (updated by supervisor broadcasts) ──
         self.peer_positions = {}  # {robot_id: (x, y)} �?all other robots
         self.peer_samples = {}
+        self.peer_broadcast_seq = -1
         self.paused_until = 0.0
         self.path_version = 0
         self.controller_time = 0.0
+        self.waypoint_advanced_at = 0.0
+        self.segment_departed_at = 0.0
+        self.segment_departure_index = -1
+        self.segment_departure_distance = 0.0
+        self.segment_arrived_at = 0.0
+        self.completed_segment_departed_at = 0.0
+        self.completed_segment_departure_index = -1
+        self.completed_segment_departure_distance = 0.0
+        self.completed_segment_arrived_at = 0.0
         self.speed_scale = 1.0
         self.waypoint_not_before: List[float] = []
         self.plan_is_partial = False
@@ -176,9 +193,17 @@ class WaypointNavigator:
         self.waypoint_threshold = GOAL_THRESHOLD
         self.planned_wait_until = 0.0
         self.planned_wait_reason = None
+        self.advance_grants = {}
+        self.advance_grant_seq = -1
+        self.advance_wait_evidence = None
         self.joint_epoch_wait_deadline = 0.0
         self.joint_coordinated = False
         self.direct_navigation = False
+        # A large heading correction may start with a pivot, but rolling
+        # route replacement must not keep a robot rotating in place forever.
+        self._joint_pivot_started_at = None
+        self._last_dwa_active = False
+        self._last_dwa_wall_ms = 0.0
         # Preserve the legacy sample order so DWA tie-breaking is unchanged.
         self._dwa_v_samples = tuple(self._frange(
             0.0, MAX_LINEAR_SPEED, DWA_V_RESOLUTION * 5))
@@ -197,6 +222,15 @@ class WaypointNavigator:
         """Set a new list of waypoints to follow."""
         self.waypoints = waypoints
         self.current_waypoint_idx = 0
+        self.waypoint_advanced_at = 0.0
+        self.segment_departed_at = 0.0
+        self.segment_departure_index = -1
+        self.segment_departure_distance = 0.0
+        self.segment_arrived_at = 0.0
+        self.completed_segment_departed_at = 0.0
+        self.completed_segment_departure_index = -1
+        self.completed_segment_departure_distance = 0.0
+        self.completed_segment_arrived_at = 0.0
         self.navigation_active = True
         self.goal_reached = False
         self.waypoint_not_before = list(waypoint_not_before or ())
@@ -217,6 +251,7 @@ class WaypointNavigator:
         self.sidestep_lateral_x = 0.0
         self.sidestep_lateral_y = 0.0
         self._emergency_stopped = False
+        self._emergency_reason = None
         self._replan_requested = False
     
     def get_current_target(self) -> Optional[Tuple[float, float]]:
@@ -227,7 +262,13 @@ class WaypointNavigator:
     
     def advance_waypoint(self) -> bool:
         """Move to next waypoint. Returns True if final goal reached."""
+        self.completed_segment_departed_at = self.segment_departed_at
+        self.completed_segment_departure_index = self.segment_departure_index
+        self.completed_segment_departure_distance = (
+            self.segment_departure_distance)
+        self.completed_segment_arrived_at = self.segment_arrived_at
         self.current_waypoint_idx += 1
+        self.waypoint_advanced_at = self.controller_time
         if self.current_waypoint_idx >= len(self.waypoints):
             self.navigation_active = False
             self.goal_reached = True
@@ -239,7 +280,43 @@ class WaypointNavigator:
             print(f"[Nav {self.robot_id}] \u2192 Waypoint {self.current_waypoint_idx}/{len(self.waypoints)-1} "
                   f"({wp[0]:.2f},{wp[1]:.2f})")
         return False
+
+    def record_segment_departure(self, left_speed: float, right_speed: float,
+                                 robot_x: float, robot_y: float) -> None:
+        """Capture the first non-zero command for one joint path segment."""
+        if (not self.joint_coordinated or
+                max(abs(left_speed), abs(right_speed)) <= 1e-6 or
+                self.segment_departure_index == self.current_waypoint_idx):
+            return
+        target = self.get_current_target()
+        if target is None:
+            return
+        self.segment_departed_at = self.controller_time
+        self.segment_departure_index = self.current_waypoint_idx
+        self.segment_departure_distance = math.hypot(
+            target[0] - robot_x, target[1] - robot_y)
+        self.segment_arrived_at = 0.0
     
+    def _advance_grant_is_valid(self, waypoint_index: int) -> bool:
+        grant = self.advance_grants.get(waypoint_index)
+        return (
+            isinstance(grant, dict) and
+            int(grant.get('plan_epoch', -1)) ==
+            int(getattr(self, 'active_plan_epoch', 0)) and
+            math.isfinite(float(grant.get('valid_until', 0.0))) and
+            float(grant.get('valid_until', 0.0)) >= self.controller_time)
+
+    def _advance_hold_is_valid(self, waypoint_index: int) -> bool:
+        evidence = self.advance_wait_evidence
+        return bool(
+            isinstance(evidence, dict) and
+            evidence.get('validated') is True and
+            int(evidence.get('plan_epoch', -1)) ==
+            int(getattr(self, 'active_plan_epoch', 0)) and
+            int(evidence.get('waypoint_index', -1)) == waypoint_index and
+            math.isfinite(float(evidence.get('valid_until', 0.0))) and
+            float(evidence.get('valid_until', 0.0)) >= self.controller_time)
+
     def compute_control(self, robot_x: float, robot_y: float,
                         robot_heading: float,
                         lidar_ranges: Optional[List[float]] = None
@@ -257,10 +334,18 @@ class WaypointNavigator:
             (left_speed, right_speed) motor velocities in rad/s.
         """
         self._nav_step_count += 1
+        self._last_dwa_active = False
+        self._last_dwa_wall_ms = 0.0
         self.planned_wait_until = 0.0
         self.planned_wait_reason = None
         target = self.get_current_target()
         if target is None:
+            if self.navigation_active:
+                # An active route with no current waypoint is a bounded route
+                # handoff failure, not an unexplained zero-speed command.
+                self._replan_requested = True
+                self.planned_wait_until = self.controller_time + 0.25
+                self.planned_wait_reason = 'route_exhausted_replan'
             return (0.0, 0.0)
         if self.current_waypoint_idx > self.joint_release_index:
             bounded_wait_until = min(
@@ -271,6 +356,25 @@ class WaypointNavigator:
                 self.planned_wait_reason = 'joint_epoch_barrier'
             return (0.0, 0.0)
 
+        if self._advance_hold_is_valid(self.current_waypoint_idx):
+            self.planned_wait_until = float(
+                self.advance_wait_evidence['valid_until'])
+            reason = self.advance_wait_evidence.get('reason') or 'dynamic_risk'
+            self.planned_wait_reason = f'advance_hold:{reason}'
+            return (0.0, 0.0)
+
+        if (self.joint_coordinated and
+                self.current_waypoint_idx < len(self.waypoint_not_before)):
+            reservation_deadline = (
+                self.waypoint_not_before[self.current_waypoint_idx] +
+                MOTION_SAFETY.joint_time_slot_s)
+            if self.controller_time > reservation_deadline:
+                # Deadline remains the hard latest-exit boundary even when
+                # the positive advance grant is absent or delayed.
+                self._replan_requested = True
+                self._emergency_stopped = True
+                self._emergency_reason = 'reservation_deadline_expired'
+                return (0.0, 0.0)
         tx, ty = target
         
         # ══════════════════════════════════════════════════════════════
@@ -300,13 +404,8 @@ class WaypointNavigator:
 
         # Check if waypoint reached
         if distance < self.waypoint_threshold:
-            deadline = (self.waypoint_not_before[self.current_waypoint_idx]
-                        if self.current_waypoint_idx < len(
-                            self.waypoint_not_before) else 0.0)
-            if self.controller_time < deadline:
-                self.planned_wait_until = deadline
-                self.planned_wait_reason = 'joint_slot_deadline'
-                return (0.0, 0.0)
+            if self.segment_arrived_at <= 0.0:
+                self.segment_arrived_at = self.controller_time
             if (self.plan_is_partial and
                     self.current_waypoint_idx == len(self.waypoints) - 1):
                 # A rolling-window endpoint is not a business-goal arrival.
@@ -331,6 +430,10 @@ class WaypointNavigator:
                 return (0.0, 0.0)
             target = self.get_current_target()
             if target is None:
+                if self.navigation_active:
+                    self._replan_requested = True
+                    self.planned_wait_until = self.controller_time + 0.25
+                    self.planned_wait_reason = 'route_exhausted_replan'
                 return (0.0, 0.0)
             tx, ty = target
             dx = tx - robot_x
@@ -357,15 +460,31 @@ class WaypointNavigator:
             # slots. Follow that centreline with pure pursuit instead of
             # running DWA/peer heuristics that deviate from the reservation
             # and create the exact dense clustering they are trying to fix.
-            if abs(heading_error) > 0.30:
+            large_heading_error = abs(heading_error) > 1.20
+            if large_heading_error and self._joint_pivot_started_at is None:
+                self._joint_pivot_started_at = self.controller_time
+            elif not large_heading_error:
+                self._joint_pivot_started_at = None
+            pivot_elapsed = (
+                0.0 if self._joint_pivot_started_at is None else
+                max(0.0, self.controller_time - self._joint_pivot_started_at))
+            if large_heading_error and pivot_elapsed < 2.0:
                 angular_speed = max(
                     -MAX_ANGULAR_SPEED * 0.70,
                     min(MAX_ANGULAR_SPEED * 0.70, heading_error * 2.5))
                 left_speed = -angular_speed * WHEEL_BASE / (2 * WHEEL_RADIUS)
                 right_speed = angular_speed * WHEEL_BASE / (2 * WHEEL_RADIUS)
             else:
+                if large_heading_error:
+                    # Near-reverse targets lie behind the chassis.  After the
+                    # bounded pivot, reverse along the already-authorized
+                    # segment while continuing to steer; positive creep here
+                    # would move away from that segment's target.
+                    alignment = min(-0.12, math.cos(heading_error))
+                else:
+                    alignment = max(0.20, math.cos(heading_error))
                 forward_speed = min(
-                    MAX_LINEAR_SPEED * 0.85, distance * 1.50)
+                    MAX_LINEAR_SPEED * 0.85, distance * 1.50) * alignment
                 angular_speed = max(
                     -MAX_ANGULAR_SPEED * 0.60,
                     min(MAX_ANGULAR_SPEED * 0.60, heading_error * 2.0))
@@ -552,14 +671,10 @@ class WaypointNavigator:
                 continue
             distance = math.hypot(position[0] - robot_x, position[1] - robot_y)
             age = max(0.0, now - float(sample.get('sample_time', now)))
-            if distance < PATH_CONFLICT_DIST:
-                if age > 0.30:
-                    # Stale peer data must reduce speed, not manufacture a
-                    # stationary obstacle. The independent 0.65 m radial
-                    # guard remains authoritative for a physical stop.
-                    factor = min(factor, 0.2)
-                if age > 0.10:
-                    factor = min(factor, 0.5)
+            if age > MOTION_SAFETY.stale_stop_age_s:
+                factor = 0.0
+            elif age > MOTION_SAFETY.stale_caution_age_s:
+                factor = min(factor, 0.5)
             rx, ry = position[0] - robot_x, position[1] - robot_y
             vx = float(velocity[0]) - own_v[0]
             vy = float(velocity[1]) - own_v[1]
@@ -922,6 +1037,7 @@ class WaypointNavigator:
         All angles use math convention: 0 = facing +x, +π/2 = facing +y.
         Trajectory simulation uses (cos h, sin h) accordingly.
         """
+        dwa_started = time.perf_counter()
         best_score = -float('inf')
         best_v = 0.0
         best_w = 0.0
@@ -1034,7 +1150,10 @@ class WaypointNavigator:
         
         left_speed = max(-MAX_SPEED, min(MAX_SPEED, left_speed))
         right_speed = max(-MAX_SPEED, min(MAX_SPEED, right_speed))
-        
+
+        self._last_dwa_active = True
+        self._last_dwa_wall_ms = (
+            time.perf_counter() - dwa_started) * 1000.0
         return (left_speed, right_speed)
     
     def _check_obstacle_distance(self, px, py, ph,
@@ -1142,6 +1261,25 @@ class RobotController:
         self._highest_prepared_epoch = 0
         self._scheduled_joint_plan = None
         self._armed_joint_epoch = None
+        # Final actuator command telemetry.  These values are assigned only
+        # by _set_motor_speeds so status reports describe what Webots was
+        # actually commanded to execute, not an intermediate planner output.
+        self._last_left_wheel_speed = 0.0
+        self._last_right_wheel_speed = 0.0
+        self._measured_left_wheel_speed = None
+        self._measured_right_wheel_speed = None
+        self._encoder_previous = None
+        self._slip_watch_target = None
+        self._slip_watch_position = None
+        self._slip_watch_heading = 0.0
+        self._slip_watch_started_at = 0.0
+        self._slip_recovery_until = 0.0
+        self._slip_recovery_cooldown_until = 0.0
+        self._status_seq = 0
+        self._status_session = uuid.uuid4().hex
+        self._command_motion_state = 'zero'
+        self._command_motion_changed_at = float(self.robot.getTime())
+        self._last_control_stop_reason = 'inactive'
         
         # State
         self.position = (0.0, 0.0)
@@ -1329,11 +1467,21 @@ class RobotController:
         if not self.emitter:
             return False
         try:
+            current_index = int(self.navigator.current_waypoint_idx)
+            current_target = self.navigator.get_current_target()
             self.emitter.send(json.dumps({
                 "type": message_type, "robot_id": self.robot_id,
                 "plan_epoch": int(epoch),
                 "active_plan_epoch": self._active_plan_epoch,
                 "path_version": self.navigator.path_version,
+                "waypoint_index": current_index,
+                "waypoint_count": len(self.navigator.waypoints),
+                "waypoint_zero": (list(self.navigator.waypoints[0])
+                                  if self.navigator.waypoints else None),
+                "current_target": (list(current_target)
+                                   if current_target is not None else None),
+                "waypoint_offset_count": len(
+                    self.navigator.waypoint_not_before),
             }).encode("utf-8"))
             return True
         except Exception:
@@ -1385,6 +1533,10 @@ class RobotController:
             self.navigator._replan_requested = False
             self.navigator._emergency_stopped = False
             self._active_plan_epoch = scheduled['epoch']
+            self.navigator.active_plan_epoch = self._active_plan_epoch
+            self.navigator.advance_grants = {}
+            self.navigator.advance_grant_seq = -1
+            self.navigator.advance_wait_evidence = None
             self._send_plan_terminal("PLAN_ACTIVATED", scheduled['epoch'])
         self._scheduled_joint_plan = None
     
@@ -1419,6 +1571,30 @@ class RobotController:
                 self.heading = math.atan2(compass_values[0], compass_values[1])
             except:
                 pass
+
+        # Wheel encoders are already enabled for every control tick.  Sample
+        # their actual angular displacement so recordings can distinguish an
+        # actuator/contact stall from a planner command that was never issued.
+        if self.left_encoder and self.right_encoder:
+            try:
+                now = float(self.robot.getTime())
+                left = float(self.left_encoder.getValue())
+                right = float(self.right_encoder.getValue())
+                if not all(math.isfinite(value)
+                           for value in (now, left, right)):
+                    raise ValueError('non-finite wheel encoder sample')
+                previous = self._encoder_previous
+                if previous is not None:
+                    dt = now - previous[0]
+                    if dt > 0.0:
+                        self._measured_left_wheel_speed = (
+                            left - previous[1]) / dt
+                        self._measured_right_wheel_speed = (
+                            right - previous[2]) / dt
+                self._encoder_previous = (now, left, right)
+            except (AttributeError, TypeError, ValueError):
+                self._measured_left_wheel_speed = None
+                self._measured_right_wheel_speed = None
     
     def _get_lidar_ranges(self) -> Optional[List[float]]:
         """Get current LiDAR range readings."""
@@ -1433,10 +1609,119 @@ class RobotController:
     
     def _set_motor_speeds(self, left: float, right: float):
         """Set wheel motor velocities."""
+        self._last_left_wheel_speed = float(left)
+        self._last_right_wheel_speed = float(right)
+        linear = abs(0.5 * WHEEL_RADIUS * (float(left) + float(right)))
+        angular = abs(WHEEL_RADIUS * (float(right) - float(left)) /
+                      WHEEL_BASE)
+        motion_state = ('moving' if linear >= 0.03 else
+                        'turning' if angular >= 0.10 else 'zero')
+        if motion_state != getattr(self, '_command_motion_state', None):
+            self._command_motion_state = motion_state
+            self._command_motion_changed_at = float(self.robot.getTime())
+        if (motion_state == 'zero' and self.navigator.navigation_active and
+                not self.navigator._emergency_stopped and
+                not self.navigator.planned_wait_reason and
+                self.robot.getTime() >= self.navigator.paused_until):
+            # A local planner may legitimately find no safe velocity, but an
+            # unexplained zero must actively request a replacement route so it
+            # cannot park forever outside the Supervisor's block accounting.
+            if not getattr(self, '_local_zero_replan_latched', False):
+                self.navigator._replan_requested = True
+                self._local_zero_replan_latched = True
+            self.navigator.planned_wait_until = self.robot.getTime() + 0.25
+            self.navigator.planned_wait_reason = 'local_planner_zero_replan'
+            self._local_zero_clear_motion_since = None
+        elif motion_state == 'moving':
+            now = float(self.robot.getTime())
+            clear_since = getattr(
+                self, '_local_zero_clear_motion_since', None)
+            if clear_since is None:
+                self._local_zero_clear_motion_since = now
+            elif now - clear_since >= 0.75:
+                self._local_zero_replan_latched = False
+        else:
+            # Turning in place is not proof that a zero-speed episode made
+            # translational progress; keep the edge latched across pivots.
+            self._local_zero_clear_motion_since = None
+        if motion_state != 'zero':
+            self._last_control_stop_reason = 'moving'
+        elif self.navigator._emergency_stopped:
+            reason = getattr(self.navigator, '_emergency_reason', None)
+            self._last_control_stop_reason = (
+                f'emergency:{reason}' if reason else 'emergency:reactive')
+        elif self.navigator.planned_wait_reason:
+            self._last_control_stop_reason = self.navigator.planned_wait_reason
+        elif self.robot.getTime() < self.navigator.paused_until:
+            self._last_control_stop_reason = 'supervisor_hold'
+        elif not self.navigator.navigation_active:
+            self._last_control_stop_reason = 'business_goal_or_inactive'
+        else:
+            self._last_control_stop_reason = 'unknown'
         if self.left_motor:
             self.left_motor.setVelocity(left)
         if self.right_motor:
             self.right_motor.setVelocity(right)
+
+    def _apply_local_wheel_slip_recovery(self, left: float, right: float):
+        """Briefly pivot when encoders spin but the chassis does not respond."""
+        now = float(self.robot.getTime())
+        target = self.navigator.get_current_target()
+        eligible = bool(
+            self.navigator.joint_coordinated and target is not None and
+            self.navigator.navigation_active and
+            not self.navigator._emergency_stopped and
+            not self.navigator.planned_wait_reason and
+            now >= self.navigator.paused_until)
+        target_identity = tuple(target) if target is not None else None
+        if not eligible:
+            self._slip_watch_target = None
+            self._slip_recovery_until = 0.0
+            return left, right
+
+        if target_identity != self._slip_watch_target:
+            self._slip_watch_target = target_identity
+            self._slip_watch_position = self.position
+            self._slip_watch_heading = self.heading
+            self._slip_watch_started_at = now
+            self._slip_recovery_until = 0.0
+            return left, right
+
+        displacement = math.hypot(
+            self.position[0] - self._slip_watch_position[0],
+            self.position[1] - self._slip_watch_position[1])
+        yaw_delta = abs(self.heading - self._slip_watch_heading)
+        yaw_delta = min(yaw_delta, abs(yaw_delta - 2.0 * math.pi))
+        if displacement >= 0.02 or yaw_delta >= 0.08:
+            self._slip_watch_position = self.position
+            self._slip_watch_heading = self.heading
+            self._slip_watch_started_at = now
+            self._slip_recovery_until = 0.0
+            return left, right
+
+        if now < self._slip_recovery_until:
+            desired = math.atan2(target[1] - self.position[1],
+                                 target[0] - self.position[0])
+            error = (desired - self.heading + math.pi) % (2.0 * math.pi) - math.pi
+            pivot = 0.8 * WHEEL_BASE / (2.0 * WHEEL_RADIUS)
+            sign = 1.0 if error >= 0.0 else -1.0
+            return -pivot * sign, pivot * sign
+
+        measured = (getattr(self, '_measured_left_wheel_speed', None),
+                    getattr(self, '_measured_right_wheel_speed', None))
+        one_wheel_command = min(abs(left), abs(right)) <= 0.25 and max(
+            abs(left), abs(right)) >= 5.0
+        one_wheel_spinning = (
+            all(value is not None for value in measured) and
+            min(abs(measured[0]), abs(measured[1])) <= 0.25 and
+            max(abs(measured[0]), abs(measured[1])) >= 2.0)
+        if (one_wheel_command and one_wheel_spinning and
+                now - self._slip_watch_started_at >= 1.0 and
+                now >= self._slip_recovery_cooldown_until):
+            self._slip_recovery_until = now + 0.75
+            self._slip_recovery_cooldown_until = now + 2.0
+            return self._apply_local_wheel_slip_recovery(left, right)
+        return left, right
     
     def _receive_commands(self):
         """Process commands from the supervisor."""
@@ -1534,6 +1819,11 @@ class RobotController:
                             'emergency_stopped', False)
                         self._active_plan_epoch = snapshot.get(
                             'active_epoch', 0)
+                        self.navigator.active_plan_epoch = (
+                            self._active_plan_epoch)
+                        self.navigator.advance_grants = {}
+                        self.navigator.advance_grant_seq = -1
+                        self.navigator.advance_wait_evidence = None
                     if (self._scheduled_joint_plan and
                             self._scheduled_joint_plan['epoch'] == epoch):
                         self._scheduled_joint_plan = None
@@ -1550,6 +1840,10 @@ class RobotController:
                     self._scheduled_joint_plan = None
                     self.navigator.path_version = version
                     self.navigator.paused_until = 0.0
+                    self.navigator.active_plan_epoch = 0
+                    self.navigator.advance_grants = {}
+                    self.navigator.advance_grant_seq = -1
+                    self.navigator.advance_wait_evidence = None
                     # Receive navigation waypoints
                     all_waypoints = command.get('all_waypoints', [])
                     direct = bool(command.get('direct_navigation', False))
@@ -1575,6 +1869,43 @@ class RobotController:
                         self.navigator.joint_release_index = max(
                             self.navigator.joint_release_index,
                             int(command.get('waypoint_index', 0)))
+
+                elif cmd_type == 'advance_grant':
+                    epoch = int(command.get('plan_epoch', -1))
+                    index = int(command.get('waypoint_index', -1))
+                    seq = int(command.get('grant_seq', -1))
+                    valid_until = float(command.get('valid_until', 0.0))
+                    current = self.navigator.current_waypoint_idx
+                    if (epoch == self._active_plan_epoch and
+                            index in (current, current + 1) and
+                            seq > self.navigator.advance_grant_seq and
+                            math.isfinite(valid_until) and
+                            valid_until >= self.robot.getTime()):
+                        self.navigator.advance_grant_seq = seq
+                        self.navigator.advance_grants[index] = {
+                            'plan_epoch': epoch, 'grant_seq': seq,
+                            'valid_until': valid_until,
+                            'validator_evidence': command.get(
+                                'validator_evidence'),
+                        }
+                        self.navigator.advance_wait_evidence = None
+
+                elif cmd_type == 'advance_hold':
+                    epoch = int(command.get('plan_epoch', -1))
+                    index = int(command.get('waypoint_index', -1))
+                    valid_until = float(command.get('valid_until', 0.0))
+                    if (epoch == self._active_plan_epoch and
+                            index == self.navigator.current_waypoint_idx and
+                            math.isfinite(valid_until) and
+                            valid_until >= self.robot.getTime()):
+                        self.navigator.advance_wait_evidence = {
+                            'validated': True,
+                            'plan_epoch': epoch,
+                            'waypoint_index': index,
+                            'valid_until': valid_until,
+                            'reason': command.get('validator_evidence'),
+                            'peer_id': command.get('peer_id'),
+                        }
                 
                 elif cmd_type == 'stop':
                     self.navigator.navigation_active = False
@@ -1617,18 +1948,27 @@ class RobotController:
                     # Update peer robot positions for conflict avoidance
                     # CRITICAL: Must set on NAVIGATOR (not just controller)
                     # because compute_control() runs on navigator's self
+                    broadcast_seq = int(command.get('broadcast_seq', 0))
+                    if broadcast_seq <= self.navigator.peer_broadcast_seq:
+                        self.receiver.nextPacket()
+                        continue
                     positions = command.get('positions', {})
                     peer_pos = {
                         int(rid): tuple(pos) for rid, pos in positions.items()
                     }
                     self.navigator.peer_positions = peer_pos
                     samples = command.get('samples', {})
+                    accepted_samples = {}
                     for rid, sample in samples.items():
                         peer_id = int(rid)
                         seq = int(sample.get('seq', 0))
                         previous = self.navigator.peer_samples.get(peer_id)
-                        if previous is None or seq >= int(previous.get('seq', -1)):
-                            self.navigator.peer_samples[peer_id] = sample
+                        if previous is None or seq > int(previous.get('seq', -1)):
+                            accepted_samples[peer_id] = sample
+                        elif previous is not None:
+                            accepted_samples[peer_id] = previous
+                    self.navigator.peer_samples = accepted_samples
+                    self.navigator.peer_broadcast_seq = broadcast_seq
                 
                 self.receiver.nextPacket()
                 
@@ -1645,6 +1985,19 @@ class RobotController:
             return
         
         try:
+            self._status_seq = getattr(self, '_status_seq', 0) + 1
+            if not getattr(self, '_status_session', None):
+                self._status_session = uuid.uuid4().hex
+            left = float(getattr(self, '_last_left_wheel_speed', 0.0))
+            right = float(getattr(self, '_last_right_wheel_speed', 0.0))
+            linear_speed = 0.5 * WHEEL_RADIUS * (left + right)
+            angular_speed = WHEEL_RADIUS * (right - left) / WHEEL_BASE
+            if self.navigator._emergency_stopped:
+                risk_level = 'emergency'
+            elif self.navigator.planned_wait_reason:
+                risk_level = 'planned_wait'
+            else:
+                risk_level = 'clear'
             payload = {
                 'robot_id': self.robot_id,
                 'position': list(self.position),
@@ -1654,11 +2007,62 @@ class RobotController:
                 'emergency_braking': self.navigator._emergency_stopped,
                 'active_path_version': self.navigator.path_version,
                 'active_waypoint_index': self.navigator.current_waypoint_idx,
+                # Report the controller-owned target, not a supervisor-side
+                # reconstruction.  This lets recordings detect an epoch or
+                # route mirror mismatch without increasing message rate.
+                'active_waypoint_target': (
+                    list(self.navigator.waypoints[
+                        self.navigator.current_waypoint_idx])
+                    if 0 <= self.navigator.current_waypoint_idx <
+                    len(self.navigator.waypoints) else None),
+                'active_waypoint_count': len(self.navigator.waypoints),
+                'waypoint_advanced_at': self.navigator.waypoint_advanced_at,
+                'segment_departed_at': (
+                    self.navigator.completed_segment_departed_at),
+                'segment_departure_index': (
+                    self.navigator.completed_segment_departure_index),
+                'segment_departure_distance': (
+                    self.navigator.completed_segment_departure_distance),
+                'segment_arrived_at': (
+                    self.navigator.completed_segment_arrived_at),
                 'active_plan_epoch': self._active_plan_epoch,
                 'paused_until': self.navigator.paused_until,
                 'planned_wait_until': self.navigator.planned_wait_until,
                 'planned_wait_reason': self.navigator.planned_wait_reason,
                 'speed_scale': self.navigator.speed_scale,
+                'status_seq': self._status_seq,
+                'status_session': self._status_session,
+                'status_sample_time': float(self.robot.getTime()),
+                'dwa_control_active': bool(getattr(
+                    self.navigator, '_last_dwa_active', False)),
+                'dwa_control_wall_ms': float(getattr(
+                    self.navigator, '_last_dwa_wall_ms', 0.0)),
+                'commanded_left_wheel_speed': left,
+                'commanded_right_wheel_speed': right,
+                'measured_left_wheel_speed': getattr(
+                    self, '_measured_left_wheel_speed', None),
+                'measured_right_wheel_speed': getattr(
+                    self, '_measured_right_wheel_speed', None),
+                'commanded_linear_speed': linear_speed,
+                'commanded_angular_speed': angular_speed,
+                'command_motion_state': getattr(
+                    self, '_command_motion_state', 'zero'),
+                'command_motion_changed_at': float(getattr(
+                    self, '_command_motion_changed_at',
+                    self.robot.getTime())),
+                'control_stop_reason': getattr(
+                    self, '_last_control_stop_reason', 'unknown'),
+                'local_risk_level': risk_level,
+                'wait_validator_evidence': (
+                    self.navigator.advance_wait_evidence),
+                # Advance grants are introduced by Step 5A-2.  Explicit
+                # sentinel fields make pre-grant telemetry unambiguous.
+                'advance_grant_seq': self.navigator.advance_grant_seq,
+                'advance_grant_waypoint_index': max(
+                    self.navigator.advance_grants, default=-1),
+                'advance_grant_valid_until': max((
+                    float(item.get('valid_until', 0.0)) for item in
+                    self.navigator.advance_grants.values()), default=0.0),
             }
             # Only INCLUDE reached_goal in the payload when actually True.
             # This way, supervisor's `msg.get('reached_goal') is True`
@@ -1728,8 +2132,13 @@ class RobotController:
                     self.position[0], self.position[1],
                     self.heading, lidar_ranges
                 )
+                left_speed, right_speed = self._apply_local_wheel_slip_recovery(
+                    left_speed, right_speed)
                 left_speed *= self.navigator.speed_scale
                 right_speed *= self.navigator.speed_scale
+                self.navigator.record_segment_departure(
+                    left_speed, right_speed,
+                    self.position[0], self.position[1])
                 self._set_motor_speeds(left_speed, right_speed)
                 
                 # Drain battery while moving

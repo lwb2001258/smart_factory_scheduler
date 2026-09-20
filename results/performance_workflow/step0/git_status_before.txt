@@ -1,0 +1,559 @@
+﻿ M controllers/factory_supervisor/__pycache__/collision_safety.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/config.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/factory_supervisor.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/grid_planner.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/joint_grid_planner.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/joint_plan_transaction.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/metrics_collector.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/motion_coordinator.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/rl_contract.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/rl_environment.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/rl_schedulers.cpython-312.pyc
+ M controllers/factory_supervisor/__pycache__/training_scenarios.cpython-312.pyc
+ M controllers/factory_supervisor/collision_safety.py
+ M controllers/factory_supervisor/config.py
+ M controllers/factory_supervisor/factory_supervisor.py
+ M controllers/factory_supervisor/grid_planner.py
+ M controllers/factory_supervisor/joint_grid_planner.py
+ M controllers/factory_supervisor/joint_plan_transaction.py
+ M controllers/factory_supervisor/metrics_collector.py
+ M controllers/factory_supervisor/motion_coordinator.py
+ M controllers/factory_supervisor/rl_contract.py
+ M controllers/factory_supervisor/rl_environment.py
+ M controllers/factory_supervisor/rl_schedulers.py
+ M controllers/factory_supervisor/training_scenarios.py
+ M controllers/robot_controller/__pycache__/robot_controller.cpython-312.pyc
+ M controllers/robot_controller/robot_controller.py
+ M results/comparison_report.txt
+ M results/fallback_debug.log
+ M scripts/__pycache__/build_dissertation_ppt.cpython-312.pyc
+ M scripts/__pycache__/run_experiments.cpython-312.pyc
+ M scripts/__pycache__/search_hyperparameters.cpython-312.pyc
+ M scripts/__pycache__/train_advanced_rl.cpython-312.pyc
+ M scripts/__pycache__/train_ppo.cpython-312.pyc
+ M scripts/__pycache__/train_scheduler.cpython-312.pyc
+ M scripts/build_dissertation_ppt.py
+ M scripts/run_experiments.py
+ M scripts/search_hyperparameters.py
+ M scripts/train_advanced_rl.py
+ M scripts/train_ppo.py
+ M scripts/train_scheduler.py
+ M tests/__pycache__/test_advanced_rl_integration.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_advanced_rl_integration.cpython-312.pyc
+ M tests/__pycache__/test_joint_grid_planner.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_joint_grid_planner.cpython-312.pyc
+ M tests/__pycache__/test_metrics_safety.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_metrics_safety.cpython-312.pyc
+ M tests/__pycache__/test_motion_coordination.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_motion_coordination.cpython-312.pyc
+ M tests/__pycache__/test_priority_yield_resume.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_priority_yield_resume.cpython-312.pyc
+ M tests/__pycache__/test_robot_protocol.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_robot_protocol.cpython-312.pyc
+ M tests/__pycache__/test_supervisor_prediction.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_supervisor_prediction.cpython-312.pyc
+ M tests/__pycache__/test_webots_behavior_proxy.cpython-312-pytest-9.0.2.pyc
+ M tests/__pycache__/test_webots_behavior_proxy.cpython-312.pyc
+ M tests/test_advanced_rl_integration.py
+ M tests/test_joint_grid_planner.py
+ M tests/test_metrics_safety.py
+ M tests/test_motion_coordination.py
+ M tests/test_priority_yield_resume.py
+ M tests/test_robot_protocol.py
+ M tests/test_supervisor_prediction.py
+ M tests/test_webots_behavior_proxy.py
+ M worlds/.smart_factory.wbproj
+ M worlds/smart_factory.wbt
+?? controllers/__pycache__/
+?? controllers/factory_supervisor/__pycache__/comparison_integrity.cpython-312.pyc
+?? controllers/factory_supervisor/__pycache__/evaluation_objective.cpython-312.pyc
+?? controllers/factory_supervisor/__pycache__/model_promotion.cpython-312.pyc
+?? controllers/factory_supervisor/__pycache__/webots_dataset.cpython-312.pyc
+?? controllers/factory_supervisor/comparison_integrity.py
+?? controllers/factory_supervisor/evaluation_objective.py
+?? controllers/factory_supervisor/model_promotion.py
+?? controllers/factory_supervisor/webots_dataset.py
+?? controllers/motion_safety.py
+?? docs/ALL_RL_SIMULATION_TRAINING_AND_WEBOTS_FINETUNING_CMD_CN.md
+?? docs/ALL_RL_WEBOTS_FINETUNE_WORKFLOW_CN.md
+?? docs/RL_WEBOTS_V8_REVIEW_AND_EVALUATION_WORKFLOW_CN.md
+?? docs/ROBOT_COLLISION_AVOIDANCE_IMPLEMENTATION_ACCEPTANCE_LOG_CN.md
+?? docs/ROBOT_COLLISION_AVOIDANCE_IMPLEMENTATION_WORKFLOW_CN.md
+?? docs/ROBOT_COLLISION_AVOIDANCE_ROUTE_RESERVATION_REVIEW_CN.md
+?? docs/ROBOT_CONTINUOUS_EXECUTION_AUTHORIZATION_WORKFLOW_CN.md
+?? docs/ROBOT_RUNTIME_EFFICIENCY_RECOVERY_ACCEPTANCE_LOG_CN.md
+?? docs/ROBOT_RUNTIME_EFFICIENCY_RECOVERY_WORKFLOW_CN.md
+?? docs/WEBOTS_PERFORMANCE_OPTIMIZATION_WORKFLOW_CN.md
+?? results/collision_workflow/
+?? results/experiment_C_DQN_20260905_201601.json
+?? results/experiment_C_DQN_20260905_202940.json
+?? results/experiment_C_DQN_20260905_205607.json
+?? results/experiment_C_DQN_20260905_211923.json
+?? results/experiment_C_DQN_20260905_213337.json
+?? results/experiment_C_DQN_20260905_215214.json
+?? results/experiment_C_DQN_20260905_230333.json
+?? results/experiment_C_DQN_20260905_232526.json
+?? results/experiment_C_DQN_20260905_234406.json
+?? results/experiment_C_DQN_20260905_235855.json
+?? results/experiment_C_DQN_20260906_001258.json
+?? results/experiment_C_DQN_20260906_002903.json
+?? results/experiment_C_DQN_20260906_020100.json
+?? results/experiment_C_DQN_20260906_023259.json
+?? results/experiment_C_DQN_20260906_025159.json
+?? results/experiment_C_DQN_20260906_030733.json
+?? results/experiment_C_DQN_20260906_032147.json
+?? results/experiment_C_DQN_20260906_034032.json
+?? results/experiment_C_DQN_20260906_035633.json
+?? results/experiment_C_DQN_20260906_041333.json
+?? results/experiment_C_DQN_20260906_043121.json
+?? results/experiment_C_DQN_20260906_045207.json
+?? results/experiment_C_DQN_20260906_083520.json
+?? results/experiment_C_DQN_20260906_090123.json
+?? results/experiment_C_DQN_20260906_092028.json
+?? results/experiment_C_DQN_20260906_093611.json
+?? results/experiment_C_DQN_20260906_095855.json
+?? results/experiment_C_DQN_20260906_102019.json
+?? results/experiment_C_DQN_20260906_103941.json
+?? results/experiment_C_DQN_20260906_105924.json
+?? results/experiment_C_DQN_20260906_112024.json
+?? results/experiment_C_DQN_20260906_114205.json
+?? results/experiment_C_DQN_20260906_120140.json
+?? results/experiment_C_DQN_20260906_122244.json
+?? results/experiment_C_DQN_20260906_124823.json
+?? results/experiment_C_DQN_20260906_130925.json
+?? results/experiment_C_DQN_20260906_133318.json
+?? results/experiment_C_DQN_20260906_135930.json
+?? results/experiment_C_DQN_20260906_141720.json
+?? results/experiment_C_DQN_20260906_143658.json
+?? results/experiment_C_DQN_20260906_145626.json
+?? results/experiment_C_DQN_20260906_151642.json
+?? results/experiment_C_DQN_20260906_153840.json
+?? results/experiment_C_DQN_20260906_160728.json
+?? results/experiment_C_DQN_20260906_163048.json
+?? results/experiment_C_DQN_20260906_165047.json
+?? results/experiment_C_DQN_20260906_171404.json
+?? results/experiment_C_DQN_20260906_173756.json
+?? results/experiment_C_DQN_20260906_180217.json
+?? results/experiment_C_FCFS_20260909_225427.json
+?? results/experiment_C_FCFS_20260909_225644.json
+?? results/experiment_C_FCFS_20260909_225733.json
+?? results/experiment_C_FCFS_20260909_230631.json
+?? results/experiment_C_FCFS_20260909_230712.json
+?? results/experiment_C_FCFS_20260909_231346.json
+?? results/experiment_C_FCFS_20260909_231424.json
+?? results/experiment_C_FCFS_20260910_001106.json
+?? results/experiment_C_FCFS_20260910_001254.json
+?? results/experiment_C_FCFS_20260910_001551.json
+?? results/experiment_C_FCFS_20260910_001759.json
+?? results/experiment_C_FCFS_20260910_002253.json
+?? results/experiment_C_FCFS_20260910_002520.json
+?? results/experiment_C_FCFS_20260910_002800.json
+?? results/experiment_C_FCFS_20260910_002848.json
+?? results/experiment_C_FCFS_20260910_003749.json
+?? results/experiment_C_FCFS_20260910_003830.json
+?? results/experiment_C_FCFS_20260910_004539.json
+?? results/experiment_C_FCFS_20260910_004619.json
+?? results/experiment_C_FCFS_20260910_010108.json
+?? results/experiment_C_FCFS_20260910_010151.json
+?? results/experiment_C_FCFS_20260910_010656.json
+?? results/experiment_C_FCFS_20260910_010738.json
+?? results/experiment_C_FCFS_20260910_012041.json
+?? results/experiment_C_FCFS_20260910_012311.json
+?? results/experiment_C_FCFS_20260910_012348.json
+?? results/experiment_C_FCFS_20260911_214818.json
+?? results/experiment_C_FCFS_20260911_215002.json
+?? results/experiment_C_FCFS_20260911_215426.json
+?? results/experiment_C_FCFS_20260911_215457.json
+?? results/experiment_C_FCFS_20260911_220036.json
+?? results/experiment_C_FCFS_20260911_220105.json
+?? results/experiment_C_FCFS_20260911_221100.json
+?? results/experiment_C_FCFS_20260911_221125.json
+?? results/experiment_C_FCFS_20260911_221931.json
+?? results/experiment_C_FCFS_20260911_221956.json
+?? results/experiment_C_FCFS_20260911_223447.json
+?? results/experiment_C_FCFS_20260911_223517.json
+?? results/experiment_C_FCFS_20260911_224746.json
+?? results/experiment_C_FCFS_20260911_224816.json
+?? results/experiment_C_FCFS_20260911_232858.json
+?? results/experiment_C_FCFS_20260911_232925.json
+?? results/experiment_C_FCFS_20260911_234107.json
+?? results/experiment_C_FCFS_20260911_234144.json
+?? results/experiment_C_FCFS_20260911_235542.json
+?? results/experiment_C_FCFS_20260911_235621.json
+?? results/experiment_C_FCFS_20260912_000408.json
+?? results/experiment_C_FCFS_20260912_001734.json
+?? results/experiment_C_FCFS_20260912_004058.json
+?? results/experiment_C_FCFS_20260912_014408.json
+?? results/experiment_C_FCFS_20260912_014441.json
+?? results/experiment_C_FCFS_20260912_014612.json
+?? results/experiment_C_FCFS_20260912_014757.json
+?? results/experiment_C_FCFS_20260912_073919.json
+?? results/experiment_C_FCFS_20260912_074050.json
+?? results/experiment_C_FCFS_20260912_074607.json
+?? results/experiment_C_FCFS_20260912_074738.json
+?? results/experiment_C_FCFS_20260912_074940.json
+?? results/experiment_C_FCFS_20260912_075036.json
+?? results/experiment_C_FCFS_20260912_115218.json
+?? results/experiment_C_FCFS_20260912_115541.json
+?? results/experiment_C_FCFS_20260912_115613.json
+?? results/experiment_C_FCFS_20260912_115904.json
+?? results/experiment_C_FCFS_20260912_120109.json
+?? results/experiment_C_FCFS_20260912_120219.json
+?? results/experiment_C_FCFS_20260912_121025.json
+?? results/experiment_C_FCFS_20260912_121136.json
+?? results/experiment_C_FCFS_20260912_122107.json
+?? results/experiment_C_FCFS_20260912_122215.json
+?? results/experiment_C_FCFS_20260912_122948.json
+?? results/experiment_C_FCFS_20260912_123046.json
+?? results/experiment_C_FCFS_20260912_123613.json
+?? results/experiment_C_FCFS_20260912_124907.json
+?? results/experiment_C_FCFS_20260912_132710.json
+?? results/experiment_C_FCFS_20260912_132750.json
+?? results/experiment_C_FCFS_20260912_132903.json
+?? results/experiment_C_FCFS_20260912_133812.json
+?? results/experiment_C_FCFS_20260912_133905.json
+?? results/experiment_C_FCFS_20260912_134014.json
+?? results/experiment_C_FCFS_20260912_134809.json
+?? results/experiment_C_FCFS_20260912_135612.json
+?? results/experiment_C_FCFS_20260912_141359.json
+?? results/experiment_C_FCFS_20260912_141438.json
+?? results/experiment_C_FCFS_20260912_141549.json
+?? results/experiment_C_FCFS_20260912_142608.json
+?? results/experiment_C_FCFS_20260912_142636.json
+?? results/experiment_C_FCFS_20260912_143600.json
+?? results/experiment_C_FCFS_20260912_145810.json
+?? results/experiment_C_FCFS_20260912_145846.json
+?? results/experiment_C_FCFS_20260912_145945.json
+?? results/experiment_C_FCFS_20260912_150557.json
+?? results/experiment_C_FCFS_20260912_151602.json
+?? results/experiment_C_FCFS_20260912_151635.json
+?? results/experiment_C_FCFS_20260912_151741.json
+?? results/experiment_C_FCFS_20260912_152334.json
+?? results/experiment_C_FCFS_20260912_153200.json
+?? results/experiment_C_FCFS_20260912_154855.json
+?? results/experiment_C_FCFS_20260912_160907.json
+?? results/experiment_C_FCFS_20260912_160941.json
+?? results/experiment_C_FCFS_20260912_161050.json
+?? results/experiment_C_FCFS_20260912_161627.json
+?? results/experiment_C_FCFS_20260912_162629.json
+?? results/experiment_C_FCFS_20260912_164438.json
+?? results/experiment_C_FCFS_20260912_170657.json
+?? results/experiment_C_FCFS_20260912_172543.json
+?? results/experiment_C_FCFS_20260912_174500.json
+?? results/experiment_C_FCFS_20260912_180224.json
+?? results/experiment_C_FCFS_20260912_182229.json
+?? results/experiment_C_FCFS_20260912_184243.json
+?? results/experiment_C_FCFS_20260912_190339.json
+?? results/experiment_C_FCFS_20260912_201134.json
+?? results/experiment_C_FCFS_20260912_201258.json
+?? results/experiment_C_FCFS_20260912_201536.json
+?? results/experiment_C_FCFS_20260912_201651.json
+?? results/experiment_C_FCFS_20260912_202010.json
+?? results/experiment_C_FCFS_20260912_202239.json
+?? results/experiment_C_FCFS_20260912_202356.json
+?? results/experiment_C_FCFS_20260912_203636.json
+?? results/experiment_C_FCFS_20260912_203756.json
+?? results/experiment_C_FCFS_20260912_204430.json
+?? results/experiment_C_FCFS_20260912_210142.json
+?? results/experiment_C_FCFS_20260912_211258.json
+?? results/experiment_C_FCFS_20260912_211917.json
+?? results/experiment_C_FCFS_20260912_213156.json
+?? results/experiment_C_FCFS_20260912_220035.json
+?? results/experiment_C_FCFS_20260912_220141.json
+?? results/experiment_C_FCFS_20260912_220713.json
+?? results/experiment_C_FCFS_20260912_221805.json
+?? results/experiment_C_FCFS_20260912_225531.json
+?? results/experiment_C_FCFS_20260912_225642.json
+?? results/experiment_C_FCFS_20260912_230757.json
+?? results/experiment_C_FCFS_20260912_230924.json
+?? results/experiment_C_FCFS_20260912_231551.json
+?? results/experiment_C_FCFS_20260912_232816.json
+?? results/experiment_C_FCFS_20260912_234114.json
+?? results/experiment_C_FCFS_20260913_000743.json
+?? results/experiment_C_FCFS_20260913_003808.json
+?? results/experiment_C_FCFS_20260913_003910.json
+?? results/experiment_C_FCFS_20260913_004500.json
+?? results/experiment_C_FCFS_20260913_005543.json
+?? results/experiment_C_FCFS_20260913_005626.json
+?? results/experiment_C_FCFS_20260913_010055.json
+?? results/experiment_C_FCFS_20260913_010749.json
+?? results/experiment_C_FCFS_20260913_012611.json
+?? results/experiment_C_FCFS_20260913_015315.json
+?? results/experiment_C_FCFS_20260913_015429.json
+?? results/experiment_C_FCFS_20260913_020426.json
+?? results/experiment_C_FCFS_20260913_020531.json
+?? results/experiment_C_FCFS_20260913_021205.json
+?? results/experiment_C_FCFS_20260913_114007.json
+?? results/experiment_C_FCFS_20260913_115549.json
+?? results/experiment_C_FCFS_20260913_115712.json
+?? results/experiment_C_FCFS_20260913_121251.json
+?? results/experiment_C_FCFS_20260913_121356.json
+?? results/experiment_C_FCFS_20260913_122812.json
+?? results/experiment_C_FCFS_20260913_122947.json
+?? results/experiment_C_FCFS_20260913_124819.json
+?? results/experiment_C_FCFS_20260913_124922.json
+?? results/experiment_C_FCFS_20260913_125810.json
+?? results/experiment_C_FCFS_20260913_130018.json
+?? results/experiment_C_FCFS_20260913_131731.json
+?? results/experiment_C_FCFS_20260913_131841.json
+?? results/experiment_C_FCFS_20260913_133314.json
+?? results/experiment_C_FCFS_20260913_133624.json
+?? results/experiment_C_FCFS_20260913_190331.json
+?? results/experiment_C_FCFS_20260913_192442.json
+?? results/experiment_C_FCFS_20260913_192805.json
+?? results/experiment_C_FCFS_20260913_192959.json
+?? results/experiment_C_FCFS_20260913_193154.json
+?? results/experiment_C_FCFS_20260913_194559.json
+?? results/experiment_C_FCFS_20260913_194828.json
+?? results/experiment_C_FCFS_20260913_195818.json
+?? results/experiment_C_FCFS_20260913_200635.json
+?? results/experiment_C_FCFS_20260913_201256.json
+?? results/experiment_C_FCFS_20260913_203543.json
+?? results/experiment_C_FCFS_20260913_203705.json
+?? results/experiment_C_FCFS_20260913_203830.json
+?? results/experiment_C_FCFS_20260913_204009.json
+?? results/experiment_C_FCFS_20260913_204847.json
+?? results/experiment_C_FCFS_20260913_205723.json
+?? results/experiment_C_FCFS_20260913_211035.json
+?? results/experiment_C_FCFS_20260913_211447.json
+?? results/experiment_C_FCFS_20260914_123140.json
+?? results/experiment_C_FCFS_20260914_123213.json
+?? results/experiment_C_FCFS_20260914_123241.json
+?? results/experiment_C_FCFS_20260914_123525.json
+?? results/experiment_C_FCFS_20260914_123731.json
+?? results/experiment_C_FCFS_20260914_123958.json
+?? results/experiment_C_FCFS_20260914_174420.json
+?? results/experiment_C_FCFS_20260914_174450.json
+?? results/experiment_C_FCFS_20260914_174724.json
+?? results/experiment_C_FCFS_20260914_175135.json
+?? results/experiment_C_FCFS_20260914_175215.json
+?? results/experiment_C_FCFS_20260914_175352.json
+?? results/experiment_C_FCFS_20260914_175454.json
+?? results/experiment_C_FCFS_20260914_180205.json
+?? results/experiment_C_FCFS_20260914_180458.json
+?? results/experiment_C_FCFS_20260914_181456.json
+?? results/experiment_C_FCFS_20260914_181631.json
+?? results/experiment_C_FCFS_20260914_181703.json
+?? results/experiment_C_FCFS_20260914_181703_stop_analysis.json
+?? results/experiment_C_FCFS_20260914_181703_stop_analysis.md
+?? results/experiment_C_FCFS_20260914_182956.json
+?? results/experiment_C_FCFS_20260914_182956_stop_analysis.json
+?? results/experiment_C_FCFS_20260914_182956_stop_analysis.md
+?? results/experiment_C_FCFS_20260914_183036.json
+?? results/experiment_C_FCFS_20260914_183036_stop_analysis.json
+?? results/experiment_C_FCFS_20260914_183036_stop_analysis.md
+?? results/experiment_C_FCFS_20260914_183305.json
+?? results/experiment_C_FCFS_20260914_183943.json
+?? results/experiment_C_FCFS_20260914_184022.json
+?? results/experiment_C_FCFS_20260914_184406.json
+?? results/experiment_C_FCFS_20260914_184446.json
+?? results/experiment_C_FCFS_20260914_185254.json
+?? results/experiment_C_FCFS_20260914_185329.json
+?? results/experiment_C_FCFS_20260914_185633.json
+?? results/experiment_C_FCFS_20260914_185711.json
+?? results/experiment_C_FCFS_20260914_185956.json
+?? results/experiment_C_FCFS_20260914_190027.json
+?? results/experiment_C_FCFS_20260914_190232.json
+?? results/experiment_C_FCFS_20260914_194741.json
+?? results/experiment_C_FCFS_20260914_194804.json
+?? results/experiment_C_FCFS_20260914_195123.json
+?? results/experiment_C_FCFS_20260914_195149.json
+?? results/experiment_C_FCFS_20260914_195330.json
+?? results/experiment_C_FCFS_20260915_034122.json
+?? results/experiment_C_FCFS_20260915_034122_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_034122_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_034154.json
+?? results/experiment_C_FCFS_20260915_034154_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_034154_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_035104.json
+?? results/experiment_C_FCFS_20260915_035104_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_035104_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_035451.json
+?? results/experiment_C_FCFS_20260915_040213.json
+?? results/experiment_C_FCFS_20260915_040629.json
+?? results/experiment_C_FCFS_20260915_041134.json
+?? results/experiment_C_FCFS_20260915_041134_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_041134_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_041851.json
+?? results/experiment_C_FCFS_20260915_041851_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_041851_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_042532.json
+?? results/experiment_C_FCFS_20260915_042532_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_042532_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_043122.json
+?? results/experiment_C_FCFS_20260915_043122_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_043122_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_043927.json
+?? results/experiment_C_FCFS_20260915_043955.json
+?? results/experiment_C_FCFS_20260915_043955_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_043955_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_044514.json
+?? results/experiment_C_FCFS_20260915_045134.json
+?? results/experiment_C_FCFS_20260915_045134_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_045134_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_045422.json
+?? results/experiment_C_FCFS_20260915_140128.json
+?? results/experiment_C_FCFS_20260915_140128_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_140128_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_140633.json
+?? results/experiment_C_FCFS_20260915_140633_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_140633_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_140915.json
+?? results/experiment_C_FCFS_20260915_140915_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_140915_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_141457.json
+?? results/experiment_C_FCFS_20260915_141457_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_141457_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_141803.json
+?? results/experiment_C_FCFS_20260915_142742.json
+?? results/experiment_C_FCFS_20260915_142742_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_142742_stop_analysis.md
+?? results/experiment_C_FCFS_20260915_143004.json
+?? results/experiment_C_FCFS_20260915_152428.json
+?? results/experiment_C_FCFS_20260915_152428_stop_analysis.json
+?? results/experiment_C_FCFS_20260915_152428_stop_analysis.md
+?? results/models/
+?? results/performance_workflow/
+?? results/webots_diagnostic_C_FCFS_20260914_180205.css
+?? results/webots_diagnostic_C_FCFS_20260914_180205.html
+?? results/webots_diagnostic_C_FCFS_20260914_180205.json
+?? results/webots_diagnostic_C_FCFS_20260914_180205.x3d
+?? results/webots_diagnostic_C_FCFS_20260914_181456.css
+?? results/webots_diagnostic_C_FCFS_20260914_181456.html
+?? results/webots_diagnostic_C_FCFS_20260914_181456.json
+?? results/webots_diagnostic_C_FCFS_20260914_181456.x3d
+?? results/webots_diagnostic_C_FCFS_20260914_181631.css
+?? results/webots_diagnostic_C_FCFS_20260914_181631.html
+?? results/webots_diagnostic_C_FCFS_20260914_181631.json
+?? results/webots_diagnostic_C_FCFS_20260914_181631.x3d
+?? results/webots_diagnostic_C_FCFS_20260914_181703.css
+?? results/webots_diagnostic_C_FCFS_20260914_181703.html
+?? results/webots_diagnostic_C_FCFS_20260914_181703.json
+?? results/webots_diagnostic_C_FCFS_20260914_181703.x3d
+?? results/webots_diagnostic_C_FCFS_20260914_182956.css
+?? results/webots_diagnostic_C_FCFS_20260914_182956.html
+?? results/webots_diagnostic_C_FCFS_20260914_182956.json
+?? results/webots_diagnostic_C_FCFS_20260914_182956.x3d
+?? results/webots_diagnostic_C_FCFS_20260914_183036.css
+?? results/webots_diagnostic_C_FCFS_20260914_183036.html
+?? results/webots_diagnostic_C_FCFS_20260914_183036.json
+?? results/webots_diagnostic_C_FCFS_20260914_183036.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_034122.css
+?? results/webots_diagnostic_C_FCFS_20260915_034122.html
+?? results/webots_diagnostic_C_FCFS_20260915_034122.json
+?? results/webots_diagnostic_C_FCFS_20260915_034122.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_034154.css
+?? results/webots_diagnostic_C_FCFS_20260915_034154.html
+?? results/webots_diagnostic_C_FCFS_20260915_034154.json
+?? results/webots_diagnostic_C_FCFS_20260915_034154.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_035104.css
+?? results/webots_diagnostic_C_FCFS_20260915_035104.html
+?? results/webots_diagnostic_C_FCFS_20260915_035104.json
+?? results/webots_diagnostic_C_FCFS_20260915_035104.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_041134.css
+?? results/webots_diagnostic_C_FCFS_20260915_041134.html
+?? results/webots_diagnostic_C_FCFS_20260915_041134.json
+?? results/webots_diagnostic_C_FCFS_20260915_041134.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_041851.css
+?? results/webots_diagnostic_C_FCFS_20260915_041851.html
+?? results/webots_diagnostic_C_FCFS_20260915_041851.json
+?? results/webots_diagnostic_C_FCFS_20260915_041851.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_042532.css
+?? results/webots_diagnostic_C_FCFS_20260915_042532.html
+?? results/webots_diagnostic_C_FCFS_20260915_042532.json
+?? results/webots_diagnostic_C_FCFS_20260915_042532.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_043122.css
+?? results/webots_diagnostic_C_FCFS_20260915_043122.html
+?? results/webots_diagnostic_C_FCFS_20260915_043122.json
+?? results/webots_diagnostic_C_FCFS_20260915_043122.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_043955.css
+?? results/webots_diagnostic_C_FCFS_20260915_043955.html
+?? results/webots_diagnostic_C_FCFS_20260915_043955.json
+?? results/webots_diagnostic_C_FCFS_20260915_043955.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_045134.css
+?? results/webots_diagnostic_C_FCFS_20260915_045134.html
+?? results/webots_diagnostic_C_FCFS_20260915_045134.json
+?? results/webots_diagnostic_C_FCFS_20260915_045134.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_140128.css
+?? results/webots_diagnostic_C_FCFS_20260915_140128.html
+?? results/webots_diagnostic_C_FCFS_20260915_140128.json
+?? results/webots_diagnostic_C_FCFS_20260915_140128.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_140633.css
+?? results/webots_diagnostic_C_FCFS_20260915_140633.html
+?? results/webots_diagnostic_C_FCFS_20260915_140633.json
+?? results/webots_diagnostic_C_FCFS_20260915_140633.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_140915.css
+?? results/webots_diagnostic_C_FCFS_20260915_140915.html
+?? results/webots_diagnostic_C_FCFS_20260915_140915.json
+?? results/webots_diagnostic_C_FCFS_20260915_140915.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_141457.css
+?? results/webots_diagnostic_C_FCFS_20260915_141457.html
+?? results/webots_diagnostic_C_FCFS_20260915_141457.json
+?? results/webots_diagnostic_C_FCFS_20260915_141457.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_141803.css
+?? results/webots_diagnostic_C_FCFS_20260915_141803.html
+?? results/webots_diagnostic_C_FCFS_20260915_141803.json
+?? results/webots_diagnostic_C_FCFS_20260915_141803.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_142742.css
+?? results/webots_diagnostic_C_FCFS_20260915_142742.html
+?? results/webots_diagnostic_C_FCFS_20260915_142742.json
+?? results/webots_diagnostic_C_FCFS_20260915_142742.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_152428.css
+?? results/webots_diagnostic_C_FCFS_20260915_152428.html
+?? results/webots_diagnostic_C_FCFS_20260915_152428.json
+?? results/webots_diagnostic_C_FCFS_20260915_152428.x3d
+?? results/webots_diagnostic_C_FCFS_20260915_152827.css
+?? results/webots_diagnostic_C_FCFS_20260915_152827.html
+?? results/webots_diagnostic_C_FCFS_20260915_152827.json
+?? results/webots_diagnostic_C_FCFS_20260915_152827.x3d
+?? results/webots_finetune/
+?? scripts/__pycache__/analyze_webots_stops.cpython-312.pyc
+?? scripts/__pycache__/audit_collision_workflow.cpython-312.pyc
+?? scripts/__pycache__/build_webots_dataset.cpython-312.pyc
+?? scripts/__pycache__/finetune_from_webots.cpython-312.pyc
+?? scripts/__pycache__/run_webots_finetune_workflow.cpython-312.pyc
+?? scripts/analyze_webots_stops.py
+?? scripts/audit_collision_workflow.py
+?? scripts/build_webots_dataset.py
+?? scripts/finetune_from_webots.py
+?? scripts/run_all_rl_webots_finetune_workflow.ps1
+?? scripts/run_webots_finetune_workflow.ps1
+?? scripts/run_webots_finetune_workflow.py
+?? tests/__pycache__/test_analyze_webots_stops.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_analyze_webots_stops.cpython-312.pyc
+?? tests/__pycache__/test_collision_workflow_audit.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_collision_workflow_audit.cpython-312.pyc
+?? tests/__pycache__/test_comparison_integrity.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_comparison_integrity.cpython-312.pyc
+?? tests/__pycache__/test_evaluation_objective.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_evaluation_objective.cpython-312.pyc
+?? tests/__pycache__/test_grid_safety_geometry.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_grid_safety_geometry.cpython-312.pyc
+?? tests/__pycache__/test_model_promotion.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_model_promotion.cpython-312.pyc
+?? tests/__pycache__/test_motion_safety_config.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_motion_safety_config.cpython-312.pyc
+?? tests/__pycache__/test_motion_safety_provenance.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_motion_safety_provenance.cpython-312.pyc
+?? tests/__pycache__/test_webots_dataset.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_webots_dataset.cpython-312.pyc
+?? tests/__pycache__/test_webots_decision_collection.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_webots_decision_collection.cpython-312.pyc
+?? tests/__pycache__/test_webots_finetune.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_webots_finetune.cpython-312.pyc
+?? tests/__pycache__/test_webots_workflow_resume.cpython-312-pytest-9.0.2.pyc
+?? tests/__pycache__/test_webots_workflow_resume.cpython-312.pyc
+?? tests/__pycache__/test_webots_world_physics.cpython-312-pytest-9.0.2.pyc
+?? tests/test_analyze_webots_stops.py
+?? tests/test_collision_workflow_audit.py
+?? tests/test_comparison_integrity.py
+?? tests/test_evaluation_objective.py
+?? tests/test_grid_safety_geometry.py
+?? tests/test_model_promotion.py
+?? tests/test_motion_safety_config.py
+?? tests/test_motion_safety_provenance.py
+?? tests/test_webots_dataset.py
+?? tests/test_webots_decision_collection.py
+?? tests/test_webots_finetune.py
+?? tests/test_webots_workflow_resume.py
+?? worlds/.smart_factory.wbproj.qtcrash-backup-20260912-1423
