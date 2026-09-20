@@ -43,7 +43,7 @@ BATTERY_DEPLETION_TIME_SECONDS = 1800.0
 BATTERY_DRAIN_RATE = BATTERY_CAPACITY / BATTERY_DEPLETION_TIME_SECONDS
 INITIAL_BATTERY_MIN = 25.0
 
-GOAL_THRESHOLD = 0.35     # m - distance to consider waypoint reached
+GOAL_THRESHOLD = 0.38     # m - distance to consider waypoint reached
 HEADING_THRESHOLD = 0.15  # rad - heading alignment threshold
 
 OBSTACLE_THRESHOLD = 0.8  # m - increased for earlier steering clearance
