@@ -133,6 +133,9 @@ class RobotInfo:
         self.priority_yield_wait_deadline = 0.0
         self.priority_yield_original_goal = None
         self.priority_yield_cooldown_until = 0.0
+        self.priority_yield_bounded_until = 0.0
+        self.dock_clearance_origin = None
+        self.dock_clearance_location = None
         self._joint_stall_recovery_until = 0.0
         self._joint_route_less_since = None
         self._hard_stall_watch_pos = initial_position
@@ -204,6 +207,64 @@ class FactorySupervisor:
     Main factory supervisor that coordinates all robots.
     Runs as a Webots supervisor node.
     """
+
+    def _start_animation_recording(self) -> bool:
+        """Start an opt-in Webots HTML5 animation recording.
+
+        A path supplied through ``SMART_FACTORY_ANIMATION_PATH`` is the sole
+        switch. Webots derives the JSON and X3D companions from the HTML
+        filename, so all three targets are checked before recording starts.
+        """
+        self._animation_recording_started = False
+        raw_path = os.environ.get('SMART_FACTORY_ANIMATION_PATH', '').strip()
+        if not raw_path:
+            return False
+
+        path = os.path.abspath(os.path.expandvars(raw_path))
+        if not path.lower().endswith('.html'):
+            raise ValueError(
+                "SMART_FACTORY_ANIMATION_PATH must use the .html extension")
+        stem, _extension = os.path.splitext(path)
+        targets = [path, stem + '.json', stem + '.x3d']
+        existing = [target for target in targets if os.path.exists(target)]
+        if existing:
+            raise FileExistsError(
+                "Refusing to overwrite existing Webots animation files: " +
+                ', '.join(existing))
+
+        parent = os.path.dirname(path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        if not self.supervisor.animationStartRecording(path):
+            raise RuntimeError("Webots rejected HTML5 animation recording")
+        self._animation_recording_path = path
+        self._animation_recording_started = True
+        print(f"[Recording] Started Webots HTML5 animation: {path}",
+              flush=True)
+        return True
+
+    def _finish_animation_recording(self) -> bool:
+        """Stop HTML5 recording and verify its required export files."""
+        if not getattr(self, '_animation_recording_started', False):
+            return True
+
+        if not self.supervisor.animationStopRecording():
+            print("[Recording] Webots failed to stop/export HTML5 animation.",
+                  flush=True)
+            return False
+
+        path = self._animation_recording_path
+        stem, _extension = os.path.splitext(path)
+        required = [path, stem + '.json', stem + '.x3d']
+        invalid = [target for target in required
+                   if not os.path.isfile(target) or os.path.getsize(target) <= 0]
+        if invalid:
+            print("[Recording] HTML5 animation export is missing required "
+                  f"files: {', '.join(invalid)}", flush=True)
+            return False
+        self._animation_recording_started = False
+        print(f"[Recording] Saved Webots HTML5 animation: {path}", flush=True)
+        return True
 
     def _log_replan(self, *args, **kwargs):
         """Print replan diagnostics with the current simulation timestamp."""
@@ -990,18 +1051,47 @@ class FactorySupervisor:
         """Return True when a robot must never be selected as active yielder."""
         return (
             robot.state == RobotState.RETURNING_TO_CHARGE or
+            self._dock_clearance_priority_active(robot) or
             bool(getattr(robot, 'emergency_braking', False)) or
             float(getattr(robot, 'battery', 1.0)) < LOW_BATTERY_THRESHOLD
         )
 
+    @staticmethod
+    def _dock_clearance_priority_active(robot) -> bool:
+        """True while a post-delivery robot is still clearing its old dock."""
+        origin = getattr(robot, 'dock_clearance_origin', None)
+        if origin is None or robot.state != RobotState.RETURNING_HOME:
+            return False
+        return math.hypot(
+            robot.position[0] - origin[0],
+            robot.position[1] - origin[1]) < YIELD_RESUME_MIN_CLEARANCE
+
+    def _dock_clearance_required(self, robot_id: int, location: str) -> bool:
+        """Whether another active task is currently targeting this dock."""
+        if location not in ALL_LOCATIONS:
+            return False
+        for peer_id, peer in self.robots.items():
+            if peer_id == robot_id or peer.current_task is None:
+                continue
+            if peer.state == RobotState.EN_ROUTE_PICKUP:
+                peer_goal = peer.current_task.pickup_location
+            elif peer.state in (RobotState.CARRYING,
+                                RobotState.EN_ROUTE_DELIVERY):
+                peer_goal = peer.current_task.delivery_location
+            else:
+                continue
+            if peer_goal == location:
+                return True
+        return False
+
     def _priority_yield_key(self, robot_id: int):
         """Deterministic right-of-way key; higher values keep the route.
 
-        Task priority is the only conflict-domain signal.  Exempt robots are
-        never selected as the yielder, and robot ID is used only as a final
-        deterministic tie-break for identical task priorities.  Goal distance
-        is intentionally absent so a closer-but-lower-priority robot cannot
-        influence the winner/yielder selection.
+        Safety-exempt and actively dock-clearing robots are never selected as
+        the yielder. For all other robots, task priority is the only conflict-
+        domain signal and robot ID is the final deterministic tie-break. Goal
+        distance is intentionally absent so proximity cannot oscillate the
+        winner/yielder selection.
         """
         robot = self.robots[robot_id]
         exempt = 1 if self._priority_yield_is_exempt(robot) else 0
@@ -1739,6 +1829,33 @@ class FactorySupervisor:
         wait_seconds = max(1.0, min(YIELD_RESUME_TIMEOUT, earliest + 1.0))
         deadline = self.sim_time + wait_seconds
 
+        if not ENABLE_PRIORITY_YIELD_RESUME:
+            # Keep the inexpensive local right-of-way action even when the
+            # experimental resume state machine is disabled. Its deadline is
+            # explicit, so it cannot retain arrival ownership or a reduced
+            # speed after the crossing has cleared.
+            robot.priority_yield_bounded_until = max(
+                robot.priority_yield_bounded_until, deadline)
+            self._hold_robot(yielder, wait_seconds)
+            if self._set_robot_speed_scale(yielder, 0.40):
+                robot.joint_shield_until = max(
+                    getattr(robot, 'joint_shield_until', 0.0), deadline)
+            self._set_robot_speed_scale(winner, 1.0)
+            for peer_id in component:
+                if peer_id in (winner, yielder):
+                    continue
+                peer = self.robots[peer_id]
+                if self._set_robot_speed_scale(peer_id, 0.60):
+                    peer.joint_shield_until = max(
+                        getattr(peer, 'joint_shield_until', 0.0), deadline)
+            if getattr(self, 'metrics', None) is not None:
+                self.metrics.record_yield_event(
+                    'yield_start', self.sim_time, yielder, winner)
+            print(f"[PriorityYieldSideBounded] T={self.sim_time:.1f}s "
+                  f"winner={winner} yielder={yielder} "
+                  f"hold={wait_seconds:.2f}s")
+            return True
+
         robot.priority_yield_state = 'waiting_clear'
         robot.priority_yield_winner = winner
         robot.priority_yield_standoff = None
@@ -1762,6 +1879,37 @@ class FactorySupervisor:
         print(f"[PriorityYieldSide] T={self.sim_time:.1f}s winner={winner} "
               f"yielder={yielder} hold={wait_seconds:.2f}s ")
         return True
+
+    def _priority_yield_expire_bounded_waits(self, active_robots) -> None:
+        """Release only expired, stateless side-yield bookkeeping."""
+        now = self.sim_time
+        for robot in active_robots.values():
+            deadline = float(getattr(
+                robot, 'priority_yield_bounded_until', 0.0) or 0.0)
+            if deadline <= 0.0 or deadline > now:
+                continue
+
+            other_wait_until = max(
+                float(getattr(robot, 'hold_until', 0.0) or 0.0),
+                float(getattr(robot, 'dispatch_not_before', 0.0) or 0.0),
+                float(getattr(robot, 'controller_paused_until', 0.0) or 0.0),
+                float(getattr(
+                    robot, 'controller_joint_wait_until', 0.0) or 0.0),
+            )
+            if other_wait_until > now:
+                # A later wait owns the robot now. Preserve its metadata and
+                # revisit cleanup only after that independent deadline.
+                robot.priority_yield_bounded_until = other_wait_until
+            else:
+                robot.priority_yield_bounded_until = 0.0
+                robot.hold_until = 0.0
+                robot.wait_started = 0.0
+
+            if (getattr(robot, 'priority_yield_state', None) is None and
+                    getattr(robot, 'joint_shield_until', 0.0) <= now and
+                    robot.speed_scale < 0.99):
+                self._set_robot_speed_scale(robot.robot_id, 1.0)
+                robot.joint_shield_until = 0.0
 
     def _priority_yield_resume_scan(self, active_robots) -> bool:
         """Run the joint-mode priority yield prediction and state machine."""
@@ -1903,6 +2051,7 @@ class FactorySupervisor:
             rid: robot for rid, robot in self.robots.items()
             if self._has_active_navigation(robot)
         }
+        self._priority_yield_expire_bounded_waits(self.robots)
         if not active:
             return
 
@@ -2518,6 +2667,8 @@ class FactorySupervisor:
             return 98
         if source in ('_priority_yield_resume', '_priority_yield_direct'):
             return 96
+        if source == '_priority_dock_clearance':
+            return 92
         if source in ('_joint_group_recovery', '_resume_after_escape'):
             return 95
         if source == 'joint_grid_transaction':
@@ -2555,7 +2706,7 @@ class FactorySupervisor:
             '_command_reverse', '_joint_group_recovery',
             '_resume_after_escape', '_teleport_stalled_group',
             '_priority_yield_resume', '_priority_yield_direct',
-            '_joint_stall_recovery',
+            '_priority_dock_clearance', '_joint_stall_recovery',
         }
         txn = getattr(self, '_joint_plan_transaction', None)
         if (txn is not None and robot_id in txn.members and
@@ -2582,7 +2733,7 @@ class FactorySupervisor:
         joint_intent_sources = {
             '_assign_tasks_impl', '_handle_goal_reached',
             '_send_to_charging', '_send_to_home',
-            '_relocate_idle_robots',
+            '_relocate_idle_robots', '_priority_dock_clearance',
         }
         if (ENABLE_JOINT_RUNTIME and not is_runtime_replan and
                 source in joint_intent_sources):
@@ -2783,7 +2934,7 @@ class FactorySupervisor:
         normal_route_sources = {
             '_handle_goal_reached', '_send_to_home',
             '_relocate_idle_robots', '_send_to_charging',
-            'joint_planner',
+            '_priority_dock_clearance', 'joint_planner',
         }
         is_runtime_replan = source not in normal_route_sources
         if not self._route_write_allowed(robot, source):
@@ -5328,8 +5479,13 @@ class FactorySupervisor:
         # The new deterministic yield protocol owns the arrival at its
         # standoff; it must not be treated as a business-goal transition.
         if getattr(robot, 'priority_yield_state', None) is not None:
-            self._priority_yield_handle_arrival(robot_id, force=force)
-            return
+            if ENABLE_PRIORITY_YIELD_RESUME:
+                self._priority_yield_handle_arrival(robot_id, force=force)
+                return
+            # A disabled protocol must never retain ownership of a business
+            # arrival. Clear state left by an older controller/configuration
+            # and continue the normal pickup/delivery transition now.
+            self._priority_yield_clear_state(robot)
 
         # An escape waypoint is a temporary motion leg, never a business
         # pickup/delivery/home arrival. Resume the authoritative goal through
@@ -5451,6 +5607,7 @@ class FactorySupervisor:
         
         elif robot.state == RobotState.EN_ROUTE_DELIVERY and robot.current_task:
             # Arrived at delivery location - task complete!
+            completed_location = robot.current_task.delivery_location
             robot.current_task.status = TaskStatus.COMPLETED
             robot.current_task.completion_time = self.sim_time
             robot.tasks_completed += 1
@@ -5490,6 +5647,19 @@ class FactorySupervisor:
             if robot.battery < LOW_BATTERY_THRESHOLD:
                 self._send_to_charging(robot_id)
                 return
+            # If another active task is already targeting this exact dock,
+            # leave immediately and retain right-of-way only until one metre
+            # clear. This prevents task chaining from turning a completed
+            # robot into the next arrival's stationary obstacle.
+            if self._dock_clearance_required(robot_id, completed_location):
+                robot.dock_clearance_origin = tuple(
+                    ALL_LOCATIONS[completed_location])
+                robot.dock_clearance_location = completed_location
+                if self._relocate_idle_robot(
+                        robot_id, source='_priority_dock_clearance'):
+                    return
+                robot.dock_clearance_origin = None
+                robot.dock_clearance_location = None
             # Reserve the current position's nearest node so peers
             # don't route through us while we wait.
             cur_node = self.motion_coordinator.graph.get_nearest_node(
@@ -5511,6 +5681,8 @@ class FactorySupervisor:
             robot.current_waypoint_idx = 0
             robot.state = RobotState.IDLE
             robot.goal_location = None
+            robot.dock_clearance_origin = None
+            robot.dock_clearance_location = None
             self.motion_coordinator.clear_robot_path(robot_id)
             self.motion_coordinator.release_lifelong(robot_id)
             self.motion_coordinator.release_robot_grid(robot_id)
@@ -5625,6 +5797,46 @@ class FactorySupervisor:
         print(f"[T={self.sim_time:.1f}] Robot {robot_id} returning to home "
               f"spot {home_xy}")
 
+    def _relocate_idle_robot(self, rid: int,
+                             source: str = '_relocate_idle_robots') -> bool:
+        """Plan one idle robot to a free non-dock rest node."""
+        robot = self.robots[rid]
+        if robot.state != RobotState.IDLE or robot.waypoints:
+            return False
+        cur_node = self.motion_coordinator.graph.get_nearest_node(
+            robot.position)
+        if cur_node in REST_NODES:
+            return False
+        result = self.motion_coordinator.find_nearest_rest_node(
+            robot.position, exclude_robot_id=rid)
+        if result is None:
+            return False
+        target_name, target_xy = result
+        if math.hypot(robot.position[0] - target_xy[0],
+                      robot.position[1] - target_xy[1]) < 0.4:
+            return False
+        self.motion_coordinator.release_home(rid)
+        node_path = self.motion_coordinator.lifelong.plan(
+            rid, cur_node, target_name)
+        if not node_path:
+            return False
+        waypoints = [WAYPOINTS[node] for node in node_path]
+        if waypoints and math.hypot(
+                waypoints[0][0] - robot.position[0],
+                waypoints[0][1] - robot.position[1]) < 0.05:
+            waypoints.pop(0)
+        if not waypoints:
+            return False
+
+        robot.state = RobotState.RETURNING_HOME
+        robot.goal_location = tuple(target_xy)
+        if self._install_runtime_plan(
+                rid, waypoints, delay=0.0, source=source):
+            return True
+        robot.state = RobotState.IDLE
+        robot.goal_location = None
+        return False
+
     def _relocate_idle_robots(self):
         """
         Lazy relocation �?for each IDLE robot not already at a REST_NODE,
@@ -5636,43 +5848,8 @@ class FactorySupervisor:
         """
         if not getattr(self, "system_ready", True):
             return
-        for rid, robot in self.robots.items():
-            if robot.state != RobotState.IDLE:
-                continue
-            if robot.waypoints:
-                continue   # already relocating
-            # Skip if already at a rest node
-            cur_node = self.motion_coordinator.graph.get_nearest_node(
-                robot.position)
-            if cur_node in REST_NODES:
-                continue
-            # Find nearest free rest node
-            result = self.motion_coordinator.find_nearest_rest_node(
-                robot.position, exclude_robot_id=rid)
-            if result is None:
-                continue
-            target_name, target_xy = result
-            d2 = math.hypot(robot.position[0] - target_xy[0],
-                             robot.position[1] - target_xy[1])
-            if d2 < 0.4:
-                continue
-            self.motion_coordinator.release_home(rid)
-            # Plan via lifelong (node-name based, guaranteed on-graph)
-            node_path = self.motion_coordinator.lifelong.plan(
-                rid, cur_node, target_name)
-            if not node_path:
-                continue
-            wpts = [WAYPOINTS[n] for n in node_path]
-            # Drop redundant first waypoint
-            if wpts and (
-                    abs(wpts[0][0] - robot.position[0]) < 0.05 and
-                    abs(wpts[0][1] - robot.position[1]) < 0.05):
-                wpts.pop(0)
-            if not wpts:
-                continue
-            robot.state = RobotState.RETURNING_HOME
-            robot.goal_location = tuple(target_xy)
-            self._install_runtime_plan(rid, wpts, delay=0.0)
+        for rid in self.robots:
+            self._relocate_idle_robot(rid)
 
     def _send_to_charging(self, robot_id: int):
         """Route to the nearest reachable station, then shortest queue."""
@@ -6081,6 +6258,16 @@ class FactorySupervisor:
                if ENABLE_NONPHYSICAL_RECOVERY else
                "disabled (physical retreat/replan only)"))
         print(f"{'='*60}\n")
+
+        try:
+            self._start_animation_recording()
+        except Exception as exc:
+            print(f"[Recording] Unable to start required HTML5 animation: {exc}",
+                  flush=True)
+            if AUTO_STOP_SIMULATION and hasattr(
+                    self.supervisor, "simulationQuit"):
+                self.supervisor.simulationQuit(2)
+            return
         
         dt = self.timestep / 1000.0  # Convert ms to seconds
         
@@ -6322,11 +6509,12 @@ class FactorySupervisor:
 
         # Simulation complete
         self._finalize()
+        recording_ok = self._finish_animation_recording()
         # In batch mode the other robot controllers keep Webots alive after
         # the supervisor returns. Explicitly terminate the simulation once
         # results are flushed so automated validation has a reliable exit.
         if AUTO_STOP_SIMULATION and hasattr(self.supervisor, "simulationQuit"):
-            self.supervisor.simulationQuit(0)
+            self.supervisor.simulationQuit(0 if recording_ok else 3)
 
     def _log_status(self):
         """Print periodic status update."""

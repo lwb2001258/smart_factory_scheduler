@@ -10,8 +10,9 @@ sys.path.insert(0, str(SUPERVISOR_DIR))
 
 import factory_supervisor as fs
 from factory_supervisor import FactorySupervisor, RobotInfo
-from config import RobotState
+from config import RobotState, TaskStatus
 from metrics_collector import MetricsCollector
+from task_generator import TransportTask
 
 
 class PriorityYieldResumeTests(unittest.TestCase):
@@ -85,6 +86,84 @@ class PriorityYieldResumeTests(unittest.TestCase):
             2: self._robot(2, (0.1, 0.0), task_priority=1.0, goal=(5.0, 0.0)),
         }
         self.assertGreater(sup._priority_yield_key(2), sup._priority_yield_key(1))
+
+    def test_dock_clearance_robot_has_priority_only_until_one_metre_clear(self):
+        sup = self._supervisor()
+        clearing = RobotInfo(1, (0.2, 0.0))
+        clearing.state = RobotState.RETURNING_HOME
+        clearing.goal_location = (2.0, 0.0)
+        clearing.waypoints = [(2.0, 0.0)]
+        clearing.dock_clearance_origin = (0.0, 0.0)
+        peer = self._robot(2, (0.0, 0.5), task_priority=100.0)
+        sup.robots = {1: clearing, 2: peer}
+
+        self.assertGreater(sup._priority_yield_key(1),
+                           sup._priority_yield_key(2))
+        clearing.position = (1.01, 0.0)
+        self.assertLess(sup._priority_yield_key(1),
+                        sup._priority_yield_key(2))
+
+    def test_dock_clearance_requires_an_active_peer_with_same_goal(self):
+        sup = self._supervisor()
+        finished = RobotInfo(1, (0.0, 0.0))
+        peer = self._robot(2, (1.0, 0.0))
+        peer.current_task.pickup_location = "WS1"
+        peer.current_task.delivery_location = "S1"
+        sup.robots = {1: finished, 2: peer}
+
+        self.assertTrue(sup._dock_clearance_required(1, "WS1"))
+        self.assertFalse(sup._dock_clearance_required(1, "WS2"))
+        peer.state = RobotState.IDLE
+        self.assertFalse(sup._dock_clearance_required(1, "WS1"))
+
+    def test_delivery_completion_immediately_dispatches_pressured_dock_clearance(self):
+        sup = self._supervisor()
+        delivered = TransportTask(
+            task_id=7,
+            pickup_location="S1",
+            delivery_location="WS1",
+            pickup_position=(-3.0, 1.5),
+            delivery_position=(-6.0, 3.5),
+            arrival_time=0.0,
+            status=TaskStatus.IN_PROGRESS,
+        )
+        incoming = TransportTask(
+            task_id=8,
+            pickup_location="WS1",
+            delivery_location="S2",
+            pickup_position=(-6.0, 3.5),
+            delivery_position=(-1.0, 1.5),
+            arrival_time=1.0,
+        )
+        clearing = RobotInfo(1, delivered.delivery_position)
+        clearing.state = RobotState.EN_ROUTE_DELIVERY
+        clearing.current_task = delivered
+        clearing.goal_location = delivered.delivery_location
+        peer = RobotInfo(2, (-4.0, 3.0))
+        peer.state = RobotState.EN_ROUTE_PICKUP
+        peer.current_task = incoming
+        peer.goal_location = incoming.pickup_location
+        peer.waypoints = [incoming.pickup_position]
+        sup.robots = {1: clearing, 2: peer}
+        sup.metrics = mock.Mock()
+        sup.motion_coordinator = mock.Mock()
+        sup._get_robot_positions_from_webots = mock.Mock()
+
+        def relocate(robot_id, source):
+            sup.robots[robot_id].state = RobotState.RETURNING_HOME
+            return True
+
+        sup._relocate_idle_robot = mock.Mock(side_effect=relocate)
+        sup._handle_goal_reached(1)
+
+        self.assertEqual(TaskStatus.COMPLETED, delivered.status)
+        self.assertIsNone(clearing.current_task)
+        self.assertEqual(RobotState.RETURNING_HOME, clearing.state)
+        self.assertEqual(delivered.delivery_position,
+                         clearing.dock_clearance_origin)
+        self.assertEqual("WS1", clearing.dock_clearance_location)
+        sup._relocate_idle_robot.assert_called_once_with(
+            1, source="_priority_dock_clearance")
 
     def test_select_yielder_respects_task_priority(self):
         sup = self._supervisor()
@@ -161,6 +240,128 @@ class PriorityYieldResumeTests(unittest.TestCase):
                     return_value=True) as legacy:
                 self.assertTrue(sup._joint_collision_scan(active))
                 legacy.assert_called_once()
+
+    def test_side_wait_is_bounded_without_latching_state_when_feature_is_off(self):
+        sup = self._supervisor()
+        sup.robots = {
+            1: self._robot(1, (-2.0, 0.0), goal=(2.0, 0.0)),
+            2: self._robot(2, (0.0, -2.0), goal=(0.0, 2.0)),
+        }
+        sup._send_command_to_robot = mock.Mock(return_value=True)
+        with mock.patch.object(fs, "ENABLE_PRIORITY_YIELD_RESUME", False):
+            self.assertTrue(sup._priority_yield_side_wait(
+                (1, 2), [(1, 2, 0.5, 0.2)]))
+        for robot in sup.robots.values():
+            self.assertIsNone(robot.priority_yield_state)
+        yielder = sup.robots[1]
+        self.assertEqual(0.4, yielder.speed_scale)
+        self.assertEqual(11.5, yielder.hold_until)
+        self.assertEqual(11.5, yielder.priority_yield_bounded_until)
+        self.assertEqual(11.5, yielder.joint_shield_until)
+        self.assertEqual(1.0, sup.robots[2].speed_scale)
+
+    def test_bounded_side_wait_expiry_restores_speed_and_wait_metadata(self):
+        sup = self._supervisor()
+        robot = self._robot(1, (0.0, 0.0))
+        robot.priority_yield_bounded_until = 9.0
+        robot.hold_until = 9.0
+        robot.wait_started = 8.0
+        robot.joint_shield_until = 9.0
+        robot.speed_scale = 0.4
+        sup.robots = {1: robot}
+
+        def set_speed(_robot_id, scale):
+            robot.speed_scale = scale
+            return True
+
+        sup._set_robot_speed_scale = mock.Mock(side_effect=set_speed)
+        sup._priority_yield_expire_bounded_waits(sup.robots)
+
+        self.assertEqual(0.0, robot.priority_yield_bounded_until)
+        self.assertEqual(0.0, robot.hold_until)
+        self.assertEqual(0.0, robot.wait_started)
+        self.assertEqual(1.0, robot.speed_scale)
+
+    def test_side_wait_keeps_state_machine_behavior_when_feature_is_on(self):
+        sup = self._supervisor()
+        sup.robots = {
+            1: self._robot(1, (-2.0, 0.0), goal=(2.0, 0.0)),
+            2: self._robot(2, (0.0, -2.0), goal=(0.0, 2.0)),
+        }
+        sup._send_command_to_robot = mock.Mock(return_value=True)
+
+        with mock.patch.object(fs, "ENABLE_PRIORITY_YIELD_RESUME", True):
+            self.assertTrue(sup._priority_yield_side_wait(
+                (1, 2), [(1, 2, 0.5, 0.2)]))
+
+        yielder = sup.robots[1]
+        self.assertEqual("waiting_clear", yielder.priority_yield_state)
+        self.assertEqual(2, yielder.priority_yield_winner)
+        self.assertEqual(11.5, yielder.priority_yield_wait_deadline)
+        self.assertEqual(0.0, yielder.priority_yield_bounded_until)
+
+    def test_bounded_side_wait_expiry_preserves_later_wait(self):
+        sup = self._supervisor()
+        robot = self._robot(1, (0.0, 0.0))
+        robot.priority_yield_bounded_until = 9.0
+        robot.hold_until = 12.0
+        robot.wait_started = 8.0
+        robot.joint_shield_until = 12.0
+        robot.speed_scale = 0.4
+        sup.robots = {1: robot}
+        sup._set_robot_speed_scale = mock.Mock(return_value=True)
+
+        sup._priority_yield_expire_bounded_waits(sup.robots)
+
+        self.assertEqual(12.0, robot.priority_yield_bounded_until)
+        self.assertEqual(12.0, robot.hold_until)
+        self.assertEqual(8.0, robot.wait_started)
+        self.assertEqual(0, sup._set_robot_speed_scale.call_count)
+
+    def test_disabled_stale_yield_does_not_swallow_delivery_arrival(self):
+        sup = self._supervisor()
+        task = TransportTask(
+            task_id=7,
+            pickup_location="S1",
+            delivery_location="WS1",
+            pickup_position=(0.0, 0.0),
+            delivery_position=(2.0, 3.0),
+            arrival_time=0.0,
+            status=TaskStatus.IN_PROGRESS,
+        )
+        robot = RobotInfo(1, task.delivery_position)
+        robot.state = RobotState.EN_ROUTE_DELIVERY
+        robot.current_task = task
+        robot.goal_location = task.delivery_location
+        robot.priority_yield_state = "waiting_clear"
+        robot.priority_yield_winner = 2
+        robot.priority_yield_original_goal = task.delivery_location
+        robot.hold_until = 20.0
+        robot.speed_scale = 0.4
+        sup.robots = {1: robot}
+        sup.metrics = mock.Mock()
+        sup.motion_coordinator = mock.Mock()
+        sup.motion_coordinator.graph.get_nearest_node.return_value = None
+        sup._get_robot_positions_from_webots = mock.Mock()
+
+        def restore_speed(_robot_id, scale):
+            robot.speed_scale = scale
+            return True
+
+        sup._set_robot_speed_scale = mock.Mock(side_effect=restore_speed)
+
+        with mock.patch.object(fs, "ENABLE_PRIORITY_YIELD_RESUME", False):
+            sup._handle_goal_reached(1)
+
+        self.assertEqual(TaskStatus.COMPLETED, task.status)
+        self.assertEqual(RobotState.IDLE, robot.state)
+        self.assertIsNone(robot.current_task)
+        self.assertIsNone(robot.priority_yield_state)
+        self.assertEqual(0.0, robot.hold_until)
+        self.assertEqual(1.0, robot.speed_scale)
+        sup._set_robot_speed_scale.assert_called_once_with(1, 1.0)
+        sup.metrics.record_task_completion.assert_called_once_with(
+            task, 1, sup.sim_time)
 
 
 if __name__ == "__main__":
