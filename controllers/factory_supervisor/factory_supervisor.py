@@ -2340,7 +2340,6 @@ class FactorySupervisor:
             os.environ.get('SMART_FACTORY_DEBUG_STATES_ENABLED', '0') == '1')
         self._debug_state_interval = max(
             1, int(os.environ.get('SMART_FACTORY_DEBUG_STATES_INTERVAL', '16')))
-        self._debug_state_buffer = []
         if self._debug_state_enabled:
             with open(self._debug_state_path, 'w', encoding='utf-8') as handle:
                 handle.write('sim_time,robot_id,state,pos_x,pos_y,goal_x,goal_y,'
@@ -6321,32 +6320,29 @@ class FactorySupervisor:
             if (self._debug_state_enabled and
                     self.step_count % self._debug_state_interval == 0):
                 try:
-                    for rid in sorted(self.robots):
-                        robot = self.robots[rid]
-                        goal = self._navigation_goal(robot)
-                        goal_xy = self._goal_coordinates(goal)
-                        self._debug_state_buffer.append(
-                            f'{self.sim_time:.3f},{rid},{robot.state},'
-                            f'{robot.position[0]:.3f},{robot.position[1]:.3f},'
-                            f'{goal_xy[0] if goal_xy else 0:.3f},'
-                            f'{goal_xy[1] if goal_xy else 0:.3f},'
-                            f'{robot.active_plan_source},'
-                            f'{robot.active_plan_epoch},'
-                            f'{robot.controller_active_plan_epoch},'
-                            f'{robot.controller_waypoint_index},'
-                            f'{len(robot.waypoints)},'
-                            f'{robot.current_task.task_id if robot.current_task else None},'
-                            f'{robot.hold_until:.3f},{robot.speed_scale:.2f},'
-                            f'{robot.heading:.3f},'
-                            f'{robot.emergency_braking},'
-                            f'{robot.controller_joint_wait_reason},'
-                            f'{robot.controller_joint_wait_until:.3f},'
-                            f'{getattr(robot, "_replan_requested", False)}\n')
-                    if len(self._debug_state_buffer) >= 128:
-                        with open(self._debug_state_path, 'a',
-                                  encoding='utf-8') as handle:
-                            handle.writelines(self._debug_state_buffer)
-                        self._debug_state_buffer.clear()
+                    with open(self._debug_state_path, 'a',
+                              encoding='utf-8') as handle:
+                        for rid in sorted(self.robots):
+                            robot = self.robots[rid]
+                            goal = self._navigation_goal(robot)
+                            goal_xy = self._goal_coordinates(goal)
+                            handle.write(
+                                f'{self.sim_time:.3f},{rid},{robot.state},'
+                                f'{robot.position[0]:.3f},{robot.position[1]:.3f},'
+                                f'{goal_xy[0] if goal_xy else 0:.3f},'
+                                f'{goal_xy[1] if goal_xy else 0:.3f},'
+                                f'{robot.active_plan_source},'
+                                f'{robot.active_plan_epoch},'
+                                f'{robot.controller_active_plan_epoch},'
+                                f'{robot.controller_waypoint_index},'
+                                f'{len(robot.waypoints)},'
+                                f'{robot.current_task.task_id if robot.current_task else None},'
+                                f'{robot.hold_until:.3f},{robot.speed_scale:.2f},'
+                                f'{robot.heading:.3f},'
+                                f'{robot.emergency_braking},'
+                                f'{robot.controller_joint_wait_reason},'
+                                f'{robot.controller_joint_wait_until:.3f},'
+                                f'{getattr(robot, "_replan_requested", False)}\n')
                 except Exception as debug_error:
                     print(f'[DEBUG_STATES] write failed: {debug_error}')
 
@@ -6558,13 +6554,6 @@ class FactorySupervisor:
 
     def _finalize(self):
         """Finalize simulation and save results."""
-        if self._debug_state_buffer:
-            try:
-                with open(self._debug_state_path, 'a', encoding='utf-8') as handle:
-                    handle.writelines(self._debug_state_buffer)
-                self._debug_state_buffer.clear()
-            except Exception as debug_error:
-                print(f'[DEBUG_STATES] final flush failed: {debug_error}')
         print(f"\n{'='*60}")
         print(f"Simulation Complete: Scenario {self.scenario_name}")
         print(f"{'='*60}")
