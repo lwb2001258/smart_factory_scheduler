@@ -8,3 +8,5 @@
 /results/smoke_factory_grounded_v2/
 /results/validation/
 .pytest_cache/
+/docs/
+/results/
