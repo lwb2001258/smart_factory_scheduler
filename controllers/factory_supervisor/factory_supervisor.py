@@ -1365,7 +1365,7 @@ class FactorySupervisor:
         travel_seconds = (
             math.hypot(target[0] - robot.position[0],
                        target[1] - robot.position[1]) /
-            max(0.10, 0.22 * 0.55))
+            max(0.10, 0.24 * 0.55))
         lookahead = min(YIELD_PREDICTION_HORIZON, travel_seconds + 1.5)
         for sample in winner_traj:
             if sample[2] > lookahead:
@@ -3371,7 +3371,7 @@ class FactorySupervisor:
         return self._predict_trajectory(
             robot.position,
             robot.waypoints[robot.current_waypoint_idx:],
-            0.22 * scale, horizon, dt, start_delay=start_delay)
+            0.24 * scale, horizon, dt, start_delay=start_delay)
 
     def _find_joint_speed_profile(self, component, base_trajectories,
                                   minimum_distance=0.85):
@@ -3457,7 +3457,7 @@ class FactorySupervisor:
         """
         PREDICTION_HORIZON = 10.0   # �?�?预测未来10�?
         SAMPLE_DT = 0.5             # �?�?�?.5s采样一个位�?
-        ROBOT_SPEED = 0.22          # m/s
+        ROBOT_SPEED = 0.24          # m/s
         # Predict the controller's first slowdown boundary, not physical
         # overlap. This leaves planning time before the 0.65 m hard stop.
         COLLISION_RADIUS = 0.75

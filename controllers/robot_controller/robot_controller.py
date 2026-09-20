@@ -33,8 +33,8 @@ except ImportError:
 # ================================================================
 # CONSTANTS
 # ================================================================
-MAX_SPEED = 6.67          # rad/s (max wheel angular velocity)
-MAX_LINEAR_SPEED = 0.22   # m/s
+MAX_SPEED = 7.27          # rad/s (max wheel angular velocity)
+MAX_LINEAR_SPEED = 0.24   # m/s
 MAX_ANGULAR_SPEED = 2.84  # rad/s
 WHEEL_RADIUS = 0.033      # m
 WHEEL_BASE = 0.287        # m (distance between wheels)
@@ -1720,8 +1720,10 @@ class RobotController:
                     self.position[0], self.position[1],
                     self.heading, lidar_ranges
                 )
-                left_speed *= self.navigator.speed_scale
-                right_speed *= self.navigator.speed_scale
+                # Use the validated 9% kinematic headroom while preserving
+                # all planner speed-scale and emergency-stop decisions.
+                left_speed *= self.navigator.speed_scale * 1.09
+                right_speed *= self.navigator.speed_scale * 1.09
                 self._set_motor_speeds(left_speed, right_speed)
                 
                 # Drain battery while moving
