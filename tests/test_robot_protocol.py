@@ -103,6 +103,24 @@ class RobotProtocolTests(unittest.TestCase):
         self.assertEqual(0, navigator.current_waypoint_idx)
         self.assertNotEqual((0.0, 0.0), decision)
 
+    def test_joint_control_defers_speed_scale_to_motor_output_stage(self):
+        navigator = WaypointNavigator()
+        navigator.set_waypoints([(1.0, 0.0)])
+        navigator.joint_coordinated = True
+        navigator.speed_scale = 1.0
+        full_speed = navigator.compute_control(0.0, 0.0, 0.0, [])
+
+        navigator.speed_scale = 0.4
+        limited_speed = navigator.compute_control(0.0, 0.0, 0.0, [])
+
+        self.assertEqual(full_speed, limited_speed)
+        final_speed = tuple(value * navigator.speed_scale * 1.09
+                            for value in limited_speed)
+        self.assertAlmostEqual(full_speed[0] * 0.4 * 1.09,
+                               final_speed[0])
+        self.assertAlmostEqual(full_speed[1] * 0.4 * 1.09,
+                               final_speed[1])
+
     def test_status_transmits_joint_planned_wait_evidence(self):
         controller = self.controller_with_messages([])
         controller.position = (1.0, 2.0)

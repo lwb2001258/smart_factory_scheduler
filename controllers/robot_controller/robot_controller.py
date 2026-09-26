@@ -368,9 +368,9 @@ class WaypointNavigator:
                 right_speed = (
                     forward_speed + angular_speed * WHEEL_BASE / 2
                 ) / WHEEL_RADIUS
-            scale = getattr(self, 'speed_scale', 1.0)
-            left_speed *= scale
-            right_speed *= scale
+            # RobotController.run() applies speed_scale to every navigation
+            # output. Keep this branch unscaled so coordinated motion is not
+            # slowed by scale**2 while other navigation modes use scale once.
             return (left_speed, right_speed)
 
         near_dock = False
