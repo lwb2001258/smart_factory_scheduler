@@ -6405,7 +6405,10 @@ class FactorySupervisor:
             if self.sim_time >= self._next_joint_grid_tick:
                 if ENABLE_JOINT_RUNTIME:
                     self._refresh_joint_grid_candidate()
-                self._next_joint_grid_tick += 2.0
+                # Keep a rolling plan alive for a little longer during calm
+                # traffic. Predictive conflicts still pull this tick forward
+                # immediately, so safety does not wait for the cadence.
+                self._next_joint_grid_tick += 3.0
             if (os.environ.get('SMART_FACTORY_TXN_SMOKE', '0') == '1' and
                     not getattr(self, '_joint_txn_smoke_attempted', False) and
                     self.sim_time >= 5.0):
