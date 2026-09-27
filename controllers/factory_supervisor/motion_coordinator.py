@@ -227,6 +227,14 @@ class MotionCoordinator:
     - Deadlock detection: identifies circular wait conditions
     """
 
+    JOINT_GRID_EXPANSIONS_PER_SECOND = 12000
+    JOINT_GRID_TIER_SHARES = {
+        "wide": 0.35,
+        "primary": 0.40,
+        "short": 0.10,
+        "soft": 0.15,
+    }
+
     def __init__(self, num_active_robots: int = 8):
         self.num_active_robots = num_active_robots
         self.graph = FactoryGraph()
@@ -307,6 +315,18 @@ class MotionCoordinator:
         self.joint_grid_candidates_validated = 0
         self.joint_grid_candidates_timed_out = 0
         self.joint_grid_candidates_failed = 0
+        self.joint_grid_tier_statistics = {
+            name: {
+                "attempted": 0,
+                "validated": 0,
+                "expanded_nodes": 0,
+                "expansion_budget": 0,
+                "timeout": 0,
+                "no_solution": 0,
+                "validation_rejected": 0,
+            }
+            for name in self.JOINT_GRID_TIER_SHARES
+        }
         self.joint_transactions_attempted = 0
         self.joint_transactions_activated = 0
         self.joint_transactions_aborted = 0
@@ -320,33 +340,55 @@ class MotionCoordinator:
         """Build and independently validate one all-active space-time plan."""
         self.joint_grid_candidates_attempted += 1
         started = time.perf_counter()
+        expansion_budgets = self._joint_grid_expansion_budgets(max_seconds)
+
+        def try_tier(name, planner, wall_seconds):
+            statistics = self.joint_grid_tier_statistics[name]
+            statistics["attempted"] += 1
+            tier_candidate = planner.plan(
+                agents, max_seconds=wall_seconds,
+                max_expansions=expansion_budgets[name],
+                priority_order=priority_order)
+            statistics["expanded_nodes"] += planner.last_expanded_nodes
+            if tier_candidate is not None:
+                if planner.validate(tier_candidate):
+                    statistics["validated"] += 1
+                    return tier_candidate
+                statistics["validation_rejected"] += 1
+                return None
+            reason = planner.last_failure_reason
+            if reason in statistics:
+                statistics[reason] += 1
+            else:
+                statistics["no_solution"] += 1
+            return None
+
         # Try the wide-envelope tier first.  A 0.75 m centreline plan is
         # still solvable for most rolling windows and absorbs the small
         # pure-pursuit tracking error that otherwise pushes a 0.70 m plan
         # down to about 0.62 m.  If the dense state is temporarily
         # infeasible, keep the legacy 0.70 m tiers as a moving fallback.
         wide_budget = min(max_seconds * 0.55, 0.35)
-        candidate = self.joint_grid_planner_wide.plan(
-            agents, max_seconds=wide_budget, priority_order=priority_order)
-        if candidate is not None and self.joint_grid_planner_wide.validate(
-                candidate):
+        candidate = try_tier(
+            "wide", self.joint_grid_planner_wide, wide_budget)
+        if candidate is not None:
             self.joint_grid_candidates_validated += 1
             return candidate
 
         remaining = max(0.08, max_seconds - (time.perf_counter() - started))
         primary_budget = min(remaining, 0.90)
-        candidate = self.joint_grid_planner.plan(
-            agents, max_seconds=primary_budget, priority_order=priority_order)
-        if candidate is not None and self.joint_grid_planner.validate(candidate):
+        candidate = try_tier(
+            "primary", self.joint_grid_planner, primary_budget)
+        if candidate is not None:
             self.joint_grid_candidates_validated += 1
             return candidate
 
         # Keep a usable shorter-horizon path when the dense primary search
         # times out. This is a temporary throughput degradation, not a stop.
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
-        candidate = self.joint_grid_planner_short.plan(
-            agents, max_seconds=remaining, priority_order=priority_order)
-        if candidate is not None and self.joint_grid_planner_short.validate(candidate):
+        candidate = try_tier(
+            "short", self.joint_grid_planner_short, remaining)
+        if candidate is not None:
             self.joint_grid_candidates_validated += 1
             return candidate
 
@@ -356,9 +398,9 @@ class MotionCoordinator:
         # supervisor's predictive joint speed shield then restores the
         # physical clearance envelope before any pair can approach.
         remaining = max(0.02, max_seconds - (time.perf_counter() - started))
-        candidate = self.joint_grid_planner_soft.plan(
-            agents, max_seconds=remaining, priority_order=priority_order)
-        if candidate is not None and self.joint_grid_planner_soft.validate(candidate):
+        candidate = try_tier(
+            "soft", self.joint_grid_planner_soft, remaining)
+        if candidate is not None:
             candidate.is_relaxed = True
             self.joint_grid_candidates_validated += 1
             return candidate
@@ -368,6 +410,24 @@ class MotionCoordinator:
         else:
             self.joint_grid_candidates_failed += 1
         return None
+
+    @classmethod
+    def _joint_grid_expansion_budgets(cls, max_seconds: float) -> dict:
+        """Return deterministic per-tier work quotas for one candidate."""
+        total = max(
+            1000,
+            int(round(max(0.0, max_seconds) *
+                      cls.JOINT_GRID_EXPANSIONS_PER_SECOND)),
+        )
+        budgets = {}
+        allocated = 0
+        names = tuple(cls.JOINT_GRID_TIER_SHARES)
+        for name in names[:-1]:
+            budget = int(total * cls.JOINT_GRID_TIER_SHARES[name])
+            budgets[name] = budget
+            allocated += budget
+        budgets[names[-1]] = total - allocated
+        return budgets
 
     def set_priorities(self, robot_ids: List[int]):
         """
@@ -2188,6 +2248,11 @@ class MotionCoordinator:
             "joint_grid_candidates_timed_out":
                 self.joint_grid_candidates_timed_out,
             "joint_grid_candidates_failed": self.joint_grid_candidates_failed,
+            "joint_grid_tier_statistics": {
+                name: dict(statistics)
+                for name, statistics in
+                self.joint_grid_tier_statistics.items()
+            },
             "joint_transactions_attempted": self.joint_transactions_attempted,
             "joint_transactions_activated": self.joint_transactions_activated,
             "joint_transactions_aborted": self.joint_transactions_aborted,

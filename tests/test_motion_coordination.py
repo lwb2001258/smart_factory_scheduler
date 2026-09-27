@@ -29,6 +29,11 @@ def rasterize(coordinator, start, waypoints, spacing=0.10):
 
 
 class MotionCoordinationRegressionTests(unittest.TestCase):
+    def test_joint_grid_tiers_receive_deterministic_expansion_budgets(self):
+        self.assertEqual(
+            {"wide": 1050, "primary": 1200, "short": 300, "soft": 450},
+            MotionCoordinator._joint_grid_expansion_budgets(0.25))
+
     def test_joint_grid_validation_rejection_is_counted_as_failure(self):
         coordinator = MotionCoordinator(2)
         agents = {

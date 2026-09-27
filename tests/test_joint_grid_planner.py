@@ -12,6 +12,20 @@ from joint_grid_planner import JointGridPlanner
 
 
 class JointGridPlannerTests(unittest.TestCase):
+    def test_precomputed_vertex_mask_matches_cell_conflict_semantics(self):
+        for minimum_distance in (None, 0.70, 0.75):
+            planner = JointGridPlanner(
+                self.grid, separation_cells=3,
+                minimum_distance_m=minimum_distance)
+            offsets = set(planner._vertex_conflict_offsets)
+            radius = planner._conflict_radius_cells()
+            for dc in range(-radius, radius + 1):
+                for dr in range(-radius, radius + 1):
+                    self.assertEqual(
+                        planner._cells_conflict((10, 10),
+                                                (10 + dc, 10 + dr)),
+                        (dc, dr) in offsets)
+
     def setUp(self):
         self.grid = OccupancyGrid()
         self.planner = JointGridPlanner(
@@ -76,6 +90,15 @@ class JointGridPlannerTests(unittest.TestCase):
         self.assertLess(elapsed, 0.23)
         self.assertIsNotNone(plan)
         self.assertTrue(self.planner.validate(plan, 4))
+
+    def test_expansion_budget_is_a_deterministic_search_stop(self):
+        plan = self.planner.plan(
+            {1: ((-7.0, 3.0), (7.0, 3.0))},
+            max_seconds=1.0, max_expansions=1)
+        self.assertIsNone(plan)
+        self.assertEqual("expansion_budget", self.planner.last_failure_reason)
+        self.assertEqual(1, self.planner.last_expanded_nodes)
+        self.assertEqual(1, self.planner.last_orders_evaluated)
 
 
 if __name__ == '__main__':

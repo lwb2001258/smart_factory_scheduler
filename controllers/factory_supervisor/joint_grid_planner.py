@@ -56,17 +56,25 @@ class JointGridPlanner:
                                    else float(minimum_distance_m))
         self.max_expansions_per_robot = int(max_expansions_per_robot)
         self.last_failure_reason = None
+        self.last_expanded_nodes = 0
+        self.last_orders_evaluated = 0
         self._static_heuristic_cache = {}
+        self._vertex_conflict_offsets = self._build_vertex_conflict_offsets()
 
     def plan(self, agents: Dict[int, Tuple[Tuple[float, float],
                                            Tuple[float, float]]],
              *, max_seconds: float = 0.20,
+             max_expansions: Optional[int] = None,
              priority_order: Optional[Tuple[int, ...]] = None
              ) -> Optional[JointGridPlan]:
         started = time.perf_counter()
         self.last_failure_reason = None
+        self.last_expanded_nodes = 0
+        self.last_orders_evaluated = 0
         if not agents:
             return JointGridPlan({}, 0.0, (), 0, self.time_slot_seconds)
+        expansion_budget = (None if max_expansions is None else
+                            max(1, int(max_expansions)))
         ids = tuple(sorted(agents))
         base_order = ids
         if priority_order is not None:
@@ -88,9 +96,17 @@ class JointGridPlanner:
             if time.perf_counter() - started >= max_seconds:
                 self.last_failure_reason = "timeout"
                 break
+            if (expansion_budget is not None and
+                    total_expanded >= expansion_budget):
+                self.last_failure_reason = "expansion_budget"
+                break
+            remaining_expansions = (None if expansion_budget is None else
+                                    expansion_budget - total_expanded)
+            self.last_orders_evaluated += 1
             candidate, expanded = self._plan_order(
-                order, agents, started, max_seconds)
+                order, agents, started, max_seconds, remaining_expansions)
             total_expanded += expanded
+            self.last_expanded_nodes = total_expanded
             if candidate is None:
                 continue
             candidate_plan = JointGridPlan(
@@ -105,12 +121,20 @@ class JointGridPlanner:
             self.last_failure_reason = "no_solution"
         return None
 
-    def _plan_order(self, order, agents, started, max_seconds):
+    def _plan_order(self, order, agents, started, max_seconds,
+                    max_expansions=None):
         vertex: Dict[Tuple[Cell, int], int] = {}
         edges: Dict[int, List[Tuple[Cell, Cell, int]]] = {}
         result: Dict[int, List[TimedCell]] = {}
         expanded_total = 0
         for rid in order:
+            remaining_expansions = (
+                None if max_expansions is None
+                else max_expansions - expanded_total)
+            if (remaining_expansions is not None and
+                    remaining_expansions <= 0):
+                self.last_failure_reason = "expansion_budget"
+                return None, expanded_total
             start_xy, goal_xy = agents[rid]
             start = self.grid.world_to_grid(*start_xy)
             goal = self.grid.world_to_grid(*goal_xy)
@@ -124,7 +148,7 @@ class JointGridPlanner:
                 self._static_heuristic_cache[goal] = static_dist
             path, expanded = self._space_time_astar(
                 rid, start, goal, endpoint_cells, static_dist, vertex, edges,
-                started, max_seconds)
+                started, max_seconds, remaining_expansions)
             expanded_total += expanded
             if path is None:
                 return None, expanded_total
@@ -134,7 +158,8 @@ class JointGridPlanner:
         return result, expanded_total
 
     def _space_time_astar(self, rid, start, goal, endpoint_cells, static_dist,
-                          vertex, edges, started, max_seconds):
+                          vertex, edges, started, max_seconds,
+                          max_expansions=None):
         start_state = (start, 0)
         queue = [(self._heuristic_for(start, goal, static_dist),
                   0, 0.0, start_state)]
@@ -143,12 +168,17 @@ class JointGridPlanner:
         sequence = 0
         expanded = 0
         while queue:
-            if (expanded >= self.max_expansions_per_robot or
+            if ((max_expansions is not None and
+                 expanded >= max_expansions) or
+                    expanded >= self.max_expansions_per_robot or
                     time.perf_counter() - started >= max_seconds):
-                self.last_failure_reason = (
-                    "expansion_limit"
-                    if expanded >= self.max_expansions_per_robot
-                    else "timeout")
+                if (max_expansions is not None and
+                        expanded >= max_expansions):
+                    self.last_failure_reason = "expansion_budget"
+                elif expanded >= self.max_expansions_per_robot:
+                    self.last_failure_reason = "expansion_limit"
+                else:
+                    self.last_failure_reason = "timeout"
                 return None, expanded
             _, _, queued_g, (cell, slot) = heapq.heappop(queue)
             if queued_g != g_score.get((cell, slot)):
@@ -257,16 +287,30 @@ class JointGridPlanner:
                            first_xy[1] - second_xy[1]) <=
                 self.minimum_distance_m)
 
-    def _vertex_conflict(self, cell, slot, rid, vertex):
+    def _build_vertex_conflict_offsets(self):
+        """Precompute the translation-invariant safety footprint.
+
+        The occupancy grid has a fixed linear world transform, so whether two
+        cells violate the configured separation depends only on their offset.
+        Building this mask once preserves ``_cells_conflict`` semantics while
+        avoiding a full square scan and repeated world conversions at every
+        A* successor.
+        """
         radius = self._conflict_radius_cells()
-        for dc in range(-radius, radius + 1):
-            for dr in range(-radius, radius + 1):
-                neighbour = (cell[0] + dc, cell[1] + dr)
-                owner = vertex.get((neighbour, slot))
-                if owner is None or owner == rid:
-                    continue
-                if self._cells_conflict(cell, neighbour):
-                    return True
+        origin = (0, 0)
+        return tuple(
+            (dc, dr)
+            for dc in range(-radius, radius + 1)
+            for dr in range(-radius, radius + 1)
+            if self._cells_conflict(origin, (dc, dr))
+        )
+
+    def _vertex_conflict(self, cell, slot, rid, vertex):
+        for dc, dr in self._vertex_conflict_offsets:
+            neighbour = (cell[0] + dc, cell[1] + dr)
+            owner = vertex.get((neighbour, slot))
+            if owner is not None and owner != rid:
+                return True
         return False
 
     def _edge_conflict(self, first, second, slot, rid, edges):
